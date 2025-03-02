@@ -3,11 +3,17 @@ import '../index.css'
 import { useState } from 'react'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { createRootRoute, Link, Outlet } from '@tanstack/react-router'
+import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/router-devtools'
 import { ThemeProvider } from '@/components/theme-provider'
+import { Toaster } from 'react-hot-toast'
+import type { AuthState } from '@/types/auth'
+interface MyRouterContext {
+  // The ReturnType of your useAuth hook or the value of your AuthContext
+  auth: AuthState | null
+}
 
-export const Route = createRootRoute({
+export const Route = createRootRouteWithContext<MyRouterContext>()({
   component: () => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const [queryClient] = useState(
@@ -38,6 +44,7 @@ export const Route = createRootRoute({
         <QueryClientProvider client={queryClient}>
           <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
             <Outlet />
+            <Toaster position="bottom-right" reverseOrder={true} />
           </ThemeProvider>
         </QueryClientProvider>
         <TanStackRouterDevtools />

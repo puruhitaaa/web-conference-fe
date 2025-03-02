@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Link } from "@tanstack/react-router"
+import { Link, redirect } from "@tanstack/react-router"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -20,6 +20,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import axios from 'axios'
+import useSignIn from 'react-auth-kit/hooks/useSignIn';
+import toast from "react-hot-toast"
+import { authRoutes } from "@/api"
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -37,9 +41,27 @@ export function LoginForm({
       password: "",
     },
   })
+  const signIn = useSignIn()
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
+    axios.post(authRoutes.login, values)
+            .then((res) => {
+                if(res.status === 200){
+                    if(signIn({
+                        auth: {
+                            token: res.data.token,
+                            type: 'Bearer'
+                        },
+                        refresh: res.data.refreshToken
+                        // userState: res.data.authUserState
+                    })){ // Only if you are using refreshToken feature
+                        toast.success('Login successful')
+                        redirect({ to: "/" })
+                    } else {
+                        toast.error('Login failed')
+                    }
+                }
+            })
   }
 
   return (

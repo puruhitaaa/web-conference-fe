@@ -14,34 +14,22 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as TableImport } from './routes/table'
+import { Route as RegisterImport } from './routes/register'
+import { Route as LoginImport } from './routes/login'
+import { Route as IndexImport } from './routes/index'
 
 // Create Virtual Routes
 
-const RegisterLazyImport = createFileRoute('/register')()
 const QueryLazyImport = createFileRoute('/query')()
-const LoginLazyImport = createFileRoute('/login')()
 const FormLazyImport = createFileRoute('/form')()
-const IndexLazyImport = createFileRoute('/')()
 
 // Create/Update Routes
-
-const RegisterLazyRoute = RegisterLazyImport.update({
-  id: '/register',
-  path: '/register',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/register.lazy').then((d) => d.Route))
 
 const QueryLazyRoute = QueryLazyImport.update({
   id: '/query',
   path: '/query',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/query.lazy').then((d) => d.Route))
-
-const LoginLazyRoute = LoginLazyImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/login.lazy').then((d) => d.Route))
 
 const FormLazyRoute = FormLazyImport.update({
   id: '/form',
@@ -55,11 +43,23 @@ const TableRoute = TableImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const IndexLazyRoute = IndexLazyImport.update({
+const RegisterRoute = RegisterImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const LoginRoute = LoginImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+} as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -69,7 +69,21 @@ declare module '@tanstack/react-router' {
       id: '/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexLazyImport
+      preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginImport
+      parentRoute: typeof rootRoute
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterImport
       parentRoute: typeof rootRoute
     }
     '/table': {
@@ -86,25 +100,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FormLazyImport
       parentRoute: typeof rootRoute
     }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginLazyImport
-      parentRoute: typeof rootRoute
-    }
     '/query': {
       id: '/query'
       path: '/query'
       fullPath: '/query'
       preLoaderRoute: typeof QueryLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/register': {
-      id: '/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof RegisterLazyImport
       parentRoute: typeof rootRoute
     }
   }
@@ -113,58 +113,58 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexLazyRoute
+  '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
   '/table': typeof TableRoute
   '/form': typeof FormLazyRoute
-  '/login': typeof LoginLazyRoute
   '/query': typeof QueryLazyRoute
-  '/register': typeof RegisterLazyRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexLazyRoute
+  '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
   '/table': typeof TableRoute
   '/form': typeof FormLazyRoute
-  '/login': typeof LoginLazyRoute
   '/query': typeof QueryLazyRoute
-  '/register': typeof RegisterLazyRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof IndexLazyRoute
+  '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
   '/table': typeof TableRoute
   '/form': typeof FormLazyRoute
-  '/login': typeof LoginLazyRoute
   '/query': typeof QueryLazyRoute
-  '/register': typeof RegisterLazyRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/table' | '/form' | '/login' | '/query' | '/register'
+  fullPaths: '/' | '/login' | '/register' | '/table' | '/form' | '/query'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/table' | '/form' | '/login' | '/query' | '/register'
-  id: '__root__' | '/' | '/table' | '/form' | '/login' | '/query' | '/register'
+  to: '/' | '/login' | '/register' | '/table' | '/form' | '/query'
+  id: '__root__' | '/' | '/login' | '/register' | '/table' | '/form' | '/query'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexLazyRoute: typeof IndexLazyRoute
+  IndexRoute: typeof IndexRoute
+  LoginRoute: typeof LoginRoute
+  RegisterRoute: typeof RegisterRoute
   TableRoute: typeof TableRoute
   FormLazyRoute: typeof FormLazyRoute
-  LoginLazyRoute: typeof LoginLazyRoute
   QueryLazyRoute: typeof QueryLazyRoute
-  RegisterLazyRoute: typeof RegisterLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexLazyRoute: IndexLazyRoute,
+  IndexRoute: IndexRoute,
+  LoginRoute: LoginRoute,
+  RegisterRoute: RegisterRoute,
   TableRoute: TableRoute,
   FormLazyRoute: FormLazyRoute,
-  LoginLazyRoute: LoginLazyRoute,
   QueryLazyRoute: QueryLazyRoute,
-  RegisterLazyRoute: RegisterLazyRoute,
 }
 
 export const routeTree = rootRoute
@@ -178,15 +178,21 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/login",
+        "/register",
         "/table",
         "/form",
-        "/login",
-        "/query",
-        "/register"
+        "/query"
       ]
     },
     "/": {
-      "filePath": "index.lazy.tsx"
+      "filePath": "index.tsx"
+    },
+    "/login": {
+      "filePath": "login.tsx"
+    },
+    "/register": {
+      "filePath": "register.tsx"
     },
     "/table": {
       "filePath": "table.tsx"
@@ -194,14 +200,8 @@ export const routeTree = rootRoute
     "/form": {
       "filePath": "form.lazy.tsx"
     },
-    "/login": {
-      "filePath": "login.lazy.tsx"
-    },
     "/query": {
       "filePath": "query.lazy.tsx"
-    },
-    "/register": {
-      "filePath": "register.lazy.tsx"
     }
   }
 }
