@@ -1,0 +1,40 @@
+{
+  "users": [
+    {
+      "email": "test@mail.com",
+      "password": "$2a$10$ls6XrT1zmgFcInBuTeFtuujyAYVwL1UNHF2sTbPOd0kMqoVCSpy3K",
+      "id": 1
+    },
+    {
+      "email": "test1@mail.com",
+      "password": "$2a$10$2mGRDmk0HacmlVQARQEWfOjAyHn6m/1JgTJM8fy9mzPlT9lr82/kK",
+      "id": 2
+    }
+  ],
+  "papers": [
+    {
+      "id": 1,
+      "paperId": "PP-1",
+      "authorName": "John Doe",
+      "conferenceTitle": "Test 1",
+      "paperTitle": "Paper 1",
+      "userId": "1",
+      "conferenceType": "ICIGSA",
+      "status": "pending"
+    },
+    {
+      "id": 2,
+      "paperId": "PP-2",
+      "authorName": "Jane Doe",
+      "conferenceTitle": "Test 2",
+      "paperTitle": "Paper 2",
+      "userId": "2",
+      "conferenceType": "ICIKTA",
+      "status": "pending"
+    }
+  ],
+  "loas": [],
+  "invoices": [],
+  "receipts": [],
+  "payments": []
+}

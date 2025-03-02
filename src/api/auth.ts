@@ -1,6 +1,8 @@
+import { apiConfig } from "./config";
+
 export const authRoutes = {
-    login: '/api/login',
-    register: '/api/register',
-    logout: '/api/logout',
-    refresh: '/api/refresh',
+    login: `${apiConfig.baseUrl}/login`,
+    register: `${apiConfig.baseUrl}/register`,
+    logout: `${apiConfig.baseUrl}/logout`,
+    refresh: `${apiConfig.baseUrl}/refresh`,
 }

@@ -1,17 +1,17 @@
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Link } from "@tanstack/react-router"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Link, redirect } from "@tanstack/react-router";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import {
   Form,
   FormControl,
@@ -19,16 +19,21 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
+} from "@/components/ui/form";
+import axios from "axios";
+import { authRoutes } from "@/api";
+import toast from "react-hot-toast";
 
-const formSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  confirmPassword: z.string()
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-})
+const formSchema = z
+  .object({
+    email: z.string().email("Please enter a valid email address"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
 export function RegisterForm({
   className,
@@ -41,10 +46,14 @@ export function RegisterForm({
       password: "",
       confirmPassword: "",
     },
-  })
+  });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
+    const { email, password } = formSchema.parse(values);
+    axios.post(authRoutes.register, { email, password }).then(() => {
+      toast.success("Registration successful");
+      redirect({ to: "/login" });
+    });
   }
 
   return (
@@ -58,7 +67,10 @@ export function RegisterForm({
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="flex flex-col gap-6"
+            >
               <FormField
                 control={form.control}
                 name="email"
@@ -116,5 +128,5 @@ export function RegisterForm({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

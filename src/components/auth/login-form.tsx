@@ -1,17 +1,17 @@
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Link, redirect } from "@tanstack/react-router"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Link, redirect } from "@tanstack/react-router";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import {
   Form,
   FormControl,
@@ -19,16 +19,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import axios from 'axios'
-import useSignIn from 'react-auth-kit/hooks/useSignIn';
-import toast from "react-hot-toast"
-import { authRoutes } from "@/api"
+} from "@/components/ui/form";
+import axios from "axios";
+import useSignIn from "react-auth-kit/hooks/useSignIn";
+import toast from "react-hot-toast";
+import { authRoutes } from "@/api";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
-})
+});
 
 export function LoginForm({
   className,
@@ -40,28 +40,30 @@ export function LoginForm({
       email: "",
       password: "",
     },
-  })
-  const signIn = useSignIn()
+  });
+  const signIn = useSignIn();
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    axios.post(authRoutes.login, values)
-            .then((res) => {
-                if(res.status === 200){
-                    if(signIn({
-                        auth: {
-                            token: res.data.token,
-                            type: 'Bearer'
-                        },
-                        refresh: res.data.refreshToken
-                        // userState: res.data.authUserState
-                    })){ // Only if you are using refreshToken feature
-                        toast.success('Login successful')
-                        redirect({ to: "/" })
-                    } else {
-                        toast.error('Login failed')
-                    }
-                }
-            })
+    axios.post(authRoutes.login, values).then((res) => {
+      if (res.status === 200) {
+        if (
+          signIn({
+            auth: {
+              token: res.data.accessToken,
+              type: "Bearer",
+            },
+            refresh: res.data.refreshToken,
+            // userState: res.data.authUserState
+          })
+        ) {
+          // Only if you are using refreshToken feature
+          toast.success("Login successful");
+          redirect({ to: "/" });
+        } else {
+          toast.error("Login failed");
+        }
+      }
+    });
   }
 
   return (
@@ -75,7 +77,10 @@ export function LoginForm({
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="flex flex-col gap-6"
+            >
               <FormField
                 control={form.control}
                 name="email"
@@ -128,5 +133,5 @@ export function LoginForm({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
