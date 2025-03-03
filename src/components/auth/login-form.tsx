@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Link, redirect } from "@tanstack/react-router";
+import { Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -42,6 +42,7 @@ export function LoginForm({
     },
   });
   const signIn = useSignIn();
+  const navigate = useNavigate({ from: "/login" });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     axios.post(authRoutes.login, values).then((res) => {
@@ -52,13 +53,19 @@ export function LoginForm({
               token: res.data.accessToken,
               type: "Bearer",
             },
-            refresh: res.data.refreshToken,
-            // userState: res.data.authUserState
+            userState: {
+              id: res.data.id,
+              email: res.data.email,
+            },
+            // refresh: res.data.refreshToken,
           })
         ) {
           // Only if you are using refreshToken feature
           toast.success("Login successful");
-          redirect({ to: "/" });
+          navigate({
+            to: "/",
+            replace: true,
+          });
         } else {
           toast.error("Login failed");
         }

@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Link, redirect } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -47,12 +47,16 @@ export function RegisterForm({
       confirmPassword: "",
     },
   });
+  const navigate = useNavigate({ from: "/register" });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     const { email, password } = formSchema.parse(values);
     axios.post(authRoutes.register, { email, password }).then(() => {
       toast.success("Registration successful");
-      redirect({ to: "/login" });
+      navigate({
+        to: "/login",
+        replace: true,
+      });
     });
   }
 

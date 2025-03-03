@@ -1,23 +1,22 @@
-import { LoginForm } from '@/components/auth/login-form'
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { LoginForm } from "@/components/auth/login-form";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/login')({
+export const Route = createFileRoute("/login")({
   beforeLoad: ({ context, search }) => {
-    console.log(search)
     if (context?.auth) {
       // TODO: Redirect to the previous page
       throw redirect({
-        to: '/',
-      })
+        to: "/",
+      });
     }
   },
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
   return (
-    <div className='min-h-screen flex items-center justify-center'>
+    <div className="min-h-screen flex items-center justify-center">
       <LoginForm />
     </div>
-  )
+  );
 }
