@@ -1,17 +1,17 @@
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Link, useNavigate, useRouter } from "@tanstack/react-router";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Link, useNavigate } from "@tanstack/react-router"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
 import {
   Form,
   FormControl,
@@ -19,16 +19,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import axios from "axios";
-import useSignIn from "react-auth-kit/hooks/useSignIn";
-import toast from "react-hot-toast";
-import { authRoutes } from "@/api";
+} from "@/components/ui/form"
+import axios from "axios"
+import useSignIn from "react-auth-kit/hooks/useSignIn"
+import toast from "react-hot-toast"
+import { authRoutes } from "@/api"
+import { useMutation } from "@tanstack/react-query"
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
-});
+})
 
 export function LoginForm({
   className,
@@ -40,12 +41,14 @@ export function LoginForm({
       email: "",
       password: "",
     },
-  });
-  const signIn = useSignIn();
-  const navigate = useNavigate({ from: "/login" });
+  })
+  const signIn = useSignIn()
+  const navigate = useNavigate({ from: "/login" })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    axios.post(authRoutes.login, values).then((res) => {
+  const loginMutation = useMutation({
+    mutationFn: (values: z.infer<typeof formSchema>) =>
+      axios.post(authRoutes.login, values),
+    onSuccess: (res) => {
       if (res.status === 200) {
         if (
           signIn({
@@ -53,29 +56,32 @@ export function LoginForm({
               token: res.data.accessToken,
               type: "Bearer",
             },
-            userState: {
-              id: res.data.id,
-              email: res.data.email,
-            },
-            // refresh: res.data.refreshToken,
+            userState: res.data.authUserState,
           })
         ) {
-          // Only if you are using refreshToken feature
-          toast.success("Login successful");
+          toast.success("Login successful")
           navigate({
             to: "/",
+            ignoreBlocker: true,
             replace: true,
-          });
+          })
         } else {
-          toast.error("Login failed");
+          toast.error("Login failed")
         }
       }
-    });
+    },
+    onError: () => {
+      toast.error("Login failed")
+    },
+  })
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    loginMutation.mutate(values)
   }
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card className="md:min-w-lg w-full md:w-[initial]">
+      <Card className='md:min-w-lg w-full md:w-[initial]'>
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>
           <CardDescription>
@@ -86,18 +92,18 @@ export function LoginForm({
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="flex flex-col gap-6"
+              className='flex flex-col gap-6'
             >
               <FormField
                 control={form.control}
-                name="email"
+                name='email'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="m@example.com"
-                        type="email"
+                        placeholder='m@example.com'
+                        type='email'
                         {...field}
                       />
                     </FormControl>
@@ -107,31 +113,31 @@ export function LoginForm({
               />
               <FormField
                 control={form.control}
-                name="password"
+                name='password'
                 render={({ field }) => (
                   <FormItem>
-                    <div className="flex items-center">
+                    <div className='flex items-center'>
                       <FormLabel>Password</FormLabel>
                       <a
-                        href="#"
-                        className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                        href='#'
+                        className='ml-auto inline-block text-sm underline-offset-4 hover:underline'
                       >
                         Forgot your password?
                       </a>
                     </div>
                     <FormControl>
-                      <Input type="password" {...field} />
+                      <Input type='password' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
+              <Button type='submit' className='w-full'>
                 Login
               </Button>
-              <div className="text-center text-sm">
+              <div className='text-center text-sm'>
                 Don&apos;t have an account?{" "}
-                <Link to="/register" className="underline underline-offset-4">
+                <Link to='/register' className='underline underline-offset-4'>
                   Sign up
                 </Link>
               </div>
@@ -140,5 +146,5 @@ export function LoginForm({
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

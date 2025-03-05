@@ -14,9 +14,11 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as TableImport } from './routes/table'
-import { Route as RegisterImport } from './routes/register'
-import { Route as LoginImport } from './routes/login'
-import { Route as IndexImport } from './routes/index'
+import { Route as AuthImport } from './routes/_auth'
+import { Route as AppImport } from './routes/_app'
+import { Route as AppIndexImport } from './routes/_app/index'
+import { Route as AuthRegisterImport } from './routes/_auth/register'
+import { Route as AuthLoginImport } from './routes/_auth/login'
 
 // Create Virtual Routes
 
@@ -43,47 +45,50 @@ const TableRoute = TableImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const RegisterRoute = RegisterImport.update({
-  id: '/register',
-  path: '/register',
+const AuthRoute = AuthImport.update({
+  id: '/_auth',
   getParentRoute: () => rootRoute,
 } as any)
 
-const LoginRoute = LoginImport.update({
-  id: '/login',
-  path: '/login',
+const AppRoute = AppImport.update({
+  id: '/_app',
   getParentRoute: () => rootRoute,
 } as any)
 
-const IndexRoute = IndexImport.update({
+const AppIndexRoute = AppIndexImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => AppRoute,
+} as any)
+
+const AuthRegisterRoute = AuthRegisterImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => AuthRoute,
+} as any)
+
+const AuthLoginRoute = AuthLoginImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AuthRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AppImport
       parentRoute: typeof rootRoute
     }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginImport
-      parentRoute: typeof rootRoute
-    }
-    '/register': {
-      id: '/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof RegisterImport
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthImport
       parentRoute: typeof rootRoute
     }
     '/table': {
@@ -107,61 +112,115 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof QueryLazyImport
       parentRoute: typeof rootRoute
     }
+    '/_auth/login': {
+      id: '/_auth/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof AuthLoginImport
+      parentRoute: typeof AuthImport
+    }
+    '/_auth/register': {
+      id: '/_auth/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof AuthRegisterImport
+      parentRoute: typeof AuthImport
+    }
+    '/_app/': {
+      id: '/_app/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AppIndexImport
+      parentRoute: typeof AppImport
+    }
   }
 }
 
 // Create and export the route tree
 
+interface AppRouteChildren {
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
+interface AuthRouteChildren {
+  AuthLoginRoute: typeof AuthLoginRoute
+  AuthRegisterRoute: typeof AuthRegisterRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthLoginRoute: AuthLoginRoute,
+  AuthRegisterRoute: AuthRegisterRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/register': typeof RegisterRoute
+  '': typeof AuthRouteWithChildren
   '/table': typeof TableRoute
   '/form': typeof FormLazyRoute
   '/query': typeof QueryLazyRoute
+  '/login': typeof AuthLoginRoute
+  '/register': typeof AuthRegisterRoute
+  '/': typeof AppIndexRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/register': typeof RegisterRoute
+  '': typeof AuthRouteWithChildren
   '/table': typeof TableRoute
   '/form': typeof FormLazyRoute
   '/query': typeof QueryLazyRoute
+  '/login': typeof AuthLoginRoute
+  '/register': typeof AuthRegisterRoute
+  '/': typeof AppIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/register': typeof RegisterRoute
+  '/_app': typeof AppRouteWithChildren
+  '/_auth': typeof AuthRouteWithChildren
   '/table': typeof TableRoute
   '/form': typeof FormLazyRoute
   '/query': typeof QueryLazyRoute
+  '/_auth/login': typeof AuthLoginRoute
+  '/_auth/register': typeof AuthRegisterRoute
+  '/_app/': typeof AppIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/register' | '/table' | '/form' | '/query'
+  fullPaths: '' | '/table' | '/form' | '/query' | '/login' | '/register' | '/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/register' | '/table' | '/form' | '/query'
-  id: '__root__' | '/' | '/login' | '/register' | '/table' | '/form' | '/query'
+  to: '' | '/table' | '/form' | '/query' | '/login' | '/register' | '/'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/_auth'
+    | '/table'
+    | '/form'
+    | '/query'
+    | '/_auth/login'
+    | '/_auth/register'
+    | '/_app/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  LoginRoute: typeof LoginRoute
-  RegisterRoute: typeof RegisterRoute
+  AppRoute: typeof AppRouteWithChildren
+  AuthRoute: typeof AuthRouteWithChildren
   TableRoute: typeof TableRoute
   FormLazyRoute: typeof FormLazyRoute
   QueryLazyRoute: typeof QueryLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  LoginRoute: LoginRoute,
-  RegisterRoute: RegisterRoute,
+  AppRoute: AppRouteWithChildren,
+  AuthRoute: AuthRouteWithChildren,
   TableRoute: TableRoute,
   FormLazyRoute: FormLazyRoute,
   QueryLazyRoute: QueryLazyRoute,
@@ -177,22 +236,25 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/",
-        "/login",
-        "/register",
+        "/_app",
+        "/_auth",
         "/table",
         "/form",
         "/query"
       ]
     },
-    "/": {
-      "filePath": "index.tsx"
+    "/_app": {
+      "filePath": "_app.tsx",
+      "children": [
+        "/_app/"
+      ]
     },
-    "/login": {
-      "filePath": "login.tsx"
-    },
-    "/register": {
-      "filePath": "register.tsx"
+    "/_auth": {
+      "filePath": "_auth.tsx",
+      "children": [
+        "/_auth/login",
+        "/_auth/register"
+      ]
     },
     "/table": {
       "filePath": "table.tsx"
@@ -202,6 +264,18 @@ export const routeTree = rootRoute
     },
     "/query": {
       "filePath": "query.lazy.tsx"
+    },
+    "/_auth/login": {
+      "filePath": "_auth/login.tsx",
+      "parent": "/_auth"
+    },
+    "/_auth/register": {
+      "filePath": "_auth/register.tsx",
+      "parent": "/_auth"
+    },
+    "/_app/": {
+      "filePath": "_app/index.tsx",
+      "parent": "/_app"
     }
   }
 }

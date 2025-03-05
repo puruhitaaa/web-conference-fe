@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import {
   BadgeCheck,
@@ -7,7 +7,7 @@ import {
   CreditCard,
   LogOut,
   Sparkles,
-} from "lucide-react";
+} from "lucide-react"
 
 import {
   DropdownMenu,
@@ -17,36 +17,29 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu"
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar";
-import useSignOut from "react-auth-kit/hooks/useSignOut";
-import { useNavigate } from "@tanstack/react-router";
+} from "@/components/ui/sidebar"
+import useSignOut from "react-auth-kit/hooks/useSignOut"
+import { useNavigate } from "@tanstack/react-router"
+import type { User } from "@/types/auth"
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string;
-    email: string;
-    avatar: string;
-  };
-}) {
-  const signOut = useSignOut();
-  const { isMobile } = useSidebar();
-  const navigate = useNavigate({ from: "/" });
+export function NavUser({ user }: { user: User }) {
+  const signOut = useSignOut()
+  const { isMobile } = useSidebar()
+  const navigate = useNavigate({ from: "/" })
 
   const handleLogout = () => {
-    signOut();
+    signOut()
     navigate({
       to: "/login",
       replace: true,
-    });
-  };
+    })
+  }
 
   return (
     <SidebarMenu>
@@ -54,27 +47,27 @@ export function NavUser({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              size='lg'
+              className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
             >
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+              <div className='grid flex-1 text-left text-sm leading-tight'>
+                <span className='truncate font-medium'>{user.name}</span>
+                <span className='truncate text-xs'>{user.email}</span>
               </div>
-              <ChevronsUpDown className="ml-auto size-4" />
+              <ChevronsUpDown className='ml-auto size-4' />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            className='w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg'
             side={isMobile ? "bottom" : "right"}
-            align="end"
+            align='end'
             sideOffset={4}
           >
-            <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+            <DropdownMenuLabel className='p-0 font-normal'>
+              <div className='flex items-center gap-2 px-1 py-1.5 text-left text-sm'>
+                <div className='grid flex-1 text-left text-sm leading-tight'>
+                  <span className='truncate font-medium'>{user.name}</span>
+                  <span className='truncate text-xs'>{user.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
@@ -109,5 +102,5 @@ export function NavUser({
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  );
+  )
 }

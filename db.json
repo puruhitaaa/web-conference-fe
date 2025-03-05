@@ -2,13 +2,9 @@
   "users": [
     {
       "email": "test@mail.com",
-      "password": "$2a$10$ls6XrT1zmgFcInBuTeFtuujyAYVwL1UNHF2sTbPOd0kMqoVCSpy3K",
+      "password": "$2a$10$hLKPkMiLNjyu2UDFUj3.7uoiIBj6UL9EMIYhPL7mJAywqGUe2wMOe",
+      "name": "Test User",
       "id": 1
-    },
-    {
-      "email": "test1@mail.com",
-      "password": "$2a$10$2mGRDmk0HacmlVQARQEWfOjAyHn6m/1JgTJM8fy9mzPlT9lr82/kK",
-      "id": 2
     }
   ],
   "papers": [
