@@ -8,9 +8,11 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import useAuthUser from "react-auth-kit/hooks/useAuthUser"
 import type { User } from "@/types/auth"
+import { Logo } from "@/components/ui/logo"
 
 const data = {
   navMain: [
@@ -66,6 +68,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar variant='inset' collapsible='icon' {...props}>
       <SidebarContent>
+        <div className='px-4 py-4'>
+          <Logo className='mx-auto' />
+        </div>
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>

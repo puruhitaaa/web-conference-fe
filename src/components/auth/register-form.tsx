@@ -24,6 +24,7 @@ import axios from "axios"
 import { authRoutes } from "@/api"
 import toast from "react-hot-toast"
 import { useMutation } from "@tanstack/react-query"
+import { Logo } from "../ui/logo"
 
 const formSchema = z
   .object({
@@ -74,7 +75,11 @@ export function RegisterForm({
   }
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div
+      className={cn("flex flex-col gap-6 w-full max-w-lg", className)}
+      {...props}
+    >
+      <Logo className='mx-auto' />
       <Card className='md:min-w-lg w-full md:w-[initial]'>
         <CardHeader>
           <CardTitle>Register to your account</CardTitle>

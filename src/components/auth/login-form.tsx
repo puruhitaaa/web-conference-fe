@@ -25,6 +25,7 @@ import useSignIn from "react-auth-kit/hooks/useSignIn"
 import toast from "react-hot-toast"
 import { authRoutes } from "@/api"
 import { useMutation } from "@tanstack/react-query"
+import { Logo } from "../ui/logo"
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -80,7 +81,11 @@ export function LoginForm({
   }
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div
+      className={cn("flex flex-col gap-6 w-full max-w-lg", className)}
+      {...props}
+    >
+      <Logo className='mx-auto' />
       <Card className='md:min-w-lg w-full md:w-[initial]'>
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>

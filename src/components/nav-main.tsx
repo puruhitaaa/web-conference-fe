@@ -16,7 +16,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar"
-import { useLocation } from "@tanstack/react-router"
+import { Link, useLocation } from "@tanstack/react-router"
 
 export function NavMain({
   items,
@@ -75,9 +75,9 @@ export function NavMain({
                           asChild
                           isActive={location.pathname === subItem.url}
                         >
-                          <a href={subItem.url}>
+                          <Link to={subItem.url}>
                             <span>{subItem.title}</span>
-                          </a>
+                          </Link>
                         </SidebarMenuSubButton>
                       </SidebarMenuSubItem>
                     ))}
@@ -90,9 +90,12 @@ export function NavMain({
               <SidebarMenuButton
                 isActive={location.pathname === item.url}
                 tooltip={item.title}
+                asChild
               >
-                {item.icon && <item.icon />}
-                <a href={item.url}>{item.title}</a>
+                <Link to={item.url}>
+                  {item.icon && <item.icon />}
+                  {item.title}
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           )

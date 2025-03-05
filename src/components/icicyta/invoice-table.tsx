@@ -132,11 +132,13 @@ export function InvoiceTable() {
       header: "Total",
       cell: ({ row }) => {
         const amount = parseFloat(row.getValue("total"))
-        const formatted = new Intl.NumberFormat("en-US", {
+        const formatted = new Intl.NumberFormat("id-ID", {
           style: "currency",
-          currency: "USD",
+          currency: "IDR",
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
         }).format(amount)
-        return <div className='text-right font-medium'>{formatted}</div>
+        return <div className='font-medium'>{formatted}</div>
       },
     },
     {
