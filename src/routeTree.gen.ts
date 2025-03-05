@@ -19,6 +19,9 @@ import { Route as AppImport } from './routes/_app'
 import { Route as AppIndexImport } from './routes/_app/index'
 import { Route as AuthRegisterImport } from './routes/_auth/register'
 import { Route as AuthLoginImport } from './routes/_auth/login'
+import { Route as AppIcodsaReceiptImport } from './routes/_app/icodsa/receipt'
+import { Route as AppIcodsaLoaImport } from './routes/_app/icodsa/loa'
+import { Route as AppIcodsaInvoiceImport } from './routes/_app/icodsa/invoice'
 
 // Create Virtual Routes
 
@@ -71,6 +74,24 @@ const AuthLoginRoute = AuthLoginImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => AuthRoute,
+} as any)
+
+const AppIcodsaReceiptRoute = AppIcodsaReceiptImport.update({
+  id: '/icodsa/receipt',
+  path: '/icodsa/receipt',
+  getParentRoute: () => AppRoute,
+} as any)
+
+const AppIcodsaLoaRoute = AppIcodsaLoaImport.update({
+  id: '/icodsa/loa',
+  path: '/icodsa/loa',
+  getParentRoute: () => AppRoute,
+} as any)
+
+const AppIcodsaInvoiceRoute = AppIcodsaInvoiceImport.update({
+  id: '/icodsa/invoice',
+  path: '/icodsa/invoice',
+  getParentRoute: () => AppRoute,
 } as any)
 
 // Populate the FileRoutesByPath interface
@@ -133,6 +154,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexImport
       parentRoute: typeof AppImport
     }
+    '/_app/icodsa/invoice': {
+      id: '/_app/icodsa/invoice'
+      path: '/icodsa/invoice'
+      fullPath: '/icodsa/invoice'
+      preLoaderRoute: typeof AppIcodsaInvoiceImport
+      parentRoute: typeof AppImport
+    }
+    '/_app/icodsa/loa': {
+      id: '/_app/icodsa/loa'
+      path: '/icodsa/loa'
+      fullPath: '/icodsa/loa'
+      preLoaderRoute: typeof AppIcodsaLoaImport
+      parentRoute: typeof AppImport
+    }
+    '/_app/icodsa/receipt': {
+      id: '/_app/icodsa/receipt'
+      path: '/icodsa/receipt'
+      fullPath: '/icodsa/receipt'
+      preLoaderRoute: typeof AppIcodsaReceiptImport
+      parentRoute: typeof AppImport
+    }
   }
 }
 
@@ -140,10 +182,16 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
+  AppIcodsaInvoiceRoute: typeof AppIcodsaInvoiceRoute
+  AppIcodsaLoaRoute: typeof AppIcodsaLoaRoute
+  AppIcodsaReceiptRoute: typeof AppIcodsaReceiptRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
+  AppIcodsaInvoiceRoute: AppIcodsaInvoiceRoute,
+  AppIcodsaLoaRoute: AppIcodsaLoaRoute,
+  AppIcodsaReceiptRoute: AppIcodsaReceiptRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -168,6 +216,9 @@ export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/': typeof AppIndexRoute
+  '/icodsa/invoice': typeof AppIcodsaInvoiceRoute
+  '/icodsa/loa': typeof AppIcodsaLoaRoute
+  '/icodsa/receipt': typeof AppIcodsaReceiptRoute
 }
 
 export interface FileRoutesByTo {
@@ -178,6 +229,9 @@ export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/': typeof AppIndexRoute
+  '/icodsa/invoice': typeof AppIcodsaInvoiceRoute
+  '/icodsa/loa': typeof AppIcodsaLoaRoute
+  '/icodsa/receipt': typeof AppIcodsaReceiptRoute
 }
 
 export interface FileRoutesById {
@@ -190,13 +244,36 @@ export interface FileRoutesById {
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
   '/_app/': typeof AppIndexRoute
+  '/_app/icodsa/invoice': typeof AppIcodsaInvoiceRoute
+  '/_app/icodsa/loa': typeof AppIcodsaLoaRoute
+  '/_app/icodsa/receipt': typeof AppIcodsaReceiptRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/table' | '/form' | '/query' | '/login' | '/register' | '/'
+  fullPaths:
+    | ''
+    | '/table'
+    | '/form'
+    | '/query'
+    | '/login'
+    | '/register'
+    | '/'
+    | '/icodsa/invoice'
+    | '/icodsa/loa'
+    | '/icodsa/receipt'
   fileRoutesByTo: FileRoutesByTo
-  to: '' | '/table' | '/form' | '/query' | '/login' | '/register' | '/'
+  to:
+    | ''
+    | '/table'
+    | '/form'
+    | '/query'
+    | '/login'
+    | '/register'
+    | '/'
+    | '/icodsa/invoice'
+    | '/icodsa/loa'
+    | '/icodsa/receipt'
   id:
     | '__root__'
     | '/_app'
@@ -207,6 +284,9 @@ export interface FileRouteTypes {
     | '/_auth/login'
     | '/_auth/register'
     | '/_app/'
+    | '/_app/icodsa/invoice'
+    | '/_app/icodsa/loa'
+    | '/_app/icodsa/receipt'
   fileRoutesById: FileRoutesById
 }
 
@@ -246,7 +326,10 @@ export const routeTree = rootRoute
     "/_app": {
       "filePath": "_app.tsx",
       "children": [
-        "/_app/"
+        "/_app/",
+        "/_app/icodsa/invoice",
+        "/_app/icodsa/loa",
+        "/_app/icodsa/receipt"
       ]
     },
     "/_auth": {
@@ -275,6 +358,18 @@ export const routeTree = rootRoute
     },
     "/_app/": {
       "filePath": "_app/index.tsx",
+      "parent": "/_app"
+    },
+    "/_app/icodsa/invoice": {
+      "filePath": "_app/icodsa/invoice.tsx",
+      "parent": "/_app"
+    },
+    "/_app/icodsa/loa": {
+      "filePath": "_app/icodsa/loa.tsx",
+      "parent": "/_app"
+    },
+    "/_app/icodsa/receipt": {
+      "filePath": "_app/icodsa/receipt.tsx",
       "parent": "/_app"
     }
   }

@@ -12,7 +12,6 @@ import {
 import useAuthUser from "react-auth-kit/hooks/useAuthUser"
 import type { User } from "@/types/auth"
 
-// This is sample data.
 const data = {
   navMain: [
     {
@@ -53,8 +52,8 @@ const data = {
           url: "/icicyta/invoice",
         },
         {
-          title: "Quantum",
-          url: "#",
+          title: "Receipt",
+          url: "/icicyta/receipt",
         },
       ],
     },

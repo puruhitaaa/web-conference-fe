@@ -29,8 +29,37 @@
       "status": "pending"
     }
   ],
-  "loas": [],
-  "invoices": [],
+  "loas": [
+    {
+      "paperId": "Sint qui non nisi te",
+      "authorName": "Mannix Mays",
+      "time": "Aperiam consequatur",
+      "conferenceTitle": "Nihil temporibus dol",
+      "placeAndDate": "17-Jul-1975",
+      "status": "rejected",
+      "signature": "Adipisci et ratione ",
+      "department": "Quis aut eos ut haru",
+      "id": "821eb32b-3bc5-4ac5-ada4-7494b130aa79"
+    }
+  ],
+  "invoices": [
+    {
+      "invoiceNumber": "INV-828386",
+      "placeAndDate": "12-Apr-1980",
+      "authorName": "Tyrone Rodriguez",
+      "institution": "Quas tempore facere",
+      "email": "paleteti@mailinator.com",
+      "paperId": "Et alias exercitatio",
+      "paperTitle": "Numquam cupidatat in",
+      "description": "Magni aliqua Perspi",
+      "quantity": 612,
+      "price": 122,
+      "total": 74664,
+      "department": "Eaque aut nulla veni",
+      "signature": "Fugiat voluptatem ",
+      "id": "e312c2d1-ff86-4342-8050-2f02aca9bd97"
+    }
+  ],
   "receipts": [],
   "payments": []
 }
