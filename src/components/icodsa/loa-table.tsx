@@ -60,7 +60,7 @@ export function LoaTable() {
 
   // Fetch LoAs
   const { data: loas = [], isLoading } = useQuery<Loa[]>({
-    queryKey: ["loas"],
+    queryKey: ["icodsa-loas"],
     queryFn: async () => {
       const response = await axios.get(protectedRoutes.loas)
       return response.data
@@ -73,7 +73,7 @@ export function LoaTable() {
       await axios.delete(`${protectedRoutes.loas}/${id}`)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["loas"] })
+      queryClient.invalidateQueries({ queryKey: ["icodsa-loas"] })
       toast.success("LoA deleted successfully")
     },
     onError: () => {

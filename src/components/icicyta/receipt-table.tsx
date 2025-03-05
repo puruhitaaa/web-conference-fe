@@ -65,7 +65,7 @@ export function ReceiptTable() {
 
   // Fetch Receipts
   const { data: receipts = [], isLoading } = useQuery<Receipt[]>({
-    queryKey: ["icodsa-receipts"],
+    queryKey: ["icicyta-receipts"],
     queryFn: async () => {
       const response = await axios.get(protectedRoutes.receipts)
       return response.data
@@ -78,7 +78,7 @@ export function ReceiptTable() {
       await axios.delete(`${protectedRoutes.receipts}/${id}`)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["icodsa-receipts"] })
+      queryClient.invalidateQueries({ queryKey: ["icicyta-receipts"] })
       toast.success("Receipt deleted successfully")
     },
     onError: () => {

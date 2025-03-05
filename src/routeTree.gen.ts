@@ -8,12 +8,9 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { createFileRoute } from '@tanstack/react-router'
-
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as TableImport } from './routes/table'
 import { Route as AuthImport } from './routes/_auth'
 import { Route as AppImport } from './routes/_app'
 import { Route as AppIndexImport } from './routes/_app/index'
@@ -22,31 +19,11 @@ import { Route as AuthLoginImport } from './routes/_auth/login'
 import { Route as AppIcodsaReceiptImport } from './routes/_app/icodsa/receipt'
 import { Route as AppIcodsaLoaImport } from './routes/_app/icodsa/loa'
 import { Route as AppIcodsaInvoiceImport } from './routes/_app/icodsa/invoice'
-
-// Create Virtual Routes
-
-const QueryLazyImport = createFileRoute('/query')()
-const FormLazyImport = createFileRoute('/form')()
+import { Route as AppIcicytaReceiptImport } from './routes/_app/icicyta/receipt'
+import { Route as AppIcicytaLoaImport } from './routes/_app/icicyta/loa'
+import { Route as AppIcicytaInvoiceImport } from './routes/_app/icicyta/invoice'
 
 // Create/Update Routes
-
-const QueryLazyRoute = QueryLazyImport.update({
-  id: '/query',
-  path: '/query',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/query.lazy').then((d) => d.Route))
-
-const FormLazyRoute = FormLazyImport.update({
-  id: '/form',
-  path: '/form',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/form.lazy').then((d) => d.Route))
-
-const TableRoute = TableImport.update({
-  id: '/table',
-  path: '/table',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const AuthRoute = AuthImport.update({
   id: '/_auth',
@@ -94,6 +71,24 @@ const AppIcodsaInvoiceRoute = AppIcodsaInvoiceImport.update({
   getParentRoute: () => AppRoute,
 } as any)
 
+const AppIcicytaReceiptRoute = AppIcicytaReceiptImport.update({
+  id: '/icicyta/receipt',
+  path: '/icicyta/receipt',
+  getParentRoute: () => AppRoute,
+} as any)
+
+const AppIcicytaLoaRoute = AppIcicytaLoaImport.update({
+  id: '/icicyta/loa',
+  path: '/icicyta/loa',
+  getParentRoute: () => AppRoute,
+} as any)
+
+const AppIcicytaInvoiceRoute = AppIcicytaInvoiceImport.update({
+  id: '/icicyta/invoice',
+  path: '/icicyta/invoice',
+  getParentRoute: () => AppRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -110,27 +105,6 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: ''
       preLoaderRoute: typeof AuthImport
-      parentRoute: typeof rootRoute
-    }
-    '/table': {
-      id: '/table'
-      path: '/table'
-      fullPath: '/table'
-      preLoaderRoute: typeof TableImport
-      parentRoute: typeof rootRoute
-    }
-    '/form': {
-      id: '/form'
-      path: '/form'
-      fullPath: '/form'
-      preLoaderRoute: typeof FormLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/query': {
-      id: '/query'
-      path: '/query'
-      fullPath: '/query'
-      preLoaderRoute: typeof QueryLazyImport
       parentRoute: typeof rootRoute
     }
     '/_auth/login': {
@@ -152,6 +126,27 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AppIndexImport
+      parentRoute: typeof AppImport
+    }
+    '/_app/icicyta/invoice': {
+      id: '/_app/icicyta/invoice'
+      path: '/icicyta/invoice'
+      fullPath: '/icicyta/invoice'
+      preLoaderRoute: typeof AppIcicytaInvoiceImport
+      parentRoute: typeof AppImport
+    }
+    '/_app/icicyta/loa': {
+      id: '/_app/icicyta/loa'
+      path: '/icicyta/loa'
+      fullPath: '/icicyta/loa'
+      preLoaderRoute: typeof AppIcicytaLoaImport
+      parentRoute: typeof AppImport
+    }
+    '/_app/icicyta/receipt': {
+      id: '/_app/icicyta/receipt'
+      path: '/icicyta/receipt'
+      fullPath: '/icicyta/receipt'
+      preLoaderRoute: typeof AppIcicytaReceiptImport
       parentRoute: typeof AppImport
     }
     '/_app/icodsa/invoice': {
@@ -182,6 +177,9 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
+  AppIcicytaInvoiceRoute: typeof AppIcicytaInvoiceRoute
+  AppIcicytaLoaRoute: typeof AppIcicytaLoaRoute
+  AppIcicytaReceiptRoute: typeof AppIcicytaReceiptRoute
   AppIcodsaInvoiceRoute: typeof AppIcodsaInvoiceRoute
   AppIcodsaLoaRoute: typeof AppIcodsaLoaRoute
   AppIcodsaReceiptRoute: typeof AppIcodsaReceiptRoute
@@ -189,6 +187,9 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
+  AppIcicytaInvoiceRoute: AppIcicytaInvoiceRoute,
+  AppIcicytaLoaRoute: AppIcicytaLoaRoute,
+  AppIcicytaReceiptRoute: AppIcicytaReceiptRoute,
   AppIcodsaInvoiceRoute: AppIcodsaInvoiceRoute,
   AppIcodsaLoaRoute: AppIcodsaLoaRoute,
   AppIcodsaReceiptRoute: AppIcodsaReceiptRoute,
@@ -210,12 +211,12 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 export interface FileRoutesByFullPath {
   '': typeof AuthRouteWithChildren
-  '/table': typeof TableRoute
-  '/form': typeof FormLazyRoute
-  '/query': typeof QueryLazyRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/': typeof AppIndexRoute
+  '/icicyta/invoice': typeof AppIcicytaInvoiceRoute
+  '/icicyta/loa': typeof AppIcicytaLoaRoute
+  '/icicyta/receipt': typeof AppIcicytaReceiptRoute
   '/icodsa/invoice': typeof AppIcodsaInvoiceRoute
   '/icodsa/loa': typeof AppIcodsaLoaRoute
   '/icodsa/receipt': typeof AppIcodsaReceiptRoute
@@ -223,12 +224,12 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '': typeof AuthRouteWithChildren
-  '/table': typeof TableRoute
-  '/form': typeof FormLazyRoute
-  '/query': typeof QueryLazyRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/': typeof AppIndexRoute
+  '/icicyta/invoice': typeof AppIcicytaInvoiceRoute
+  '/icicyta/loa': typeof AppIcicytaLoaRoute
+  '/icicyta/receipt': typeof AppIcicytaReceiptRoute
   '/icodsa/invoice': typeof AppIcodsaInvoiceRoute
   '/icodsa/loa': typeof AppIcodsaLoaRoute
   '/icodsa/receipt': typeof AppIcodsaReceiptRoute
@@ -238,12 +239,12 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_app': typeof AppRouteWithChildren
   '/_auth': typeof AuthRouteWithChildren
-  '/table': typeof TableRoute
-  '/form': typeof FormLazyRoute
-  '/query': typeof QueryLazyRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
   '/_app/': typeof AppIndexRoute
+  '/_app/icicyta/invoice': typeof AppIcicytaInvoiceRoute
+  '/_app/icicyta/loa': typeof AppIcicytaLoaRoute
+  '/_app/icicyta/receipt': typeof AppIcicytaReceiptRoute
   '/_app/icodsa/invoice': typeof AppIcodsaInvoiceRoute
   '/_app/icodsa/loa': typeof AppIcodsaLoaRoute
   '/_app/icodsa/receipt': typeof AppIcodsaReceiptRoute
@@ -253,24 +254,24 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | ''
-    | '/table'
-    | '/form'
-    | '/query'
     | '/login'
     | '/register'
     | '/'
+    | '/icicyta/invoice'
+    | '/icicyta/loa'
+    | '/icicyta/receipt'
     | '/icodsa/invoice'
     | '/icodsa/loa'
     | '/icodsa/receipt'
   fileRoutesByTo: FileRoutesByTo
   to:
     | ''
-    | '/table'
-    | '/form'
-    | '/query'
     | '/login'
     | '/register'
     | '/'
+    | '/icicyta/invoice'
+    | '/icicyta/loa'
+    | '/icicyta/receipt'
     | '/icodsa/invoice'
     | '/icodsa/loa'
     | '/icodsa/receipt'
@@ -278,12 +279,12 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_app'
     | '/_auth'
-    | '/table'
-    | '/form'
-    | '/query'
     | '/_auth/login'
     | '/_auth/register'
     | '/_app/'
+    | '/_app/icicyta/invoice'
+    | '/_app/icicyta/loa'
+    | '/_app/icicyta/receipt'
     | '/_app/icodsa/invoice'
     | '/_app/icodsa/loa'
     | '/_app/icodsa/receipt'
@@ -293,17 +294,11 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
-  TableRoute: typeof TableRoute
-  FormLazyRoute: typeof FormLazyRoute
-  QueryLazyRoute: typeof QueryLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
-  TableRoute: TableRoute,
-  FormLazyRoute: FormLazyRoute,
-  QueryLazyRoute: QueryLazyRoute,
 }
 
 export const routeTree = rootRoute
@@ -317,16 +312,16 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/_app",
-        "/_auth",
-        "/table",
-        "/form",
-        "/query"
+        "/_auth"
       ]
     },
     "/_app": {
       "filePath": "_app.tsx",
       "children": [
         "/_app/",
+        "/_app/icicyta/invoice",
+        "/_app/icicyta/loa",
+        "/_app/icicyta/receipt",
         "/_app/icodsa/invoice",
         "/_app/icodsa/loa",
         "/_app/icodsa/receipt"
@@ -339,15 +334,6 @@ export const routeTree = rootRoute
         "/_auth/register"
       ]
     },
-    "/table": {
-      "filePath": "table.tsx"
-    },
-    "/form": {
-      "filePath": "form.lazy.tsx"
-    },
-    "/query": {
-      "filePath": "query.lazy.tsx"
-    },
     "/_auth/login": {
       "filePath": "_auth/login.tsx",
       "parent": "/_auth"
@@ -358,6 +344,18 @@ export const routeTree = rootRoute
     },
     "/_app/": {
       "filePath": "_app/index.tsx",
+      "parent": "/_app"
+    },
+    "/_app/icicyta/invoice": {
+      "filePath": "_app/icicyta/invoice.tsx",
+      "parent": "/_app"
+    },
+    "/_app/icicyta/loa": {
+      "filePath": "_app/icicyta/loa.tsx",
+      "parent": "/_app"
+    },
+    "/_app/icicyta/receipt": {
+      "filePath": "_app/icicyta/receipt.tsx",
       "parent": "/_app"
     },
     "/_app/icodsa/invoice": {

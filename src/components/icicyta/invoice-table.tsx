@@ -32,12 +32,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { MoreHorizontal, Plus } from "lucide-react"
-import { ReceiptDialog } from "./receipt-dialog"
+import { InvoiceDialog } from "./invoice-dialog"
 import toast from "react-hot-toast"
 
-export type Receipt = {
+export type Invoice = {
   id: string
-  receiptNumber: string
+  invoiceNumber: string
   placeAndDate: string
   authorName: string
   institution: string
@@ -45,29 +45,29 @@ export type Receipt = {
   paperId: string
   paperTitle: string
   description: string
-  amount: number
-  paymentMethod: string
-  paymentDate: string
-  status: "paid" | "pending" | "cancelled"
-  notes: string
+  quantity: number
+  price: number
+  total: number
+  department: string
+  signature: string
 }
 
-export function ReceiptTable() {
+export function InvoiceTable() {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [currentReceipt, setCurrentReceipt] = useState<Receipt | null>(null)
+  const [currentInvoice, setCurrentInvoice] = useState<Invoice | null>(null)
   const [dialogMode, setDialogMode] = useState<"create" | "edit" | "view">(
     "create"
   )
 
   const queryClient = useQueryClient()
 
-  // Fetch Receipts
-  const { data: receipts = [], isLoading } = useQuery<Receipt[]>({
-    queryKey: ["icodsa-receipts"],
+  // Fetch Invoices
+  const { data: invoices = [], isLoading } = useQuery<Invoice[]>({
+    queryKey: ["icicyta-invoices"],
     queryFn: async () => {
-      const response = await axios.get(protectedRoutes.receipts)
+      const response = await axios.get(protectedRoutes.invoices)
       return response.data
     },
   })
@@ -75,45 +75,45 @@ export function ReceiptTable() {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`${protectedRoutes.receipts}/${id}`)
+      await axios.delete(`${protectedRoutes.invoices}/${id}`)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["icodsa-receipts"] })
-      toast.success("Receipt deleted successfully")
+      queryClient.invalidateQueries({ queryKey: ["icicyta-invoices"] })
+      toast.success("Invoice deleted successfully")
     },
     onError: () => {
-      toast.error("Failed to delete receipt")
+      toast.error("Failed to delete invoice")
     },
   })
 
   const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this receipt?")) {
+    if (confirm("Are you sure you want to delete this invoice?")) {
       deleteMutation.mutate(id)
     }
   }
 
-  const handleEdit = (receipt: Receipt) => {
-    setCurrentReceipt(receipt)
+  const handleEdit = (invoice: Invoice) => {
+    setCurrentInvoice(invoice)
     setDialogMode("edit")
     setIsDialogOpen(true)
   }
 
-  const handleView = (receipt: Receipt) => {
-    setCurrentReceipt(receipt)
+  const handleView = (invoice: Invoice) => {
+    setCurrentInvoice(invoice)
     setDialogMode("view")
     setIsDialogOpen(true)
   }
 
   const handleCreate = () => {
-    setCurrentReceipt(null)
+    setCurrentInvoice(null)
     setDialogMode("create")
     setIsDialogOpen(true)
   }
 
-  const columns: ColumnDef<Receipt>[] = [
+  const columns: ColumnDef<Invoice>[] = [
     {
-      accessorKey: "receiptNumber",
-      header: "Receipt #",
+      accessorKey: "invoiceNumber",
+      header: "Invoice #",
     },
     {
       accessorKey: "authorName",
@@ -124,10 +124,14 @@ export function ReceiptTable() {
       header: "Paper ID",
     },
     {
-      accessorKey: "amount",
-      header: "Amount",
+      accessorKey: "paperTitle",
+      header: "Paper Title",
+    },
+    {
+      accessorKey: "total",
+      header: "Total",
       cell: ({ row }) => {
-        const amount = parseFloat(row.getValue("amount"))
+        const amount = parseFloat(row.getValue("total"))
         const formatted = new Intl.NumberFormat("en-US", {
           style: "currency",
           currency: "USD",
@@ -136,38 +140,14 @@ export function ReceiptTable() {
       },
     },
     {
-      accessorKey: "paymentMethod",
-      header: "Payment Method",
-    },
-    {
-      accessorKey: "status",
-      header: "Status",
-      cell: ({ row }) => {
-        const status = row.getValue("status") as string
-        return (
-          <div
-            className={`px-2 py-1 rounded-full text-xs font-medium inline-block ${
-              status === "paid"
-                ? "bg-green-100 text-green-800"
-                : status === "pending"
-                  ? "bg-yellow-100 text-yellow-800"
-                  : "bg-red-100 text-red-800"
-            }`}
-          >
-            {status}
-          </div>
-        )
-      },
-    },
-    {
-      accessorKey: "paymentDate",
-      header: "Payment Date",
+      accessorKey: "placeAndDate",
+      header: "Date",
     },
     {
       id: "actions",
       header: "Actions",
       cell: ({ row }) => {
-        const receipt = row.original
+        const invoice = row.original
 
         return (
           <DropdownMenu>
@@ -179,15 +159,15 @@ export function ReceiptTable() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end'>
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => handleView(receipt)}>
+              <DropdownMenuItem onClick={() => handleView(invoice)}>
                 View
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleEdit(receipt)}>
+              <DropdownMenuItem onClick={() => handleEdit(invoice)}>
                 Edit
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                onClick={() => handleDelete(receipt.id)}
+                onClick={() => handleDelete(invoice.id)}
                 className='text-red-600'
               >
                 Delete
@@ -200,7 +180,7 @@ export function ReceiptTable() {
   ]
 
   const table = useReactTable({
-    data: receipts,
+    data: invoices,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -228,7 +208,7 @@ export function ReceiptTable() {
           className='max-w-sm'
         />
         <Button onClick={handleCreate}>
-          <Plus className='mr-2 h-4 w-4' /> Add New Receipt
+          <Plus className='mr-2 h-4 w-4' /> Add New Invoice
         </Button>
       </div>
       <div className='rounded-md border'>
@@ -281,7 +261,7 @@ export function ReceiptTable() {
                   colSpan={columns.length}
                   className='h-24 text-center'
                 >
-                  No receipts found.
+                  No invoices found.
                 </TableCell>
               </TableRow>
             )}
@@ -307,11 +287,11 @@ export function ReceiptTable() {
         </Button>
       </div>
 
-      <ReceiptDialog
+      <InvoiceDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         mode={dialogMode}
-        receipt={currentReceipt}
+        invoice={currentInvoice}
       />
     </div>
   )

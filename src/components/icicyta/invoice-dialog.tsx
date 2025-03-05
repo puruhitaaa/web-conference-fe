@@ -99,14 +99,14 @@ export function InvoiceDialog({
       })
     } else if (open && !invoice) {
       form.reset({
-        invoiceNumber: `INV-${new Date().getTime().toString().slice(-6)}`,
+        invoiceNumber: `ICICYTA-INV-${new Date().getTime().toString().slice(-6)}`,
         placeAndDate: new Date().toLocaleDateString(),
         authorName: "",
         institution: "",
         email: "",
         paperId: "",
         paperTitle: "",
-        description: "Conference registration fee",
+        description: "ICICYTA Conference registration fee",
         quantity: 1,
         price: 0,
         total: 0,
@@ -135,7 +135,7 @@ export function InvoiceDialog({
       return response.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["icodsa-invoices"] })
+      queryClient.invalidateQueries({ queryKey: ["icicyta-invoices"] })
       toast.success("Invoice created successfully")
       onOpenChange(false)
     },
@@ -157,7 +157,7 @@ export function InvoiceDialog({
       return response.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["icodsa-invoices"] })
+      queryClient.invalidateQueries({ queryKey: ["icicyta-invoices"] })
       toast.success("Invoice updated successfully")
       onOpenChange(false)
     },
@@ -211,7 +211,7 @@ export function InvoiceDialog({
                     <FormLabel>Invoice Number</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='INV-123456'
+                        placeholder='ICICYTA-INV-123456'
                         {...field}
                         disabled={isViewMode}
                       />
@@ -304,7 +304,7 @@ export function InvoiceDialog({
                     <FormLabel>Paper ID</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='PP-123'
+                        placeholder='ICICYTA-123'
                         {...field}
                         disabled={isViewMode}
                       />
@@ -340,7 +340,7 @@ export function InvoiceDialog({
                   <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder='Conference registration fee'
+                      placeholder='ICICYTA Conference registration fee'
                       {...field}
                       disabled={isViewMode}
                     />
@@ -361,6 +361,7 @@ export function InvoiceDialog({
                       <Input
                         type='number'
                         min='1'
+                        step='1'
                         {...field}
                         disabled={isViewMode}
                       />
@@ -418,7 +419,7 @@ export function InvoiceDialog({
                     <FormLabel>Department</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='Computer Science'
+                        placeholder='Finance Department'
                         {...field}
                         disabled={isViewMode}
                       />
@@ -435,7 +436,7 @@ export function InvoiceDialog({
                     <FormLabel>Signature</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='Dr. John Smith'
+                        placeholder='Dr. Jane Smith'
                         {...field}
                         disabled={isViewMode}
                       />

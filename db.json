@@ -60,6 +60,39 @@
       "id": "e312c2d1-ff86-4342-8050-2f02aca9bd97"
     }
   ],
-  "receipts": [],
+  "receipts": [
+    {
+      "receiptNumber": "RCP-304762",
+      "placeAndDate": "07-May-2008",
+      "authorName": "Driscoll Armstrong",
+      "institution": "Voluptates harum vol",
+      "email": "huro@mailinator.com",
+      "paperId": "Odit consequatur est",
+      "paperTitle": "Qui ab et molestiae ",
+      "description": "Quos doloribus qui e",
+      "amount": 32,
+      "paymentMethod": "Tenetur temporibus q",
+      "paymentDate": "03-Dec-1985",
+      "status": "pending",
+      "notes": "Occaecat autem dicta",
+      "id": "c6207cd7-8772-49fb-96c9-f020cd03fe72"
+    },
+    {
+      "receiptNumber": "RCP-317968",
+      "placeAndDate": "16-Nov-2014",
+      "authorName": "Garth Cole",
+      "institution": "Quidem sit aut aliq",
+      "email": "sety@mailinator.com",
+      "paperId": "Quis ad reprehenderi",
+      "paperTitle": "Esse facere quia ita",
+      "description": "In amet excepturi s",
+      "amount": 62,
+      "paymentMethod": "Ad omnis adipisicing",
+      "paymentDate": "30-Dec-1979",
+      "status": "cancelled",
+      "notes": "Quam praesentium per",
+      "id": "601beae1-ca74-4d99-9a9e-d7a79a48eeaa"
+    }
+  ],
   "payments": []
 }

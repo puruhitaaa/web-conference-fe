@@ -57,13 +57,15 @@ export function InvoiceTable() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [currentInvoice, setCurrentInvoice] = useState<Invoice | null>(null)
-  const [dialogMode, setDialogMode] = useState<"create" | "edit" | "view">("create")
-  
+  const [dialogMode, setDialogMode] = useState<"create" | "edit" | "view">(
+    "create"
+  )
+
   const queryClient = useQueryClient()
 
   // Fetch Invoices
   const { data: invoices = [], isLoading } = useQuery<Invoice[]>({
-    queryKey: ["invoices"],
+    queryKey: ["icodsa-invoices"],
     queryFn: async () => {
       const response = await axios.get(protectedRoutes.invoices)
       return response.data
@@ -76,12 +78,12 @@ export function InvoiceTable() {
       await axios.delete(`${protectedRoutes.invoices}/${id}`)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["invoices"] })
+      queryClient.invalidateQueries({ queryKey: ["icodsa-invoices"] })
       toast.success("Invoice deleted successfully")
     },
     onError: () => {
       toast.error("Failed to delete invoice")
-    }
+    },
   })
 
   const handleDelete = (id: string) => {
@@ -134,7 +136,7 @@ export function InvoiceTable() {
           style: "currency",
           currency: "USD",
         }).format(amount)
-        return <div className="text-right font-medium">{formatted}</div>
+        return <div className='text-right font-medium'>{formatted}</div>
       },
     },
     {
@@ -150,19 +152,23 @@ export function InvoiceTable() {
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
+              <Button variant='ghost' className='h-8 w-8 p-0'>
+                <span className='sr-only'>Open menu</span>
+                <MoreHorizontal className='h-4 w-4' />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align='end'>
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => handleView(invoice)}>View</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleEdit(invoice)}>Edit</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleView(invoice)}>
+                View
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleEdit(invoice)}>
+                Edit
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => handleDelete(invoice.id)}
-                className="text-red-600"
+                className='text-red-600'
               >
                 Delete
               </DropdownMenuItem>
@@ -190,20 +196,22 @@ export function InvoiceTable() {
 
   return (
     <div>
-      <div className="flex items-center justify-between py-4">
+      <div className='flex items-center justify-between py-4'>
         <Input
-          placeholder="Filter by author name..."
-          value={(table.getColumn("authorName")?.getFilterValue() as string) ?? ""}
+          placeholder='Filter by author name...'
+          value={
+            (table.getColumn("authorName")?.getFilterValue() as string) ?? ""
+          }
           onChange={(event) =>
             table.getColumn("authorName")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          className='max-w-sm'
         />
         <Button onClick={handleCreate}>
-          <Plus className="mr-2 h-4 w-4" /> Add New Invoice
+          <Plus className='mr-2 h-4 w-4' /> Add New Invoice
         </Button>
       </div>
-      <div className="rounded-md border">
+      <div className='rounded-md border'>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -224,7 +232,10 @@ export function InvoiceTable() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell
+                  colSpan={columns.length}
+                  className='h-24 text-center'
+                >
                   Loading...
                 </TableCell>
               </TableRow>
@@ -236,14 +247,20 @@ export function InvoiceTable() {
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell
+                  colSpan={columns.length}
+                  className='h-24 text-center'
+                >
                   No invoices found.
                 </TableCell>
               </TableRow>
@@ -251,27 +268,27 @@ export function InvoiceTable() {
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
+      <div className='flex items-center justify-end space-x-2 py-4'>
         <Button
-          variant="outline"
-          size="sm"
+          variant='outline'
+          size='sm'
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
           Previous
         </Button>
         <Button
-          variant="outline"
-          size="sm"
+          variant='outline'
+          size='sm'
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
         >
           Next
         </Button>
       </div>
-      
-      <InvoiceDialog 
-        open={isDialogOpen} 
+
+      <InvoiceDialog
+        open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         mode={dialogMode}
         invoice={currentInvoice}

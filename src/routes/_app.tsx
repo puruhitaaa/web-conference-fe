@@ -5,6 +5,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import NotFound from "@/components/not-found"
 
 export const Route = createFileRoute("/_app")({
   beforeLoad: ({ context }) => {
@@ -15,6 +16,7 @@ export const Route = createFileRoute("/_app")({
     }
   },
   component: AppLayout,
+  notFoundComponent: NotFound,
 })
 
 function AppLayout() {

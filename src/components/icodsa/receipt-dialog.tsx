@@ -134,7 +134,7 @@ export function ReceiptDialog({
       return response.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["receipts"] })
+      queryClient.invalidateQueries({ queryKey: ["icodsa-receipts"] })
       toast.success("Receipt created successfully")
       onOpenChange(false)
     },
@@ -156,7 +156,7 @@ export function ReceiptDialog({
       return response.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["receipts"] })
+      queryClient.invalidateQueries({ queryKey: ["icodsa-receipts"] })
       toast.success("Receipt updated successfully")
       onOpenChange(false)
     },

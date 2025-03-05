@@ -23,11 +23,19 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
 import toast from "react-hot-toast"
-import { Invoice } from "./invoice-table"
+import { Receipt } from "./receipt-table"
 
 const formSchema = z.object({
-  invoiceNumber: z.string().min(1, "Invoice number is required"),
+  receiptNumber: z.string().min(1, "Receipt number is required"),
   placeAndDate: z.string().min(1, "Place and date is required"),
   authorName: z.string().min(1, "Author name is required"),
   institution: z.string().min(1, "Institution is required"),
@@ -35,35 +43,35 @@ const formSchema = z.object({
   paperId: z.string().min(1, "Paper ID is required"),
   paperTitle: z.string().min(1, "Paper title is required"),
   description: z.string().min(1, "Description is required"),
-  quantity: z.coerce.number().positive("Quantity must be positive"),
-  price: z.coerce.number().positive("Price must be positive"),
-  total: z.coerce.number().positive("Total must be positive"),
-  department: z.string().min(1, "Department is required"),
-  signature: z.string().min(1, "Signature is required"),
+  amount: z.coerce.number().positive("Amount must be positive"),
+  paymentMethod: z.string().min(1, "Payment method is required"),
+  paymentDate: z.string().min(1, "Payment date is required"),
+  status: z.enum(["paid", "pending", "cancelled"]),
+  notes: z.string().optional(),
 })
 
-type InvoiceFormValues = z.infer<typeof formSchema>
+type ReceiptFormValues = z.infer<typeof formSchema>
 
-interface InvoiceDialogProps {
+interface ReceiptDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   mode: "create" | "edit" | "view"
-  invoice: Invoice | null
+  receipt: Receipt | null
 }
 
-export function InvoiceDialog({
+export function ReceiptDialog({
   open,
   onOpenChange,
   mode,
-  invoice,
-}: InvoiceDialogProps) {
+  receipt,
+}: ReceiptDialogProps) {
   const queryClient = useQueryClient()
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const form = useForm<InvoiceFormValues>({
+  const form = useForm<ReceiptFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      invoiceNumber: "",
+      receiptNumber: "",
       placeAndDate: "",
       authorName: "",
       institution: "",
@@ -71,76 +79,67 @@ export function InvoiceDialog({
       paperId: "",
       paperTitle: "",
       description: "",
-      quantity: 1,
-      price: 0,
-      total: 0,
-      department: "",
-      signature: "",
+      amount: 0,
+      paymentMethod: "",
+      paymentDate: "",
+      status: "pending",
+      notes: "",
     },
   })
 
-  // Reset form when dialog opens with invoice data
+  // Reset form when dialog opens with receipt data
   useEffect(() => {
-    if (open && invoice) {
+    if (open && receipt) {
       form.reset({
-        invoiceNumber: invoice.invoiceNumber,
-        placeAndDate: invoice.placeAndDate,
-        authorName: invoice.authorName,
-        institution: invoice.institution,
-        email: invoice.email,
-        paperId: invoice.paperId,
-        paperTitle: invoice.paperTitle,
-        description: invoice.description,
-        quantity: invoice.quantity,
-        price: invoice.price,
-        total: invoice.total,
-        department: invoice.department,
-        signature: invoice.signature,
+        receiptNumber: receipt.receiptNumber,
+        placeAndDate: receipt.placeAndDate,
+        authorName: receipt.authorName,
+        institution: receipt.institution,
+        email: receipt.email,
+        paperId: receipt.paperId,
+        paperTitle: receipt.paperTitle,
+        description: receipt.description,
+        amount: receipt.amount,
+        paymentMethod: receipt.paymentMethod,
+        paymentDate: receipt.paymentDate,
+        status: receipt.status,
+        notes: receipt.notes,
       })
-    } else if (open && !invoice) {
+    } else if (open && !receipt) {
       form.reset({
-        invoiceNumber: `INV-${new Date().getTime().toString().slice(-6)}`,
+        receiptNumber: `ICICYTA-RCP-${new Date().getTime().toString().slice(-6)}`,
         placeAndDate: new Date().toLocaleDateString(),
         authorName: "",
         institution: "",
         email: "",
         paperId: "",
         paperTitle: "",
-        description: "Conference registration fee",
-        quantity: 1,
-        price: 0,
-        total: 0,
-        department: "",
-        signature: "",
+        description: "ICICYTA Conference registration payment",
+        amount: 0,
+        paymentMethod: "Bank Transfer",
+        paymentDate: new Date().toLocaleDateString(),
+        status: "pending",
+        notes: "",
       })
     }
-  }, [open, invoice, form])
-
-  // Watch quantity and price to calculate total
-  const quantity = form.watch("quantity")
-  const price = form.watch("price")
-
-  useEffect(() => {
-    const total = quantity * price
-    form.setValue("total", total)
-  }, [quantity, price, form])
+  }, [open, receipt, form])
 
   // Create mutation
   const createMutation = useMutation({
-    mutationFn: async (values: InvoiceFormValues) => {
-      const response = await axios.post(protectedRoutes.invoices, {
+    mutationFn: async (values: ReceiptFormValues) => {
+      const response = await axios.post(protectedRoutes.receipts, {
         ...values,
         id: crypto.randomUUID(),
       })
       return response.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["icodsa-invoices"] })
-      toast.success("Invoice created successfully")
+      queryClient.invalidateQueries({ queryKey: ["icicyta-receipts"] })
+      toast.success("Receipt created successfully")
       onOpenChange(false)
     },
     onError: () => {
-      toast.error("Failed to create invoice")
+      toast.error("Failed to create receipt")
     },
     onSettled: () => {
       setIsSubmitting(false)
@@ -149,31 +148,31 @@ export function InvoiceDialog({
 
   // Update mutation
   const updateMutation = useMutation({
-    mutationFn: async (values: InvoiceFormValues & { id: string }) => {
+    mutationFn: async (values: ReceiptFormValues & { id: string }) => {
       const response = await axios.put(
-        `${protectedRoutes.invoices}/${values.id}`,
+        `${protectedRoutes.receipts}/${values.id}`,
         values
       )
       return response.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["icodsa-invoices"] })
-      toast.success("Invoice updated successfully")
+      queryClient.invalidateQueries({ queryKey: ["icicyta-receipts"] })
+      toast.success("Receipt updated successfully")
       onOpenChange(false)
     },
     onError: () => {
-      toast.error("Failed to update invoice")
+      toast.error("Failed to update receipt")
     },
     onSettled: () => {
       setIsSubmitting(false)
     },
   })
 
-  function onSubmit(values: InvoiceFormValues) {
+  function onSubmit(values: ReceiptFormValues) {
     setIsSubmitting(true)
 
-    if (mode === "edit" && invoice) {
-      updateMutation.mutate({ ...values, id: invoice.id })
+    if (mode === "edit" && receipt) {
+      updateMutation.mutate({ ...values, id: receipt.id })
     } else {
       createMutation.mutate(values)
     }
@@ -182,10 +181,10 @@ export function InvoiceDialog({
   const isViewMode = mode === "view"
   const title =
     mode === "create"
-      ? "Create New Invoice"
+      ? "Create New Receipt"
       : mode === "edit"
-        ? "Edit Invoice"
-        : "View Invoice"
+        ? "Edit Receipt"
+        : "View Receipt"
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -194,10 +193,10 @@ export function InvoiceDialog({
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
             {mode === "create"
-              ? "Fill in the details to create a new invoice."
+              ? "Fill in the details to create a new receipt."
               : mode === "edit"
-                ? "Edit the invoice details."
-                : "View invoice details."}
+                ? "Edit the receipt details."
+                : "View receipt details."}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -205,13 +204,13 @@ export function InvoiceDialog({
             <div className='grid grid-cols-2 gap-4'>
               <FormField
                 control={form.control}
-                name='invoiceNumber'
+                name='receiptNumber'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Invoice Number</FormLabel>
+                    <FormLabel>Receipt Number</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='INV-123456'
+                        placeholder='ICICYTA-RCP-123456'
                         {...field}
                         disabled={isViewMode}
                       />
@@ -304,7 +303,7 @@ export function InvoiceDialog({
                     <FormLabel>Paper ID</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='PP-123'
+                        placeholder='ICICYTA-123'
                         {...field}
                         disabled={isViewMode}
                       />
@@ -340,7 +339,7 @@ export function InvoiceDialog({
                   <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder='Conference registration fee'
+                      placeholder='ICICYTA Conference registration payment'
                       {...field}
                       disabled={isViewMode}
                     />
@@ -353,28 +352,10 @@ export function InvoiceDialog({
             <div className='grid grid-cols-3 gap-4'>
               <FormField
                 control={form.control}
-                name='quantity'
+                name='amount'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Quantity</FormLabel>
-                    <FormControl>
-                      <Input
-                        type='number'
-                        min='1'
-                        {...field}
-                        disabled={isViewMode}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='price'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Price</FormLabel>
+                    <FormLabel>Amount</FormLabel>
                     <FormControl>
                       <Input
                         type='number'
@@ -390,17 +371,32 @@ export function InvoiceDialog({
               />
               <FormField
                 control={form.control}
-                name='total'
+                name='paymentMethod'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Total</FormLabel>
+                    <FormLabel>Payment Method</FormLabel>
                     <FormControl>
                       <Input
-                        type='number'
-                        min='0'
-                        step='0.01'
+                        placeholder='Bank Transfer'
                         {...field}
-                        disabled={true}
+                        disabled={isViewMode}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='paymentDate'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Payment Date</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder='January 1, 2023'
+                        {...field}
+                        disabled={isViewMode}
                       />
                     </FormControl>
                     <FormMessage />
@@ -408,43 +404,53 @@ export function InvoiceDialog({
                 )}
               />
             </div>
+
+            <FormField
+              control={form.control}
+              name='status'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <Select
+                    disabled={isViewMode}
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    value={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder='Select status' />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value='paid'>Paid</SelectItem>
+                      <SelectItem value='pending'>Pending</SelectItem>
+                      <SelectItem value='cancelled'>Cancelled</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-            <div className='grid grid-cols-2 gap-4'>
-              <FormField
-                control={form.control}
-                name='department'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Department</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='Computer Science'
-                        {...field}
-                        disabled={isViewMode}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='signature'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Signature</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='Dr. John Smith'
-                        {...field}
-                        disabled={isViewMode}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name='notes'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Notes</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder='Additional notes...'
+                      className='max-h-40'
+                      {...field}
+                      disabled={isViewMode}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <DialogFooter>
               {!isViewMode ? (

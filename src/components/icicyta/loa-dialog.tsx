@@ -89,7 +89,7 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
         paperId: "",
         authorName: "",
         time: "",
-        conferenceTitle: "",
+        conferenceTitle: "ICICYTA 2023",
         placeAndDate: "",
         status: "accepted",
         signature: "",
@@ -108,7 +108,7 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
       return response.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["icodsa-loas"] })
+      queryClient.invalidateQueries({ queryKey: ["icicyta-loas"] })
       toast.success("LoA created successfully")
       onOpenChange(false)
     },
@@ -130,7 +130,7 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
       return response.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["icodsa-loas"] })
+      queryClient.invalidateQueries({ queryKey: ["icicyta-loas"] })
       toast.success("LoA updated successfully")
       onOpenChange(false)
     },
@@ -167,10 +167,10 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
             {mode === "create"
-              ? "Fill in the details to create a new Letter of Acceptance."
+              ? "Fill in the details to create a new letter of acceptance."
               : mode === "edit"
-                ? "Edit the Letter of Acceptance details."
-                : "View Letter of Acceptance details."}
+                ? "Edit the letter of acceptance details."
+                : "View letter of acceptance details."}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -184,7 +184,7 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
                     <FormLabel>Paper ID</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='PP-123'
+                        placeholder='ICICYTA-123'
                         {...field}
                         disabled={isViewMode}
                       />
@@ -212,42 +212,41 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
               />
             </div>
 
-            <div className='grid grid-cols-2 gap-4'>
-              <FormField
-                control={form.control}
-                name='time'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Time</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='10:00 AM'
-                        {...field}
-                        disabled={isViewMode}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='conferenceTitle'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Conference Title</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='ICODSA 2023'
-                        {...field}
-                        disabled={isViewMode}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name='time'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Time</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder='10:00 AM - 11:00 AM'
+                      {...field}
+                      disabled={isViewMode}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='conferenceTitle'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Conference Title</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder='ICICYTA 2023'
+                      {...field}
+                      disabled={isViewMode}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
@@ -267,28 +266,47 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
               )}
             />
 
+            <FormField
+              control={form.control}
+              name='status'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <Select
+                    disabled={isViewMode}
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                    value={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder='Select status' />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value='accepted'>Accepted</SelectItem>
+                      <SelectItem value='rejected'>Rejected</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <div className='grid grid-cols-2 gap-4'>
               <FormField
                 control={form.control}
-                name='status'
+                name='signature'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select
-                      disabled={isViewMode}
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder='Select status' />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value='accepted'>Accepted</SelectItem>
-                        <SelectItem value='rejected'>Rejected</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    <FormLabel>Signature</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder='Dr. Jane Smith'
+                        {...field}
+                        disabled={isViewMode}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -311,24 +329,6 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
                 )}
               />
             </div>
-
-            <FormField
-              control={form.control}
-              name='signature'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Signature</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='Dr. John Smith'
-                      {...field}
-                      disabled={isViewMode}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
             <DialogFooter>
               {!isViewMode ? (

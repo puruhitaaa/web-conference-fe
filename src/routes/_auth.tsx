@@ -1,3 +1,4 @@
+import NotFound from "@/components/not-found"
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/_auth")({
@@ -9,6 +10,7 @@ export const Route = createFileRoute("/_auth")({
     }
   },
   component: AuthLayout,
+  notFoundComponent: NotFound,
 })
 
 function AuthLayout() {
