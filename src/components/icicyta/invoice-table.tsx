@@ -31,8 +31,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, Plus } from "lucide-react"
+import { MoreHorizontal, Plus, Printer, FileText } from "lucide-react"
 import { InvoiceDialog } from "./invoice-dialog"
+import { InvoicePrintDialog } from "./invoice-print-dialog"
 import toast from "react-hot-toast"
 
 export type Invoice = {
@@ -60,6 +61,10 @@ export function InvoiceTable() {
   const [dialogMode, setDialogMode] = useState<"create" | "edit" | "view">(
     "create"
   )
+  const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false)
+  const [currentPrintInvoice, setCurrentPrintInvoice] =
+    useState<Invoice | null>(null)
+  const [printMode, setPrintMode] = useState<"single" | "all">("all")
 
   const queryClient = useQueryClient()
 
@@ -108,6 +113,18 @@ export function InvoiceTable() {
     setCurrentInvoice(null)
     setDialogMode("create")
     setIsDialogOpen(true)
+  }
+
+  const handlePrint = () => {
+    setPrintMode("all")
+    setCurrentPrintInvoice(null)
+    setIsPrintDialogOpen(true)
+  }
+
+  const handlePrintSingle = (invoice: Invoice) => {
+    setPrintMode("single")
+    setCurrentPrintInvoice(invoice)
+    setIsPrintDialogOpen(true)
   }
 
   const columns: ColumnDef<Invoice>[] = [
@@ -167,6 +184,10 @@ export function InvoiceTable() {
               <DropdownMenuItem onClick={() => handleEdit(invoice)}>
                 Edit
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handlePrintSingle(invoice)}>
+                <FileText className='mr-2 h-4 w-4' />
+                Print PDF
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => handleDelete(invoice.id)}
@@ -209,9 +230,17 @@ export function InvoiceTable() {
           }
           className='max-w-sm'
         />
-        <Button onClick={handleCreate}>
-          <Plus className='mr-2 h-4 w-4' /> Add New Invoice
-        </Button>
+        <div className='flex gap-2'>
+          {invoices.length ? (
+            <Button variant='outline' onClick={handlePrint}>
+              <Printer className='mr-2 h-4 w-4' />
+              Print All
+            </Button>
+          ) : null}
+          <Button onClick={handleCreate}>
+            <Plus className='mr-2 h-4 w-4' /> Add New Invoice
+          </Button>
+        </div>
       </div>
       <div className='rounded-md border'>
         <Table>
@@ -294,6 +323,23 @@ export function InvoiceTable() {
         onOpenChange={setIsDialogOpen}
         mode={dialogMode}
         invoice={currentInvoice}
+      />
+
+      <InvoicePrintDialog
+        open={isPrintDialogOpen}
+        onOpenChange={setIsPrintDialogOpen}
+        data={
+          printMode === "single" && currentPrintInvoice
+            ? currentPrintInvoice
+            : invoices
+        }
+        title={printMode === "single" ? "Print Invoice" : "Print All Invoices"}
+        description={
+          printMode === "single"
+            ? "Preview and print this invoice"
+            : "Preview and print all invoices"
+        }
+        singleMode={printMode === "single"}
       />
     </div>
   )

@@ -31,8 +31,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, Plus } from "lucide-react"
+import { MoreHorizontal, Plus, Printer, FileText } from "lucide-react"
 import { LoaDialog } from "./loa-dialog"
+import { PrintDialog } from "./print-dialog"
 import toast from "react-hot-toast"
 
 export type Loa = {
@@ -55,7 +56,9 @@ export function LoaTable() {
   const [dialogMode, setDialogMode] = useState<"create" | "edit" | "view">(
     "create"
   )
-
+  const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false)
+  const [currentPrintLoa, setCurrentPrintLoa] = useState<Loa | null>(null)
+  const [printMode, setPrintMode] = useState<"single" | "all">("all")
   const queryClient = useQueryClient()
 
   // Fetch LoAs
@@ -103,6 +106,18 @@ export function LoaTable() {
     setCurrentLoa(null)
     setDialogMode("create")
     setIsDialogOpen(true)
+  }
+
+  const handlePrint = () => {
+    setPrintMode("all")
+    setCurrentPrintLoa(null)
+    setIsPrintDialogOpen(true)
+  }
+
+  const handlePrintSingle = (loa: Loa) => {
+    setPrintMode("single")
+    setCurrentPrintLoa(loa)
+    setIsPrintDialogOpen(true)
   }
 
   const columns: ColumnDef<Loa>[] = [
@@ -162,6 +177,10 @@ export function LoaTable() {
               <DropdownMenuItem onClick={() => handleEdit(loa)}>
                 Edit
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handlePrintSingle(loa)}>
+                <FileText className='mr-2 h-4 w-4' />
+                Print PDF
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => handleDelete(loa.id)}
@@ -195,18 +214,25 @@ export function LoaTable() {
     <div>
       <div className='flex items-center justify-between py-4'>
         <Input
-          placeholder='Filter by author name...'
-          value={
-            (table.getColumn("authorName")?.getFilterValue() as string) ?? ""
-          }
+          placeholder='Filter by paper ID...'
+          value={(table.getColumn("paperId")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("authorName")?.setFilterValue(event.target.value)
+            table.getColumn("paperId")?.setFilterValue(event.target.value)
           }
           className='max-w-sm'
         />
-        <Button onClick={handleCreate}>
-          <Plus className='mr-2 h-4 w-4' /> Add New LoA
-        </Button>
+        <div className='flex gap-2'>
+          {loas.length ? (
+            <Button variant='outline' onClick={handlePrint}>
+              <Printer className='mr-2 h-4 w-4' />
+              Print All
+            </Button>
+          ) : null}
+          <Button onClick={handleCreate}>
+            <Plus className='mr-2 h-4 w-4' />
+            Add New
+          </Button>
+        </div>
       </div>
       <div className='rounded-md border'>
         <Table>
@@ -289,6 +315,25 @@ export function LoaTable() {
         onOpenChange={setIsDialogOpen}
         mode={dialogMode}
         loa={currentLoa}
+      />
+
+      <PrintDialog
+        open={isPrintDialogOpen}
+        onOpenChange={setIsPrintDialogOpen}
+        data={
+          printMode === "single" && currentPrintLoa ? currentPrintLoa : loas
+        }
+        title={
+          printMode === "single"
+            ? "Print Letter of Acceptance"
+            : "Print Letters of Acceptance"
+        }
+        description={
+          printMode === "single"
+            ? "Preview and print this Letter of Acceptance"
+            : "Preview and print all Letters of Acceptance"
+        }
+        singleMode={printMode === "single"}
       />
     </div>
   )

@@ -31,8 +31,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, Plus } from "lucide-react"
+import { MoreHorizontal, Plus, Printer, FileText } from "lucide-react"
 import { ReceiptDialog } from "./receipt-dialog"
+import { ReceiptPrintDialog } from "./receipt-print-dialog"
 import toast from "react-hot-toast"
 
 export type Receipt = {
@@ -60,6 +61,10 @@ export function ReceiptTable() {
   const [dialogMode, setDialogMode] = useState<"create" | "edit" | "view">(
     "create"
   )
+  const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false)
+  const [currentPrintReceipt, setCurrentPrintReceipt] =
+    useState<Receipt | null>(null)
+  const [printMode, setPrintMode] = useState<"single" | "all">("all")
 
   const queryClient = useQueryClient()
 
@@ -110,6 +115,18 @@ export function ReceiptTable() {
     setIsDialogOpen(true)
   }
 
+  const handlePrint = () => {
+    setPrintMode("all")
+    setCurrentPrintReceipt(null)
+    setIsPrintDialogOpen(true)
+  }
+
+  const handlePrintSingle = (receipt: Receipt) => {
+    setPrintMode("single")
+    setCurrentPrintReceipt(receipt)
+    setIsPrintDialogOpen(true)
+  }
+
   const columns: ColumnDef<Receipt>[] = [
     {
       accessorKey: "receiptNumber",
@@ -124,6 +141,10 @@ export function ReceiptTable() {
       header: "Paper ID",
     },
     {
+      accessorKey: "paperTitle",
+      header: "Paper Title",
+    },
+    {
       accessorKey: "amount",
       header: "Amount",
       cell: ({ row }) => {
@@ -136,10 +157,6 @@ export function ReceiptTable() {
         }).format(amount)
         return <div className='font-medium'>{formatted}</div>
       },
-    },
-    {
-      accessorKey: "paymentMethod",
-      header: "Payment Method",
     },
     {
       accessorKey: "status",
@@ -162,8 +179,8 @@ export function ReceiptTable() {
       },
     },
     {
-      accessorKey: "paymentDate",
-      header: "Payment Date",
+      accessorKey: "placeAndDate",
+      header: "Date",
     },
     {
       id: "actions",
@@ -186,6 +203,10 @@ export function ReceiptTable() {
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleEdit(receipt)}>
                 Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handlePrintSingle(receipt)}>
+                <FileText className='mr-2 h-4 w-4' />
+                Print PDF
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
@@ -229,9 +250,15 @@ export function ReceiptTable() {
           }
           className='max-w-sm'
         />
-        <Button onClick={handleCreate}>
-          <Plus className='mr-2 h-4 w-4' /> Add New Receipt
-        </Button>
+        <div className='flex gap-2'>
+          <Button variant='outline' onClick={handlePrint}>
+            <Printer className='mr-2 h-4 w-4' />
+            Print All
+          </Button>
+          <Button onClick={handleCreate}>
+            <Plus className='mr-2 h-4 w-4' /> Add New Receipt
+          </Button>
+        </div>
       </div>
       <div className='rounded-md border'>
         <Table>
@@ -314,6 +341,23 @@ export function ReceiptTable() {
         onOpenChange={setIsDialogOpen}
         mode={dialogMode}
         receipt={currentReceipt}
+      />
+
+      <ReceiptPrintDialog
+        open={isPrintDialogOpen}
+        onOpenChange={setIsPrintDialogOpen}
+        data={
+          printMode === "single" && currentPrintReceipt
+            ? currentPrintReceipt
+            : receipts
+        }
+        title={printMode === "single" ? "Print Receipt" : "Print All Receipts"}
+        description={
+          printMode === "single"
+            ? "Preview and print this receipt"
+            : "Preview and print all receipts"
+        }
+        singleMode={printMode === "single"}
       />
     </div>
   )

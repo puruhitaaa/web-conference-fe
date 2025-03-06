@@ -31,8 +31,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, Plus } from "lucide-react"
+import { MoreHorizontal, Plus, Printer, FileText } from "lucide-react"
 import { LoaDialog } from "./loa-dialog"
+import { PrintDialog } from "./print-dialog"
 import toast from "react-hot-toast"
 
 export type Loa = {
@@ -55,6 +56,9 @@ export function LoaTable() {
   const [dialogMode, setDialogMode] = useState<"create" | "edit" | "view">(
     "create"
   )
+  const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false)
+  const [currentPrintLoa, setCurrentPrintLoa] = useState<Loa | null>(null)
+  const [printMode, setPrintMode] = useState<"single" | "all">("all")
 
   const queryClient = useQueryClient()
 
@@ -103,6 +107,18 @@ export function LoaTable() {
     setCurrentLoa(null)
     setDialogMode("create")
     setIsDialogOpen(true)
+  }
+
+  const handlePrint = () => {
+    setPrintMode("all")
+    setCurrentPrintLoa(null)
+    setIsPrintDialogOpen(true)
+  }
+
+  const handlePrintSingle = (loa: Loa) => {
+    setPrintMode("single")
+    setCurrentPrintLoa(loa)
+    setIsPrintDialogOpen(true)
   }
 
   const columns: ColumnDef<Loa>[] = [
@@ -162,6 +178,10 @@ export function LoaTable() {
               <DropdownMenuItem onClick={() => handleEdit(loa)}>
                 Edit
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handlePrintSingle(loa)}>
+                <FileText className='mr-2 h-4 w-4' />
+                Print PDF
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => handleDelete(loa.id)}
@@ -204,9 +224,17 @@ export function LoaTable() {
           }
           className='max-w-sm'
         />
-        <Button onClick={handleCreate}>
-          <Plus className='mr-2 h-4 w-4' /> Add New LoA
-        </Button>
+        <div className='flex gap-2'>
+          {loas.length ? (
+            <Button variant='outline' onClick={handlePrint}>
+              <Printer className='mr-2 h-4 w-4' />
+              Print All
+            </Button>
+          ) : null}
+          <Button onClick={handleCreate}>
+            <Plus className='mr-2 h-4 w-4' /> Add New LoA
+          </Button>
+        </div>
       </div>
       <div className='rounded-md border'>
         <Table>
@@ -289,6 +317,21 @@ export function LoaTable() {
         onOpenChange={setIsDialogOpen}
         mode={dialogMode}
         loa={currentLoa}
+      />
+
+      <PrintDialog
+        open={isPrintDialogOpen}
+        onOpenChange={setIsPrintDialogOpen}
+        data={
+          printMode === "single" && currentPrintLoa ? currentPrintLoa : loas
+        }
+        title={printMode === "single" ? "Print LoA" : "Print All LoAs"}
+        description={
+          printMode === "single"
+            ? "Preview and print this letter of acceptance"
+            : "Preview and print all letters of acceptance"
+        }
+        singleMode={printMode === "single"}
       />
     </div>
   )

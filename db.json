@@ -7,91 +7,65 @@
       "id": 1
     }
   ],
-  "papers": [
-    {
-      "id": 1,
-      "paperId": "PP-1",
-      "authorName": "John Doe",
-      "conferenceTitle": "Test 1",
-      "paperTitle": "Paper 1",
-      "userId": "1",
-      "conferenceType": "ICIGSA",
-      "status": "pending"
-    },
-    {
-      "id": 2,
-      "paperId": "PP-2",
-      "authorName": "Jane Doe",
-      "conferenceTitle": "Test 2",
-      "paperTitle": "Paper 2",
-      "userId": "2",
-      "conferenceType": "ICIKTA",
-      "status": "pending"
-    }
-  ],
+  "papers": [],
   "loas": [
     {
-      "paperId": "Sint qui non nisi te",
-      "authorName": "Mannix Mays",
-      "time": "Aperiam consequatur",
-      "conferenceTitle": "Nihil temporibus dol",
-      "placeAndDate": "17-Jul-1975",
-      "status": "rejected",
-      "signature": "Adipisci et ratione ",
-      "department": "Quis aut eos ut haru",
-      "id": "821eb32b-3bc5-4ac5-ada4-7494b130aa79"
+      "paperId": "PP-01",
+      "authorName": "Selma Yennefer",
+      "time": "23:00",
+      "conferenceTitle": "Deserunt numquam har",
+      "placeAndDate": "27-Nov-1991",
+      "status": "accepted",
+      "signature": "Sunt voluptatem Cum",
+      "department": "Fuga Fuga Sed dolo",
+      "id": "4e468b64-e8eb-41d2-8adc-cbb7c8f5a485"
+    },
+    {
+      "paperId": "PP-02",
+      "authorName": "Rachel Cook",
+      "time": "21:00",
+      "conferenceTitle": "Test 1",
+      "placeAndDate": "Jakarta, January 1st, 2025",
+      "status": "accepted",
+      "signature": "Fugiat voluptatem ",
+      "department": "Computer Science",
+      "id": "25ffd4cf-a79a-485f-880c-f2264b583aac"
     }
   ],
   "invoices": [
     {
-      "invoiceNumber": "INV-828386",
-      "placeAndDate": "12-Apr-1980",
-      "authorName": "Tyrone Rodriguez",
-      "institution": "Quas tempore facere",
-      "email": "paleteti@mailinator.com",
-      "paperId": "Et alias exercitatio",
-      "paperTitle": "Numquam cupidatat in",
-      "description": "Magni aliqua Perspi",
-      "quantity": 612,
-      "price": 122,
-      "total": 74664,
-      "department": "Eaque aut nulla veni",
-      "signature": "Fugiat voluptatem ",
-      "id": "e312c2d1-ff86-4342-8050-2f02aca9bd97"
+      "invoiceNumber": "INV-768860",
+      "placeAndDate": "Jakarta, January 1st, 2025",
+      "authorName": "Quon Gilmore",
+      "institution": "Lorem obcaecati eos ",
+      "email": "bigubi@mailinator.com",
+      "paperId": "PP-01",
+      "paperTitle": "Test",
+      "description": "Et sit recusandae ",
+      "quantity": 10,
+      "price": 50000,
+      "total": 500000,
+      "department": "Computer Science",
+      "signature": "Totam voluptatem cor",
+      "id": "15aa18ee-bebb-4627-ac7e-185645f77ecb"
     }
   ],
   "receipts": [
     {
-      "receiptNumber": "RCP-304762",
-      "placeAndDate": "07-May-2008",
-      "authorName": "Driscoll Armstrong",
-      "institution": "Voluptates harum vol",
-      "email": "huro@mailinator.com",
-      "paperId": "Odit consequatur est",
-      "paperTitle": "Qui ab et molestiae ",
-      "description": "Quos doloribus qui e",
-      "amount": 32,
-      "paymentMethod": "Tenetur temporibus q",
-      "paymentDate": "03-Dec-1985",
-      "status": "pending",
-      "notes": "Occaecat autem dicta",
-      "id": "c6207cd7-8772-49fb-96c9-f020cd03fe72"
-    },
-    {
-      "receiptNumber": "RCP-317968",
-      "placeAndDate": "16-Nov-2014",
-      "authorName": "Garth Cole",
-      "institution": "Quidem sit aut aliq",
-      "email": "sety@mailinator.com",
-      "paperId": "Quis ad reprehenderi",
-      "paperTitle": "Esse facere quia ita",
-      "description": "In amet excepturi s",
-      "amount": 62,
-      "paymentMethod": "Ad omnis adipisicing",
-      "paymentDate": "30-Dec-1979",
-      "status": "cancelled",
-      "notes": "Quam praesentium per",
-      "id": "601beae1-ca74-4d99-9a9e-d7a79a48eeaa"
+      "receiptNumber": "RCP-469041",
+      "placeAndDate": "3/6/2025",
+      "authorName": "Sonia Day",
+      "institution": "Aute enim veniam ei",
+      "email": "joje@mailinator.com",
+      "paperId": "Iste saepe quas labo",
+      "paperTitle": "Commodo suscipit por",
+      "description": "Velit ea dolorem mol",
+      "amount": 44,
+      "paymentMethod": "Esse aliqua Odio t",
+      "paymentDate": "3/6/2025",
+      "status": "paid",
+      "notes": "Laboriosam aliquam ",
+      "id": "81fb7dc5-f7c4-4b65-9e10-10aba172a2f8"
     }
   ],
   "payments": []
