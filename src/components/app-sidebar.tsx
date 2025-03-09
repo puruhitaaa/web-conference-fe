@@ -8,7 +8,6 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarRail,
-  useSidebar,
 } from "@/components/ui/sidebar"
 import useAuthUser from "react-auth-kit/hooks/useAuthUser"
 import type { User } from "@/types/auth"
