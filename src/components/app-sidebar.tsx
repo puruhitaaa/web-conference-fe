@@ -1,23 +1,20 @@
-import * as React from "react";
-import { Circle, Home } from "lucide-react";
+import * as React from "react"
+import { Circle, Home } from "lucide-react"
 
-import { NavMain } from "@/components/nav-main";
-import { NavUser } from "@/components/nav-user";
+import { NavMain } from "@/components/nav-main"
+import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarRail,
-} from "@/components/ui/sidebar";
-import useAuthUser from "react-auth-kit/hooks/useAuthUser";
+  useSidebar,
+} from "@/components/ui/sidebar"
+import useAuthUser from "react-auth-kit/hooks/useAuthUser"
+import type { User } from "@/types/auth"
+import { Logo } from "@/components/ui/logo"
 
-// This is sample data.
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   navMain: [
     {
       title: "Dashboard",
@@ -57,27 +54,29 @@ const data = {
           url: "/icicyta/invoice",
         },
         {
-          title: "Quantum",
-          url: "#",
+          title: "Receipt",
+          url: "/icicyta/receipt",
         },
       ],
     },
   ],
-};
+}
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const auth = useAuthUser() as { user: { id: string; email: string } };
+  const auth = useAuthUser<User>()
 
-  console.log(auth);
   return (
-    <Sidebar variant="inset" collapsible="icon" {...props}>
+    <Sidebar variant='inset' collapsible='icon' {...props}>
       <SidebarContent>
+        <div className='px-4 py-4'>
+          <Logo className='mx-auto' />
+        </div>
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={auth!} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  );
+  )
 }

@@ -1,16 +1,16 @@
-import "../index.css";
+import "../index.css"
 
-import { useState } from "react";
+import { useState } from "react"
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/router-devtools";
-import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "react-hot-toast";
-import type { AuthState } from "@/types/auth";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { createRootRouteWithContext, Outlet } from "@tanstack/react-router"
+import { TanStackRouterDevtools } from "@tanstack/router-devtools"
+import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "react-hot-toast"
+import type { AuthState } from "@/types/auth"
 interface MyRouterContext {
   // The ReturnType of your useAuth hook or the value of your AuthContext
-  auth: AuthState | null;
+  auth: AuthState | null
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
@@ -24,7 +24,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
           },
         },
       })
-    );
+    )
     return (
       <>
         {/* <div className='p-2 flex gap-2 absolute top-0 left-0 w-full border-b-2 border-white'>
@@ -42,13 +42,13 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
           </Link>
         </div> */}
         <QueryClientProvider client={queryClient}>
-          <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+          <ThemeProvider defaultTheme='dark' storageKey='vite-ui-theme'>
             <Outlet />
-            <Toaster position="bottom-right" reverseOrder={true} />
+            <Toaster position='bottom-right' reverseOrder={true} />
           </ThemeProvider>
         </QueryClientProvider>
         <TanStackRouterDevtools />
       </>
-    );
+    )
   },
-});
+})
