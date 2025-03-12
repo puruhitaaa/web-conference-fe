@@ -81,10 +81,7 @@ export function RegisterForm({
   }
 
   const [showPassword, setShowPassword] = useState(false);
-<<<<<<< HEAD
-=======
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
->>>>>>> rhenofebrian
 
   return (
     <div
@@ -173,27 +170,17 @@ export function RegisterForm({
                     <FormControl>
                       <div className="relative">
                         <Input
-<<<<<<< HEAD
-                          type={showPassword ? "text" : "password"}
-=======
                           type={showConfirmPassword ? "text" : "password"}
->>>>>>> rhenofebrian
                           {...field}
                         />
                         <button
                           type="button"
                           className="absolute inset-y-0 right-3 flex items-center text-gray-500"
-<<<<<<< HEAD
-                          onClick={() => setShowPassword(!showPassword)}
-                        >
-                          {showPassword ? (
-=======
                           onClick={() =>
                             setShowConfirmPassword(!showConfirmPassword)
                           }
                         >
                           {showConfirmPassword ? (
->>>>>>> rhenofebrian
                             <EyeOff size={20} />
                           ) : (
                             <Eye size={20} />
