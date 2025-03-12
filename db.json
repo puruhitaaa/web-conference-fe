@@ -5,6 +5,12 @@
       "password": "$2a$10$hLKPkMiLNjyu2UDFUj3.7uoiIBj6UL9EMIYhPL7mJAywqGUe2wMOe",
       "name": "Test User",
       "id": 1
+    },
+    {
+      "email": "rfebrianc@gmail.com",
+      "password": "$2a$10$cPVRRZ/Sj216n.H68300CuhbvgZ.HN5bH.Ltf.XgBhr3NLRzeqsMG",
+      "name": "Rheno Febrian",
+      "id": 2
     }
   ],
   "papers": [],
@@ -30,6 +36,17 @@
       "signature": "Fugiat voluptatem ",
       "department": "Computer Science",
       "id": "25ffd4cf-a79a-485f-880c-f2264b583aac"
+    },
+    {
+      "paperId": "dwad",
+      "authorName": "dawda",
+      "time": "dawd",
+      "conferenceTitle": "dawd",
+      "placeAndDate": "dawdwa",
+      "status": "accepted",
+      "signature": "dawdaw",
+      "department": "dawdaw",
+      "id": "ef9b09bc-520c-4308-9228-cc5e1b37ca6f"
     }
   ],
   "invoices": [

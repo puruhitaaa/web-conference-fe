@@ -31,11 +31,7 @@ import { useState } from "react";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
-  password: z
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .regex(/[A-Z]/, "Harus mengandung setidaknya satu huruf kapital")
-    .regex(/[0-9]/, "harus mengandung setidaknya satu angka"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
 export function LoginForm({

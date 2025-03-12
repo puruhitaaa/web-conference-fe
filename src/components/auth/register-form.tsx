@@ -32,7 +32,11 @@ const formSchema = z
   .object({
     name: z.string().min(6),
     email: z.string().email("Please enter a valid email address"),
-    password: z.string().min(8, "Password must be at least 8 characters"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Harus mengandung setidaknya satu huruf kapital")
+      .regex(/[0-9]/, "harus mengandung setidaknya satu angka"),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -77,6 +81,10 @@ export function RegisterForm({
   }
 
   const [showPassword, setShowPassword] = useState(false);
+<<<<<<< HEAD
+=======
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+>>>>>>> rhenofebrian
 
   return (
     <div
@@ -165,15 +173,27 @@ export function RegisterForm({
                     <FormControl>
                       <div className="relative">
                         <Input
+<<<<<<< HEAD
                           type={showPassword ? "text" : "password"}
+=======
+                          type={showConfirmPassword ? "text" : "password"}
+>>>>>>> rhenofebrian
                           {...field}
                         />
                         <button
                           type="button"
                           className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+<<<<<<< HEAD
                           onClick={() => setShowPassword(!showPassword)}
                         >
                           {showPassword ? (
+=======
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                        >
+                          {showConfirmPassword ? (
+>>>>>>> rhenofebrian
                             <EyeOff size={20} />
                           ) : (
                             <Eye size={20} />
