@@ -1,17 +1,18 @@
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Eye, EyeOff } from "lucide-react";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Link, useNavigate } from "@tanstack/react-router"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import {
   Form,
   FormControl,
@@ -19,12 +20,13 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import axios from "axios"
-import { authRoutes } from "@/api"
-import toast from "react-hot-toast"
-import { useMutation } from "@tanstack/react-query"
-import { Logo } from "../ui/logo"
+} from "@/components/ui/form";
+import axios from "axios";
+import { authRoutes } from "@/api";
+import toast from "react-hot-toast";
+import { useMutation } from "@tanstack/react-query";
+import { Logo } from "../ui/logo";
+import { useState } from "react";
 
 const formSchema = z
   .object({
@@ -36,7 +38,7 @@ const formSchema = z
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
     path: ["confirmPassword"],
-  })
+  });
 
 export function RegisterForm({
   className,
@@ -50,37 +52,39 @@ export function RegisterForm({
       password: "",
       confirmPassword: "",
     },
-  })
-  const navigate = useNavigate({ from: "/register" })
+  });
+  const navigate = useNavigate({ from: "/register" });
 
   const registerMutation = useMutation({
     mutationFn: (values: z.infer<typeof formSchema>) => {
-      const { name, email, password } = formSchema.parse(values)
-      return axios.post(authRoutes.register, { name, email, password })
+      const { name, email, password } = formSchema.parse(values);
+      return axios.post(authRoutes.register, { name, email, password });
     },
     onSuccess: () => {
-      toast.success("Registration successful")
+      toast.success("Registration successful");
       navigate({
         to: "/login",
         replace: true,
-      })
+      });
     },
     onError: () => {
-      toast.error("Registration failed")
+      toast.error("Registration failed");
     },
-  })
+  });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    registerMutation.mutate(values)
+    registerMutation.mutate(values);
   }
+
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div
       className={cn("flex flex-col gap-6 w-full max-w-lg", className)}
       {...props}
     >
-      <Logo className='mx-auto' />
-      <Card className='md:min-w-lg w-full md:w-[initial]'>
+      <Logo className="mx-auto" />
+      <Card className="md:min-w-lg w-full md:w-[initial]">
         <CardHeader>
           <CardTitle>Register to your account</CardTitle>
           <CardDescription>
@@ -91,16 +95,16 @@ export function RegisterForm({
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className='flex flex-col gap-6'
+              className="flex flex-col gap-6"
             >
               <FormField
                 control={form.control}
-                name='name'
+                name="name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input type='name' {...field} />
+                      <Input type="name" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -108,14 +112,14 @@ export function RegisterForm({
               />
               <FormField
                 control={form.control}
-                name='email'
+                name="email"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='m@example.com'
-                        type='email'
+                        placeholder="m@example.com"
+                        type="email"
                         {...field}
                       />
                     </FormControl>
@@ -125,12 +129,28 @@ export function RegisterForm({
               />
               <FormField
                 control={form.control}
-                name='password'
+                name="password"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type='password' {...field} />
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          {...field}
+                        />
+                        <button
+                          type="button"
+                          className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <EyeOff size={20} />
+                          ) : (
+                            <Eye size={20} />
+                          )}
+                        </button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -138,23 +158,39 @@ export function RegisterForm({
               />
               <FormField
                 control={form.control}
-                name='confirmPassword'
+                name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Confirm Password</FormLabel>
                     <FormControl>
-                      <Input type='password' {...field} />
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          {...field}
+                        />
+                        <button
+                          type="button"
+                          className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <EyeOff size={20} />
+                          ) : (
+                            <Eye size={20} />
+                          )}
+                        </button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type='submit' className='w-full'>
+              <Button type="submit" className="w-full">
                 Register
               </Button>
-              <div className='text-center text-sm'>
+              <div className="text-center text-sm">
                 Already have an account?{" "}
-                <Link to='/login' className='underline underline-offset-4'>
+                <Link to="/login" className="underline underline-offset-4">
                   Login
                 </Link>
               </div>
@@ -163,5 +199,5 @@ export function RegisterForm({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
