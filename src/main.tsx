@@ -1,8 +1,7 @@
 import { StrictMode } from "react"
 import ReactDOM from "react-dom/client"
 import { createRouter, RouterProvider } from "@tanstack/react-router"
-import { Provider, useAtom } from "jotai"
-import { authAtom } from "./lib/auth/authStore"
+import { useAuthStore } from "./lib/auth/authStore"
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen"
@@ -24,7 +23,7 @@ declare module "@tanstack/react-router" {
 
 // Render the app
 function InnerApp() {
-  const [auth, _test] = useAtom(authAtom)
+  const auth = useAuthStore()
   return <RouterProvider router={router} context={{ auth }} />
 }
 
@@ -33,9 +32,7 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
     <StrictMode>
-      <Provider>
-        <InnerApp />
-      </Provider>
+      <InnerApp />
     </StrictMode>
   )
 }

@@ -9,8 +9,7 @@ import {
   SidebarFooter,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { useAtom } from "jotai"
-import { userAtom } from "@/lib/auth/authStore"
+import { useAuthStore } from "@/lib/auth/authStore"
 import { Logo } from "@/components/ui/logo"
 
 const data = {
@@ -62,7 +61,7 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const [user] = useAtom(userAtom)
+  const user = useAuthStore((state) => state.user)
 
   if (!user) return null
 

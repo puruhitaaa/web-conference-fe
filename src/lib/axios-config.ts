@@ -1,10 +1,9 @@
 import axios from "axios"
-import { getDefaultStore } from "jotai"
-import { authAtom } from "./auth/authStore"
+import { useAuthStore } from "./auth/authStore"
 
 // Create an axios instance
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: "/api",
   headers: {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -14,8 +13,7 @@ const api = axios.create({
 // Add a request interceptor to include auth token in all requests
 api.interceptors.request.use(
   (config) => {
-    const store = getDefaultStore()
-    const auth = store.get(authAtom)
+    const auth = useAuthStore.getState()
 
     if (auth.token && auth.tokenType) {
       config.headers.Authorization = `${auth.tokenType} ${auth.token}`

@@ -27,8 +27,7 @@ import { authRoutes } from "@/api"
 import { useMutation } from "@tanstack/react-query"
 import { Logo } from "../ui/logo"
 import { useState } from "react"
-import { useAtom } from "jotai"
-import { authAtom, login } from "@/lib/auth/authStore"
+import { useAuthStore } from "@/lib/auth/authStore"
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -46,7 +45,7 @@ export function LoginForm({
       password: "",
     },
   })
-  const [, setAuth] = useAtom(authAtom)
+  const loginAction = useAuthStore((state) => state.login)
   const navigate = useNavigate({ from: "/login" })
 
   const loginMutation = useMutation({
@@ -56,12 +55,10 @@ export function LoginForm({
       if (res.status === 200) {
         console.log("Login response:", res.data)
 
-        // Use our jotai login function
-        const loginSuccess = login(
+        const loginSuccess = loginAction(
           res.data.token,
           res.data.token_type,
-          res.data.user,
-          setAuth
+          res.data.user
         )
 
         if (loginSuccess) {
@@ -114,11 +111,7 @@ export function LoginForm({
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder='m@example.com'
-                        type='email'
-                        {...field}
-                      />
+                      <Input type='email' {...field} />
                     </FormControl>
                     <FormMessage className='text-red-500' />
                   </FormItem>
