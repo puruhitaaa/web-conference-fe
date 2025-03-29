@@ -8,7 +8,7 @@ import {
 
 export const Route = createFileRoute("/_app")({
   beforeLoad: ({ context }) => {
-    if (!context?.auth?.isAuthenticated) {
+    if (!context?.auth?.isAuthenticated || !context?.auth?.user) {
       throw redirect({
         to: "/login",
       })

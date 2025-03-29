@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CheckCircle, XCircle, Clock, AlertCircle } from "lucide-react"
+import { useAuthStore } from "@/lib/auth/authStore"
 
 // Define types for our history items based on the data structure
 type LoaHistoryItem = {
@@ -42,6 +43,7 @@ type ReceiptHistoryItem = {
 }
 
 export function Dashboard() {
+  const user = useAuthStore((state) => state.user)
   // Fetch data for all history sections using useQueries
   const results = useQueries({
     queries: [
@@ -57,6 +59,7 @@ export function Dashboard() {
             status: item.status,
           }))
         },
+        enabled: user?.role === 1 || user?.role === 2,
       },
       {
         queryKey: ["icodsa-invoice-history"],
@@ -72,6 +75,7 @@ export function Dashboard() {
             status: item.status || "pending",
           }))
         },
+        enabled: user?.role === 1 || user?.role === 2,
       },
       {
         queryKey: ["icodsa-receipt-history"],
@@ -87,13 +91,14 @@ export function Dashboard() {
             status: item.status || "pending",
           }))
         },
+        enabled: user?.role === 1 || user?.role === 2,
       },
       {
         queryKey: ["icicyta-loa-history"],
         queryFn: async () => {
           const response = await api.get(loaRoutes.list)
           return response.data
-            .filter((item: any) => item.conferenceType === "ICIKTA")
+            .filter((item: any) => item.conferenceType === "ICICYTA")
             .slice(0, 10)
             .map((item: any) => ({
               id: item.id,
@@ -103,13 +108,14 @@ export function Dashboard() {
               status: item.status,
             }))
         },
+        enabled: user?.role === 1 || user?.role === 3,
       },
       {
         queryKey: ["icicyta-invoice-history"],
         queryFn: async () => {
           const response = await api.get(invoiceRoutes.listAll)
           return response.data
-            .filter((item: any) => item.conferenceType === "ICIKTA")
+            .filter((item: any) => item.conferenceType === "ICICYTA")
             .slice(0, 10)
             .map((item: any) => ({
               id: item.id,
@@ -121,13 +127,14 @@ export function Dashboard() {
               status: item.status || "pending",
             }))
         },
+        enabled: user?.role === 1 || user?.role === 3,
       },
       {
         queryKey: ["icicyta-receipt-history"],
         queryFn: async () => {
           const response = await api.get(paymentRoutes.listAll)
           return response.data
-            .filter((item: any) => item.conferenceTitle === "ICIKTA")
+            .filter((item: any) => item.conferenceTitle === "ICICYTA")
             .slice(0, 10)
             .map((item: any) => ({
               id: item.id,
@@ -139,6 +146,7 @@ export function Dashboard() {
               status: item.status || "pending",
             }))
         },
+        enabled: user?.role === 1 || user?.role === 3,
       },
     ],
   })
@@ -377,59 +385,63 @@ export function Dashboard() {
       <h1 className='text-3xl font-bold mb-2'>Welcome</h1>
       <p className='text-gray-600 mb-8'>to Dashboard</p>
 
-      <div className='mb-10'>
-        <h2 className='text-2xl font-bold mb-6'>ICODSA</h2>
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-          {renderLoaHistoryCard(
-            "History LoA",
-            icodsaLoaHistory.data,
-            icodsaLoaHistory.isLoading,
-            icodsaLoaHistory.error,
-            "/icodsa/loa"
-          )}
-          {renderInvoiceHistoryCard(
-            "History Invoice",
-            icodsaInvoiceHistory.data,
-            icodsaInvoiceHistory.isLoading,
-            icodsaInvoiceHistory.error,
-            "/icodsa/invoice"
-          )}
-          {renderReceiptHistoryCard(
-            "History Receipt",
-            icodsaReceiptHistory.data,
-            icodsaReceiptHistory.isLoading,
-            icodsaReceiptHistory.error,
-            "/icodsa/receipt"
-          )}
+      {user?.role === 1 || user?.role === 2 ? (
+        <div className='mb-10'>
+          <h2 className='text-2xl font-bold mb-6'>ICODSA</h2>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+            {renderLoaHistoryCard(
+              "History LoA",
+              icodsaLoaHistory.data,
+              icodsaLoaHistory.isLoading,
+              icodsaLoaHistory.error,
+              "/icodsa/loa"
+            )}
+            {renderInvoiceHistoryCard(
+              "History Invoice",
+              icodsaInvoiceHistory.data,
+              icodsaInvoiceHistory.isLoading,
+              icodsaInvoiceHistory.error,
+              "/icodsa/invoice"
+            )}
+            {renderReceiptHistoryCard(
+              "History Receipt",
+              icodsaReceiptHistory.data,
+              icodsaReceiptHistory.isLoading,
+              icodsaReceiptHistory.error,
+              "/icodsa/receipt"
+            )}
+          </div>
         </div>
-      </div>
+      ) : null}
 
-      <div>
-        <h2 className='text-2xl font-bold mb-6'>ICICYTA</h2>
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-          {renderLoaHistoryCard(
-            "History LoA",
-            icicytaLoaHistory.data,
-            icicytaLoaHistory.isLoading,
-            icicytaLoaHistory.error,
-            "/icicyta/loa"
-          )}
-          {renderInvoiceHistoryCard(
-            "History Invoice",
-            icicytaInvoiceHistory.data,
-            icicytaInvoiceHistory.isLoading,
-            icicytaInvoiceHistory.error,
-            "/icicyta/invoice"
-          )}
-          {renderReceiptHistoryCard(
-            "History Receipt",
-            icicytaReceiptHistory.data,
-            icicytaReceiptHistory.isLoading,
-            icicytaReceiptHistory.error,
-            "/icicyta/receipt"
-          )}
+      {user?.role === 1 || user?.role === 3 ? (
+        <div>
+          <h2 className='text-2xl font-bold mb-6'>ICICYTA</h2>
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+            {renderLoaHistoryCard(
+              "History LoA",
+              icicytaLoaHistory.data,
+              icicytaLoaHistory.isLoading,
+              icicytaLoaHistory.error,
+              "/icicyta/loa"
+            )}
+            {renderInvoiceHistoryCard(
+              "History Invoice",
+              icicytaInvoiceHistory.data,
+              icicytaInvoiceHistory.isLoading,
+              icicytaInvoiceHistory.error,
+              "/icicyta/invoice"
+            )}
+            {renderReceiptHistoryCard(
+              "History Receipt",
+              icicytaReceiptHistory.data,
+              icicytaReceiptHistory.isLoading,
+              icicytaReceiptHistory.error,
+              "/icicyta/receipt"
+            )}
+          </div>
         </div>
-      </div>
+      ) : null}
     </div>
   )
 }
