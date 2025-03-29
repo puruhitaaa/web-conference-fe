@@ -14,7 +14,6 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as AuthImport } from './routes/_auth'
 import { Route as AppImport } from './routes/_app'
 import { Route as AppIndexImport } from './routes/_app/index'
-import { Route as AuthRegisterImport } from './routes/_auth/register'
 import { Route as AuthLoginImport } from './routes/_auth/login'
 import { Route as AppIcodsaReceiptImport } from './routes/_app/icodsa/receipt'
 import { Route as AppIcodsaLoaImport } from './routes/_app/icodsa/loa'
@@ -39,12 +38,6 @@ const AppIndexRoute = AppIndexImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppRoute,
-} as any)
-
-const AuthRegisterRoute = AuthRegisterImport.update({
-  id: '/register',
-  path: '/register',
-  getParentRoute: () => AuthRoute,
 } as any)
 
 const AuthLoginRoute = AuthLoginImport.update({
@@ -112,13 +105,6 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof AuthLoginImport
-      parentRoute: typeof AuthImport
-    }
-    '/_auth/register': {
-      id: '/_auth/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof AuthRegisterImport
       parentRoute: typeof AuthImport
     }
     '/_app/': {
@@ -199,12 +185,10 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 interface AuthRouteChildren {
   AuthLoginRoute: typeof AuthLoginRoute
-  AuthRegisterRoute: typeof AuthRegisterRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
-  AuthRegisterRoute: AuthRegisterRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
@@ -212,7 +196,6 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 export interface FileRoutesByFullPath {
   '': typeof AuthRouteWithChildren
   '/login': typeof AuthLoginRoute
-  '/register': typeof AuthRegisterRoute
   '/': typeof AppIndexRoute
   '/icicyta/invoice': typeof AppIcicytaInvoiceRoute
   '/icicyta/loa': typeof AppIcicytaLoaRoute
@@ -225,7 +208,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '': typeof AuthRouteWithChildren
   '/login': typeof AuthLoginRoute
-  '/register': typeof AuthRegisterRoute
   '/': typeof AppIndexRoute
   '/icicyta/invoice': typeof AppIcicytaInvoiceRoute
   '/icicyta/loa': typeof AppIcicytaLoaRoute
@@ -240,7 +222,6 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_auth': typeof AuthRouteWithChildren
   '/_auth/login': typeof AuthLoginRoute
-  '/_auth/register': typeof AuthRegisterRoute
   '/_app/': typeof AppIndexRoute
   '/_app/icicyta/invoice': typeof AppIcicytaInvoiceRoute
   '/_app/icicyta/loa': typeof AppIcicytaLoaRoute
@@ -255,7 +236,6 @@ export interface FileRouteTypes {
   fullPaths:
     | ''
     | '/login'
-    | '/register'
     | '/'
     | '/icicyta/invoice'
     | '/icicyta/loa'
@@ -267,7 +247,6 @@ export interface FileRouteTypes {
   to:
     | ''
     | '/login'
-    | '/register'
     | '/'
     | '/icicyta/invoice'
     | '/icicyta/loa'
@@ -280,7 +259,6 @@ export interface FileRouteTypes {
     | '/_app'
     | '/_auth'
     | '/_auth/login'
-    | '/_auth/register'
     | '/_app/'
     | '/_app/icicyta/invoice'
     | '/_app/icicyta/loa'
@@ -330,16 +308,11 @@ export const routeTree = rootRoute
     "/_auth": {
       "filePath": "_auth.tsx",
       "children": [
-        "/_auth/login",
-        "/_auth/register"
+        "/_auth/login"
       ]
     },
     "/_auth/login": {
       "filePath": "_auth/login.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/register": {
-      "filePath": "_auth/register.tsx",
       "parent": "/_auth"
     },
     "/_app/": {

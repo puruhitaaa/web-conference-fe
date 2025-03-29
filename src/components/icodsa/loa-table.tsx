@@ -11,8 +11,8 @@ import {
   ColumnFiltersState,
 } from "@tanstack/react-table"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import axios from "axios"
-import { protectedRoutes } from "@/api"
+import api from "@/lib/axios-config"
+import { loaRoutes } from "@/api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -65,7 +65,7 @@ export function LoaTable() {
   const { data: loas = [], isLoading } = useQuery<Loa[]>({
     queryKey: ["icodsa-loas"],
     queryFn: async () => {
-      const response = await axios.get(protectedRoutes.loas)
+      const response = await api.get(loaRoutes.list)
       return response.data
     },
   })
@@ -73,7 +73,7 @@ export function LoaTable() {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`${protectedRoutes.loas}/${id}`)
+      await api.delete(loaRoutes.delete(id))
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["icodsa-loas"] })

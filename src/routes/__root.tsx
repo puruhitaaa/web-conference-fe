@@ -27,20 +27,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     )
     return (
       <>
-        {/* <div className='p-2 flex gap-2 absolute top-0 left-0 w-full border-b-2 border-white'>
-          <Link to='/' className='[&.active]:text-orange-500'>
-            Home
-          </Link>{' '}
-          <Link to='/query' className='[&.active]:text-orange-500'>
-            Query
-          </Link>
-          <Link to='/form' className='[&.active]:text-orange-500'>
-            Form
-          </Link>
-          <Link to='/table' className='[&.active]:text-orange-500'>
-            Table
-          </Link>
-        </div> */}
         <QueryClientProvider client={queryClient}>
           <ThemeProvider defaultTheme='dark' storageKey='vite-ui-theme'>
             <Outlet />

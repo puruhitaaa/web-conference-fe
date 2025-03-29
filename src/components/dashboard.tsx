@@ -1,6 +1,6 @@
 import { useQueries } from "@tanstack/react-query"
-import axios from "axios"
-import { protectedRoutes } from "@/api"
+import api from "@/lib/axios-config"
+import { loaRoutes, invoiceRoutes, paymentRoutes } from "@/api"
 import { Link } from "@tanstack/react-router"
 import {
   Card,
@@ -48,7 +48,7 @@ export function Dashboard() {
       {
         queryKey: ["icodsa-loa-history"],
         queryFn: async () => {
-          const response = await axios.get(protectedRoutes.loas)
+          const response = await api.get(loaRoutes.list)
           return response.data.slice(0, 10).map((item: any) => ({
             id: item.id,
             paperId: item.paperId,
@@ -61,7 +61,7 @@ export function Dashboard() {
       {
         queryKey: ["icodsa-invoice-history"],
         queryFn: async () => {
-          const response = await axios.get(protectedRoutes.invoices)
+          const response = await api.get(invoiceRoutes.listAll)
           return response.data.slice(0, 10).map((item: any) => ({
             id: item.id,
             invoiceNumber: item.invoiceNumber,
@@ -76,7 +76,7 @@ export function Dashboard() {
       {
         queryKey: ["icodsa-receipt-history"],
         queryFn: async () => {
-          const response = await axios.get(protectedRoutes.receipts)
+          const response = await api.get(paymentRoutes.listAll)
           return response.data.slice(0, 10).map((item: any) => ({
             id: item.id,
             invoiceNumber: item.invoiceNumber,
@@ -91,7 +91,7 @@ export function Dashboard() {
       {
         queryKey: ["icicyta-loa-history"],
         queryFn: async () => {
-          const response = await axios.get(protectedRoutes.loas)
+          const response = await api.get(loaRoutes.list)
           return response.data
             .filter((item: any) => item.conferenceType === "ICIKTA")
             .slice(0, 10)
@@ -107,7 +107,7 @@ export function Dashboard() {
       {
         queryKey: ["icicyta-invoice-history"],
         queryFn: async () => {
-          const response = await axios.get(protectedRoutes.invoices)
+          const response = await api.get(invoiceRoutes.listAll)
           return response.data
             .filter((item: any) => item.conferenceType === "ICIKTA")
             .slice(0, 10)
@@ -125,7 +125,7 @@ export function Dashboard() {
       {
         queryKey: ["icicyta-receipt-history"],
         queryFn: async () => {
-          const response = await axios.get(protectedRoutes.receipts)
+          const response = await api.get(paymentRoutes.listAll)
           return response.data
             .filter((item: any) => item.conferenceTitle === "ICIKTA")
             .slice(0, 10)

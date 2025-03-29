@@ -27,18 +27,32 @@ import {
 import useSignOut from "react-auth-kit/hooks/useSignOut"
 import { useNavigate } from "@tanstack/react-router"
 import type { User } from "@/types/auth"
+import api from "@/lib/axios-config"
+import { authRoutes } from "@/api"
 
 export function NavUser({ user }: { user: User }) {
   const signOut = useSignOut()
   const { isMobile } = useSidebar()
   const navigate = useNavigate({ from: "/" })
 
-  const handleLogout = () => {
-    signOut()
-    navigate({
-      to: "/login",
-      replace: true,
-    })
+  const handleLogout = async () => {
+    try {
+      // Call the logout API endpoint before signing out client-side
+      await api.post(authRoutes.logout)
+      signOut()
+      navigate({
+        to: "/login",
+        replace: true,
+      })
+    } catch (error) {
+      console.error("Logout failed", error)
+      // Still sign out client-side even if the API call fails
+      signOut()
+      navigate({
+        to: "/login",
+        replace: true,
+      })
+    }
   }
 
   return (

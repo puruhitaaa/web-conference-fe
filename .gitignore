@@ -28,3 +28,5 @@ bun.lockb
 yarn.lock
 package.lock.json
 .qodo
+
+*.txt
