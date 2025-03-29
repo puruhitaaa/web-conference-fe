@@ -24,14 +24,15 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import useSignOut from "react-auth-kit/hooks/useSignOut"
 import { useNavigate } from "@tanstack/react-router"
 import type { User } from "@/types/auth"
 import api from "@/lib/axios-config"
 import { authRoutes } from "@/api"
+import { useAtom } from "jotai"
+import { authAtom, logout } from "@/lib/auth/authStore"
 
 export function NavUser({ user }: { user: User }) {
-  const signOut = useSignOut()
+  const [, setAuth] = useAtom(authAtom)
   const { isMobile } = useSidebar()
   const navigate = useNavigate({ from: "/" })
 
@@ -39,7 +40,8 @@ export function NavUser({ user }: { user: User }) {
     try {
       // Call the logout API endpoint before signing out client-side
       await api.post(authRoutes.logout)
-      signOut()
+      // Use our jotai logout function
+      logout(setAuth)
       navigate({
         to: "/login",
         replace: true,
@@ -47,7 +49,7 @@ export function NavUser({ user }: { user: User }) {
     } catch (error) {
       console.error("Logout failed", error)
       // Still sign out client-side even if the API call fails
-      signOut()
+      logout(setAuth)
       navigate({
         to: "/login",
         replace: true,

@@ -7,7 +7,8 @@ import { createRootRouteWithContext, Outlet } from "@tanstack/react-router"
 import { TanStackRouterDevtools } from "@tanstack/router-devtools"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "react-hot-toast"
-import type { AuthState } from "@/types/auth"
+import type { AuthState } from "@/lib/auth/authStore"
+
 interface MyRouterContext {
   // The ReturnType of your useAuth hook or the value of your AuthContext
   auth: AuthState | null

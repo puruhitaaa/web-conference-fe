@@ -1,11 +1,11 @@
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Home } from "lucide-react"
 import { Link, useRouter } from "@tanstack/react-router"
 import { Button } from "./ui/button"
-import { Home } from "lucide-react"
-import useIsAuthenticated from "react-auth-kit/hooks/useIsAuthenticated"
+import { useAtom } from "jotai"
+import { isAuthenticatedAtom } from "@/lib/auth/authStore"
 
 function NotFound() {
-  const isAuthenticated = useIsAuthenticated()
+  const [isAuthenticated] = useAtom(isAuthenticatedAtom)
   const router = useRouter()
 
   return (

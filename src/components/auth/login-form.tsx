@@ -22,12 +22,13 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import api from "@/lib/axios-config"
-import useSignIn from "react-auth-kit/hooks/useSignIn"
 import toast from "react-hot-toast"
 import { authRoutes } from "@/api"
 import { useMutation } from "@tanstack/react-query"
 import { Logo } from "../ui/logo"
 import { useState } from "react"
+import { useAtom } from "jotai"
+import { authAtom, login } from "@/lib/auth/authStore"
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -45,7 +46,7 @@ export function LoginForm({
       password: "",
     },
   })
-  const signIn = useSignIn()
+  const [, setAuth] = useAtom(authAtom)
   const navigate = useNavigate({ from: "/login" })
 
   const loginMutation = useMutation({
@@ -53,20 +54,17 @@ export function LoginForm({
       api.post(authRoutes.login, values),
     onSuccess: (res) => {
       if (res.status === 200) {
-        const signInResult = signIn({
-          auth: {
-            token: res.data.token,
-            type: res.data.token_type,
-          },
-          userState: {
-            id: res.data.user.id,
-            name: res.data.user.name,
-            email: res.data.user.email,
-            role: res.data.user.role,
-          },
-        })
+        console.log("Login response:", res.data)
 
-        if (signInResult) {
+        // Use our jotai login function
+        const loginSuccess = login(
+          res.data.token,
+          res.data.token_type,
+          res.data.user,
+          setAuth
+        )
+
+        if (loginSuccess) {
           toast.success(res.data.message || "Login successful")
           navigate({
             to: "/",
@@ -78,7 +76,8 @@ export function LoginForm({
         }
       }
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Login error:", error)
       toast.error("Login failed")
     },
   })

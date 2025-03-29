@@ -9,8 +9,8 @@ import {
   SidebarFooter,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import useAuthUser from "react-auth-kit/hooks/useAuthUser"
-import type { User } from "@/types/auth"
+import { useAtom } from "jotai"
+import { userAtom } from "@/lib/auth/authStore"
 import { Logo } from "@/components/ui/logo"
 
 const data = {
@@ -62,7 +62,9 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const auth = useAuthUser<User>()
+  const [user] = useAtom(userAtom)
+
+  if (!user) return null
 
   return (
     <Sidebar variant='inset' collapsible='icon' {...props}>
@@ -73,7 +75,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={auth!} />
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
