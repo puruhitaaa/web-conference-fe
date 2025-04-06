@@ -1,13 +1,6 @@
 "use client"
 
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles,
-} from "lucide-react"
+import { BadgeCheck, ChevronsUpDown, LogOut, Moon, Sun } from "lucide-react"
 
 import {
   DropdownMenu,
@@ -29,9 +22,11 @@ import type { User } from "@/types/auth"
 import api from "@/lib/axios-config"
 import { authRoutes } from "@/api"
 import { useAuthStore } from "@/lib/auth/authStore"
+import { useTheme } from "./theme-provider"
 
 export function NavUser({ user }: { user: User }) {
   const logout = useAuthStore((state) => state.logout)
+  const { theme, setTheme } = useTheme()
   const { isMobile } = useSidebar()
   const navigate = useNavigate({ from: "/" })
 
@@ -87,30 +82,29 @@ export function NavUser({ user }: { user: User }) {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
+            <DropdownMenuGroup className='flex flex-col gap-1'>
+              <DropdownMenuItem
+                className='cursor-pointer'
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              >
+                {theme === "dark" ? (
+                  <Sun className='text-white' />
+                ) : (
+                  <Moon className='text-black' />
+                )}
+                {theme === "dark" ? "Light Mode" : "Dark Mode"}
               </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
+              <DropdownMenuItem className='bg-gray-700 hover:!bg-gray-500 cursor-pointer text-white hover:!text-white'>
+                <BadgeCheck className='text-white' />
                 Account
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
-              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
-              <LogOut />
+            <DropdownMenuItem
+              className='bg-red-700 hover:!bg-red-500 cursor-pointer text-white hover:!text-white'
+              onClick={handleLogout}
+            >
+              <LogOut className='text-white' />
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>
