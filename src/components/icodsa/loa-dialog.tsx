@@ -3,8 +3,8 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import axios from "axios"
-import { protectedRoutes } from "@/api"
+import api from "@/lib/axios-config"
+import { loaRoutes } from "@/api"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -101,7 +101,7 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
   // Create mutation
   const createMutation = useMutation({
     mutationFn: async (values: LoaFormValues) => {
-      const response = await axios.post(protectedRoutes.loas, {
+      const response = await api.post(loaRoutes.create, {
         ...values,
         id: crypto.randomUUID(),
       })
@@ -123,10 +123,7 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: async (values: LoaFormValues & { id: string }) => {
-      const response = await axios.put(
-        `${protectedRoutes.loas}/${values.id}`,
-        values
-      )
+      const response = await api.put(loaRoutes.update(values.id), values)
       return response.data
     },
     onSuccess: () => {

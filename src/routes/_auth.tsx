@@ -1,16 +1,14 @@
-import NotFound from "@/components/not-found"
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/_auth")({
   beforeLoad: ({ context }) => {
-    if (context?.auth) {
+    if (context?.auth?.isAuthenticated) {
       throw redirect({
         to: "/",
       })
     }
   },
   component: AuthLayout,
-  notFoundComponent: NotFound,
 })
 
 function AuthLayout() {

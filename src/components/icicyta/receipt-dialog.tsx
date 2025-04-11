@@ -3,8 +3,8 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import axios from "axios"
-import { protectedRoutes } from "@/api"
+import api from "@/lib/axios-config"
+import { paymentRoutes } from "@/api"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -127,7 +127,7 @@ export function ReceiptDialog({
   // Create mutation
   const createMutation = useMutation({
     mutationFn: async (values: ReceiptFormValues) => {
-      const response = await axios.post(protectedRoutes.receipts, {
+      const response = await api.post(paymentRoutes.listAll, {
         ...values,
         id: crypto.randomUUID(),
       })
@@ -149,10 +149,7 @@ export function ReceiptDialog({
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: async (values: ReceiptFormValues & { id: string }) => {
-      const response = await axios.put(
-        `${protectedRoutes.receipts}/${values.id}`,
-        values
-      )
+      const response = await api.put(paymentRoutes.show(values.id), values)
       return response.data
     },
     onSuccess: () => {

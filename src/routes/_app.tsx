@@ -5,18 +5,16 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import NotFound from "@/components/not-found"
 
 export const Route = createFileRoute("/_app")({
   beforeLoad: ({ context }) => {
-    if (!context?.auth) {
+    if (!context?.auth?.isAuthenticated || !context?.auth?.user) {
       throw redirect({
         to: "/login",
       })
     }
   },
   component: AppLayout,
-  notFoundComponent: NotFound,
 })
 
 function AppLayout() {

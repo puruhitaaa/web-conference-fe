@@ -27,3 +27,16 @@ dist-ssr
 bun.lockb
 yarn.lock
 package.lock.json
+.qodo
+
+*.txt
+
+# Environment variables
+.env
+.env.production
+.env.development
+.env.staging
+
+# IDE
+.vscode
+.cursor

@@ -1,3 +1,3 @@
 export const apiConfig = {
-    baseUrl: 'http://localhost:3000',
+  baseUrl: "http://localhost:8000/api",
 }

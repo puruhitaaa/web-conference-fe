@@ -14,8 +14,10 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as AuthImport } from './routes/_auth'
 import { Route as AppImport } from './routes/_app'
 import { Route as AppIndexImport } from './routes/_app/index'
-import { Route as AuthRegisterImport } from './routes/_auth/register'
 import { Route as AuthLoginImport } from './routes/_auth/login'
+import { Route as AppVirtualAccountsImport } from './routes/_app/virtual-accounts'
+import { Route as AppManageAccountImport } from './routes/_app/manage-account'
+import { Route as AppBankTransferImport } from './routes/_app/bank-transfer'
 import { Route as AppIcodsaReceiptImport } from './routes/_app/icodsa/receipt'
 import { Route as AppIcodsaLoaImport } from './routes/_app/icodsa/loa'
 import { Route as AppIcodsaInvoiceImport } from './routes/_app/icodsa/invoice'
@@ -41,16 +43,28 @@ const AppIndexRoute = AppIndexImport.update({
   getParentRoute: () => AppRoute,
 } as any)
 
-const AuthRegisterRoute = AuthRegisterImport.update({
-  id: '/register',
-  path: '/register',
-  getParentRoute: () => AuthRoute,
-} as any)
-
 const AuthLoginRoute = AuthLoginImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => AuthRoute,
+} as any)
+
+const AppVirtualAccountsRoute = AppVirtualAccountsImport.update({
+  id: '/virtual-accounts',
+  path: '/virtual-accounts',
+  getParentRoute: () => AppRoute,
+} as any)
+
+const AppManageAccountRoute = AppManageAccountImport.update({
+  id: '/manage-account',
+  path: '/manage-account',
+  getParentRoute: () => AppRoute,
+} as any)
+
+const AppBankTransferRoute = AppBankTransferImport.update({
+  id: '/bank-transfer',
+  path: '/bank-transfer',
+  getParentRoute: () => AppRoute,
 } as any)
 
 const AppIcodsaReceiptRoute = AppIcodsaReceiptImport.update({
@@ -107,18 +121,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthImport
       parentRoute: typeof rootRoute
     }
+    '/_app/bank-transfer': {
+      id: '/_app/bank-transfer'
+      path: '/bank-transfer'
+      fullPath: '/bank-transfer'
+      preLoaderRoute: typeof AppBankTransferImport
+      parentRoute: typeof AppImport
+    }
+    '/_app/manage-account': {
+      id: '/_app/manage-account'
+      path: '/manage-account'
+      fullPath: '/manage-account'
+      preLoaderRoute: typeof AppManageAccountImport
+      parentRoute: typeof AppImport
+    }
+    '/_app/virtual-accounts': {
+      id: '/_app/virtual-accounts'
+      path: '/virtual-accounts'
+      fullPath: '/virtual-accounts'
+      preLoaderRoute: typeof AppVirtualAccountsImport
+      parentRoute: typeof AppImport
+    }
     '/_auth/login': {
       id: '/_auth/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof AuthLoginImport
-      parentRoute: typeof AuthImport
-    }
-    '/_auth/register': {
-      id: '/_auth/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof AuthRegisterImport
       parentRoute: typeof AuthImport
     }
     '/_app/': {
@@ -176,6 +204,9 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface AppRouteChildren {
+  AppBankTransferRoute: typeof AppBankTransferRoute
+  AppManageAccountRoute: typeof AppManageAccountRoute
+  AppVirtualAccountsRoute: typeof AppVirtualAccountsRoute
   AppIndexRoute: typeof AppIndexRoute
   AppIcicytaInvoiceRoute: typeof AppIcicytaInvoiceRoute
   AppIcicytaLoaRoute: typeof AppIcicytaLoaRoute
@@ -186,6 +217,9 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppBankTransferRoute: AppBankTransferRoute,
+  AppManageAccountRoute: AppManageAccountRoute,
+  AppVirtualAccountsRoute: AppVirtualAccountsRoute,
   AppIndexRoute: AppIndexRoute,
   AppIcicytaInvoiceRoute: AppIcicytaInvoiceRoute,
   AppIcicytaLoaRoute: AppIcicytaLoaRoute,
@@ -199,20 +233,20 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 interface AuthRouteChildren {
   AuthLoginRoute: typeof AuthLoginRoute
-  AuthRegisterRoute: typeof AuthRegisterRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
-  AuthRegisterRoute: AuthRegisterRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 export interface FileRoutesByFullPath {
   '': typeof AuthRouteWithChildren
+  '/bank-transfer': typeof AppBankTransferRoute
+  '/manage-account': typeof AppManageAccountRoute
+  '/virtual-accounts': typeof AppVirtualAccountsRoute
   '/login': typeof AuthLoginRoute
-  '/register': typeof AuthRegisterRoute
   '/': typeof AppIndexRoute
   '/icicyta/invoice': typeof AppIcicytaInvoiceRoute
   '/icicyta/loa': typeof AppIcicytaLoaRoute
@@ -224,8 +258,10 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '': typeof AuthRouteWithChildren
+  '/bank-transfer': typeof AppBankTransferRoute
+  '/manage-account': typeof AppManageAccountRoute
+  '/virtual-accounts': typeof AppVirtualAccountsRoute
   '/login': typeof AuthLoginRoute
-  '/register': typeof AuthRegisterRoute
   '/': typeof AppIndexRoute
   '/icicyta/invoice': typeof AppIcicytaInvoiceRoute
   '/icicyta/loa': typeof AppIcicytaLoaRoute
@@ -239,8 +275,10 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_app': typeof AppRouteWithChildren
   '/_auth': typeof AuthRouteWithChildren
+  '/_app/bank-transfer': typeof AppBankTransferRoute
+  '/_app/manage-account': typeof AppManageAccountRoute
+  '/_app/virtual-accounts': typeof AppVirtualAccountsRoute
   '/_auth/login': typeof AuthLoginRoute
-  '/_auth/register': typeof AuthRegisterRoute
   '/_app/': typeof AppIndexRoute
   '/_app/icicyta/invoice': typeof AppIcicytaInvoiceRoute
   '/_app/icicyta/loa': typeof AppIcicytaLoaRoute
@@ -254,8 +292,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | ''
+    | '/bank-transfer'
+    | '/manage-account'
+    | '/virtual-accounts'
     | '/login'
-    | '/register'
     | '/'
     | '/icicyta/invoice'
     | '/icicyta/loa'
@@ -266,8 +306,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | ''
+    | '/bank-transfer'
+    | '/manage-account'
+    | '/virtual-accounts'
     | '/login'
-    | '/register'
     | '/'
     | '/icicyta/invoice'
     | '/icicyta/loa'
@@ -279,8 +321,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_app'
     | '/_auth'
+    | '/_app/bank-transfer'
+    | '/_app/manage-account'
+    | '/_app/virtual-accounts'
     | '/_auth/login'
-    | '/_auth/register'
     | '/_app/'
     | '/_app/icicyta/invoice'
     | '/_app/icicyta/loa'
@@ -318,6 +362,9 @@ export const routeTree = rootRoute
     "/_app": {
       "filePath": "_app.tsx",
       "children": [
+        "/_app/bank-transfer",
+        "/_app/manage-account",
+        "/_app/virtual-accounts",
         "/_app/",
         "/_app/icicyta/invoice",
         "/_app/icicyta/loa",
@@ -330,16 +377,23 @@ export const routeTree = rootRoute
     "/_auth": {
       "filePath": "_auth.tsx",
       "children": [
-        "/_auth/login",
-        "/_auth/register"
+        "/_auth/login"
       ]
+    },
+    "/_app/bank-transfer": {
+      "filePath": "_app/bank-transfer.tsx",
+      "parent": "/_app"
+    },
+    "/_app/manage-account": {
+      "filePath": "_app/manage-account.tsx",
+      "parent": "/_app"
+    },
+    "/_app/virtual-accounts": {
+      "filePath": "_app/virtual-accounts.tsx",
+      "parent": "/_app"
     },
     "/_auth/login": {
       "filePath": "_auth/login.tsx",
-      "parent": "/_auth"
-    },
-    "/_auth/register": {
-      "filePath": "_auth/register.tsx",
       "parent": "/_auth"
     },
     "/_app/": {

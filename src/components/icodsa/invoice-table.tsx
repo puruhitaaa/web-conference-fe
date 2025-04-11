@@ -11,8 +11,8 @@ import {
   ColumnFiltersState,
 } from "@tanstack/react-table"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import axios from "axios"
-import { protectedRoutes } from "@/api"
+import api from "@/lib/axios-config"
+import { invoiceRoutes } from "@/api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -72,7 +72,7 @@ export function InvoiceTable() {
   const { data: invoices = [], isLoading } = useQuery<Invoice[]>({
     queryKey: ["icodsa-invoices"],
     queryFn: async () => {
-      const response = await axios.get(protectedRoutes.invoices)
+      const response = await api.get(invoiceRoutes.listAll)
       return response.data
     },
   })
@@ -80,7 +80,7 @@ export function InvoiceTable() {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`${protectedRoutes.invoices}/${id}`)
+      await api.delete(invoiceRoutes.updateICODSA(id))
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["icodsa-invoices"] })

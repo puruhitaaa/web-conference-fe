@@ -12,7 +12,7 @@ import {
 } from "@tanstack/react-table"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/axios-config"
-import { loaRoutes } from "@/api"
+import { bankTransferRoutes } from "@/api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -31,42 +31,44 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, Plus, Printer, FileText } from "lucide-react"
-import { LoaDialog } from "./loa-dialog"
-import { PrintDialog } from "./print-dialog"
+import { MoreHorizontal, Plus } from "lucide-react"
+import { BankTransferDialog } from "./bank-transfer-dialog"
 import toast from "react-hot-toast"
+import { useAuthStore } from "@/lib/auth/authStore"
+import { DataTablePagination } from "../data-table-pagination"
 
-export type Loa = {
+export type BankTransfer = {
   id: string
-  paperId: string
-  authorName: string
-  time: string
-  conferenceTitle: string
-  placeAndDate: string
-  status: "accepted" | "rejected"
-  signature: string
-  department: string
+  nama_bank: string
+  swift_code: string
+  recipient_name: string
+  beneficiary_bank_account_no: string
+  bank_branch: string
+  bank_address: string
+  city: string
+  country: string
+  created_by: number
 }
 
-export function LoaTable() {
+export function BankTransferTable() {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [currentLoa, setCurrentLoa] = useState<Loa | null>(null)
+  const [currentBankTransfer, setCurrentBankTransfer] =
+    useState<BankTransfer | null>(null)
   const [dialogMode, setDialogMode] = useState<"create" | "edit" | "view">(
     "create"
   )
-  const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false)
-  const [currentPrintLoa, setCurrentPrintLoa] = useState<Loa | null>(null)
-  const [printMode, setPrintMode] = useState<"single" | "all">("all")
 
   const queryClient = useQueryClient()
+  const user = useAuthStore((state) => state.user)
+  const isSuperAdmin = user?.role === 1
 
-  // Fetch LoAs
-  const { data: loas = [], isLoading } = useQuery<Loa[]>({
-    queryKey: ["icicyta-loas"],
+  // Fetch Bank Transfers
+  const { data: bankTransfers = [], isLoading } = useQuery<BankTransfer[]>({
+    queryKey: ["bank-transfers"],
     queryFn: async () => {
-      const response = await api.get(loaRoutes.list)
+      const response = await api.get(bankTransferRoutes.list)
       return response.data
     },
   })
@@ -74,93 +76,75 @@ export function LoaTable() {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(loaRoutes.delete(id))
+      await api.delete(bankTransferRoutes.delete(id))
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["icicyta-loas"] })
-      toast.success("LoA deleted successfully")
+      queryClient.invalidateQueries({ queryKey: ["bank-transfers"] })
+      toast.success("Bank transfer deleted successfully")
     },
     onError: () => {
-      toast.error("Failed to delete LoA")
+      toast.error("Failed to delete bank transfer")
     },
   })
 
   const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this LoA?")) {
+    if (confirm("Are you sure you want to delete this bank transfer?")) {
       deleteMutation.mutate(id)
     }
   }
 
-  const handleEdit = (loa: Loa) => {
-    setCurrentLoa(loa)
+  const handleEdit = (bankTransfer: BankTransfer) => {
+    setCurrentBankTransfer(bankTransfer)
     setDialogMode("edit")
     setIsDialogOpen(true)
   }
 
-  const handleView = (loa: Loa) => {
-    setCurrentLoa(loa)
+  const handleView = (bankTransfer: BankTransfer) => {
+    setCurrentBankTransfer(bankTransfer)
     setDialogMode("view")
     setIsDialogOpen(true)
   }
 
   const handleCreate = () => {
-    setCurrentLoa(null)
+    setCurrentBankTransfer(null)
     setDialogMode("create")
     setIsDialogOpen(true)
   }
 
-  const handlePrint = () => {
-    setPrintMode("all")
-    setCurrentPrintLoa(null)
-    setIsPrintDialogOpen(true)
-  }
-
-  const handlePrintSingle = (loa: Loa) => {
-    setPrintMode("single")
-    setCurrentPrintLoa(loa)
-    setIsPrintDialogOpen(true)
-  }
-
-  const columns: ColumnDef<Loa>[] = [
+  const columns: ColumnDef<BankTransfer>[] = [
     {
-      accessorKey: "paperId",
-      header: "Paper ID",
+      accessorKey: "nama_bank",
+      header: "Bank Name",
     },
     {
-      accessorKey: "authorName",
-      header: "Author Name",
+      accessorKey: "swift_code",
+      header: "SWIFT Code",
     },
     {
-      accessorKey: "conferenceTitle",
-      header: "Conference Title",
+      accessorKey: "recipient_name",
+      header: "Recipient Name",
     },
     {
-      accessorKey: "status",
-      header: "Status",
-      cell: ({ row }) => {
-        const status = row.getValue("status") as string
-        return (
-          <div
-            className={`px-2 py-1 rounded-full text-xs font-medium inline-block ${
-              status === "accepted"
-                ? "bg-green-100 text-green-800"
-                : "bg-red-100 text-red-800"
-            }`}
-          >
-            {status}
-          </div>
-        )
-      },
+      accessorKey: "beneficiary_bank_account_no",
+      header: "Account Number",
     },
     {
-      accessorKey: "placeAndDate",
-      header: "Place & Date",
+      accessorKey: "bank_branch",
+      header: "Branch",
+    },
+    {
+      accessorKey: "city",
+      header: "City",
+    },
+    {
+      accessorKey: "country",
+      header: "Country",
     },
     {
       id: "actions",
       header: "Actions",
       cell: ({ row }) => {
-        const loa = row.original
+        const bankTransfer = row.original
 
         return (
           <DropdownMenu>
@@ -172,23 +156,23 @@ export function LoaTable() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align='end'>
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => handleView(loa)}>
+              <DropdownMenuItem onClick={() => handleView(bankTransfer)}>
                 View
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleEdit(loa)}>
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handlePrintSingle(loa)}>
-                <FileText className='mr-2 h-4 w-4' />
-                Print PDF
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => handleDelete(loa.id)}
-                className='text-red-600'
-              >
-                Delete
-              </DropdownMenuItem>
+              {isSuperAdmin && (
+                <>
+                  <DropdownMenuItem onClick={() => handleEdit(bankTransfer)}>
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => handleDelete(bankTransfer.id)}
+                    className='text-red-600'
+                  >
+                    Delete
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         )
@@ -197,7 +181,7 @@ export function LoaTable() {
   ]
 
   const table = useReactTable({
-    data: loas,
+    data: bankTransfers,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -212,30 +196,25 @@ export function LoaTable() {
   })
 
   return (
-    <div>
-      <div className='flex items-center justify-between py-4'>
+    <div className='space-y-4'>
+      <div className='flex items-center justify-between'>
         <Input
-          placeholder='Filter by author name...'
+          placeholder='Filter by bank name...'
           value={
-            (table.getColumn("authorName")?.getFilterValue() as string) ?? ""
+            (table.getColumn("nama_bank")?.getFilterValue() as string) ?? ""
           }
-          onChange={(event) =>
-            table.getColumn("authorName")?.setFilterValue(event.target.value)
+          onChange={(e) =>
+            table.getColumn("nama_bank")?.setFilterValue(e.target.value)
           }
           className='max-w-sm'
         />
-        <div className='flex gap-2'>
-          {loas.length ? (
-            <Button variant='outline' onClick={handlePrint}>
-              <Printer className='mr-2 h-4 w-4' />
-              Print All
-            </Button>
-          ) : null}
+        {isSuperAdmin && (
           <Button onClick={handleCreate}>
-            <Plus className='mr-2 h-4 w-4' /> Add New LoA
+            <Plus className='mr-2 h-4 w-4' /> Add Bank Transfer
           </Button>
-        </div>
+        )}
       </div>
+
       <div className='rounded-md border'>
         <Table>
           <TableHeader>
@@ -286,52 +265,21 @@ export function LoaTable() {
                   colSpan={columns.length}
                   className='h-24 text-center'
                 >
-                  No LoAs found.
+                  No bank transfers found.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
-      <div className='flex items-center justify-end space-x-2 py-4'>
-        <Button
-          variant='outline'
-          size='sm'
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant='outline'
-          size='sm'
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
-      </div>
 
-      <LoaDialog
+      <DataTablePagination table={table} />
+
+      <BankTransferDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         mode={dialogMode}
-        loa={currentLoa}
-      />
-
-      <PrintDialog
-        open={isPrintDialogOpen}
-        onOpenChange={setIsPrintDialogOpen}
-        data={
-          printMode === "single" && currentPrintLoa ? currentPrintLoa : loas
-        }
-        title={printMode === "single" ? "Print LoA" : "Print All LoAs"}
-        description={
-          printMode === "single"
-            ? "Preview and print this letter of acceptance"
-            : "Preview and print all letters of acceptance"
-        }
-        singleMode={printMode === "single"}
+        bankTransfer={currentBankTransfer}
       />
     </div>
   )

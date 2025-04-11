@@ -11,8 +11,8 @@ import {
   ColumnFiltersState,
 } from "@tanstack/react-table"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import axios from "axios"
-import { protectedRoutes } from "@/api"
+import api from "@/lib/axios-config"
+import { paymentRoutes } from "@/api"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -72,7 +72,7 @@ export function ReceiptTable() {
   const { data: receipts = [], isLoading } = useQuery<Receipt[]>({
     queryKey: ["icicyta-receipts"],
     queryFn: async () => {
-      const response = await axios.get(protectedRoutes.receipts)
+      const response = await api.get(paymentRoutes.listAll)
       return response.data
     },
   })
@@ -80,7 +80,7 @@ export function ReceiptTable() {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`${protectedRoutes.receipts}/${id}`)
+      await api.delete(paymentRoutes.show(id))
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["icicyta-receipts"] })
