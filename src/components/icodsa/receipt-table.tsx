@@ -68,19 +68,17 @@ export function ReceiptTable() {
 
   const queryClient = useQueryClient()
 
-  // Fetch Receipts
   const { data: receipts = [], isLoading } = useQuery<Receipt[]>({
     queryKey: ["icodsa-receipts"],
     queryFn: async () => {
-      const response = await api.get(paymentRoutes.listAll)
+      const response = await api.get(paymentRoutes.listICODSA)
       return response.data
     },
   })
 
-  // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(paymentRoutes.show(id))
+      await api.delete(paymentRoutes.deleteICODSA(id))
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["icodsa-receipts"] })
@@ -116,6 +114,8 @@ export function ReceiptTable() {
   }
 
   const handlePrint = () => {
+    if (!receipts.length) return toast.error("No receipts found")
+
     setPrintMode("all")
     setCurrentPrintReceipt(null)
     setIsPrintDialogOpen(true)

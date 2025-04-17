@@ -79,7 +79,6 @@ export function InvoiceDialog({
     },
   })
 
-  // Reset form when dialog opens with invoice data
   useEffect(() => {
     if (open && invoice) {
       form.reset({
@@ -116,7 +115,6 @@ export function InvoiceDialog({
     }
   }, [open, invoice, form])
 
-  // Watch quantity and price to calculate total
   const quantity = form.watch("quantity")
   const price = form.watch("price")
 
@@ -125,10 +123,9 @@ export function InvoiceDialog({
     form.setValue("total", total)
   }, [quantity, price, form])
 
-  // Create mutation
   const createMutation = useMutation({
     mutationFn: async (values: InvoiceFormValues) => {
-      const response = await api.post(invoiceRoutes.listAll, {
+      const response = await api.post(invoiceRoutes.updateICODSA("create"), {
         ...values,
         id: crypto.randomUUID(),
       })
@@ -147,7 +144,6 @@ export function InvoiceDialog({
     },
   })
 
-  // Update mutation
   const updateMutation = useMutation({
     mutationFn: async (values: InvoiceFormValues & { id: string }) => {
       const response = await api.put(
@@ -216,7 +212,7 @@ export function InvoiceDialog({
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -233,7 +229,7 @@ export function InvoiceDialog({
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -253,7 +249,7 @@ export function InvoiceDialog({
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -270,7 +266,7 @@ export function InvoiceDialog({
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -290,7 +286,7 @@ export function InvoiceDialog({
                       disabled={isViewMode}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className='text-red-500' />
                 </FormItem>
               )}
             />
@@ -309,7 +305,7 @@ export function InvoiceDialog({
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -326,7 +322,7 @@ export function InvoiceDialog({
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -345,7 +341,7 @@ export function InvoiceDialog({
                       disabled={isViewMode}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className='text-red-500' />
                 </FormItem>
               )}
             />
@@ -365,7 +361,7 @@ export function InvoiceDialog({
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -384,7 +380,7 @@ export function InvoiceDialog({
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -403,7 +399,7 @@ export function InvoiceDialog({
                         disabled={true}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -423,7 +419,7 @@ export function InvoiceDialog({
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -440,7 +436,7 @@ export function InvoiceDialog({
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />

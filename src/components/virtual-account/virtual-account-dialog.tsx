@@ -63,7 +63,6 @@ export function VirtualAccountDialog({
     },
   })
 
-  // Reset form when dialog opens with virtual account data
   useEffect(() => {
     if (open && virtualAccount) {
       form.reset({
@@ -82,7 +81,6 @@ export function VirtualAccountDialog({
     }
   }, [open, virtualAccount, form])
 
-  // Create mutation
   const createMutation = useMutation({
     mutationFn: async (values: VirtualAccountFormValues) => {
       const response = await api.post(virtualAccountRoutes.create, {
@@ -104,7 +102,6 @@ export function VirtualAccountDialog({
     },
   })
 
-  // Update mutation
   const updateMutation = useMutation({
     mutationFn: async (values: VirtualAccountFormValues & { id: string }) => {
       const response = await api.put(
@@ -173,7 +170,7 @@ export function VirtualAccountDialog({
                       disabled={isViewMode}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className='text-red-500' />
                 </FormItem>
               )}
             />
@@ -191,7 +188,7 @@ export function VirtualAccountDialog({
                       disabled={isViewMode}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className='text-red-500' />
                 </FormItem>
               )}
             />
@@ -210,7 +207,7 @@ export function VirtualAccountDialog({
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -228,7 +225,7 @@ export function VirtualAccountDialog({
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />

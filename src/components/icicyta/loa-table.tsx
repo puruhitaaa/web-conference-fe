@@ -62,19 +62,17 @@ export function LoaTable() {
 
   const queryClient = useQueryClient()
 
-  // Fetch LoAs
   const { data: loas = [], isLoading } = useQuery<Loa[]>({
     queryKey: ["icicyta-loas"],
     queryFn: async () => {
-      const response = await api.get(loaRoutes.list)
+      const response = await api.get(loaRoutes.listICICYTA)
       return response.data
     },
   })
 
-  // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(loaRoutes.delete(id))
+      await api.delete(loaRoutes.deleteICICYTA(id))
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["icicyta-loas"] })

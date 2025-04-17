@@ -1,6 +1,6 @@
 "use client"
 
-import { BadgeCheck, ChevronsUpDown, LogOut, Moon, Sun } from "lucide-react"
+import { ChevronsUpDown, LogOut, Moon, Sun } from "lucide-react"
 
 import {
   DropdownMenu,
@@ -93,10 +93,6 @@ export function NavUser({ user }: { user: User }) {
                   <Moon className='text-black' />
                 )}
                 {theme === "dark" ? "Light Mode" : "Dark Mode"}
-              </DropdownMenuItem>
-              <DropdownMenuItem className='bg-gray-700 hover:!bg-gray-500 cursor-pointer text-white hover:!text-white'>
-                <BadgeCheck className='text-white' />
-                Account
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

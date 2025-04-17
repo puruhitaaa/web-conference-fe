@@ -1,19 +1,21 @@
 import { apiConfig } from "./config"
 
 export const invoiceRoutes = {
-  // Super Admin invoice endpoints
-  listAll: `${apiConfig.baseUrl}/invoices`,
-  show: (id: number | string) => `${apiConfig.baseUrl}/invoices/${id}`,
-
   // ICODSA invoice endpoints
+  listICODSA: `${apiConfig.baseUrl}/icodsa/invoices`,
   showICODSA: (id: number | string) =>
-    `${apiConfig.baseUrl}/invoices/icodsa/${id}`,
+    `${apiConfig.baseUrl}/icodsa/invoices/${id}`,
   updateICODSA: (id: number | string) =>
-    `${apiConfig.baseUrl}/invoices/update/icodsa/${id}`,
+    `${apiConfig.baseUrl}/icodsa/invoices/update/${id}`,
+  deleteICODSA: (id: number | string) =>
+    `${apiConfig.baseUrl}/icodsa/invoices/delete/${id}`,
 
   // ICICYTA invoice endpoints
+  listICICYTA: `${apiConfig.baseUrl}/icicyta/invoices`,
   showICICYTA: (id: number | string) =>
-    `${apiConfig.baseUrl}/invoices/icicyta/${id}`,
+    `${apiConfig.baseUrl}/icicyta/invoices/${id}`,
   updateICICYTA: (id: number | string) =>
-    `${apiConfig.baseUrl}/invoices/update/icicyta/${id}`,
+    `${apiConfig.baseUrl}/icicyta/invoices/update/${id}`,
+  deleteICICYTA: (id: number | string) =>
+    `${apiConfig.baseUrl}/icicyta/invoices/delete/${id}`,
 }
