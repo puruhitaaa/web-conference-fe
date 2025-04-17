@@ -8,6 +8,7 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { useAuthStore } from "@/lib/auth/authStore";
 import { Logo } from "@/components/ui/logo";
@@ -82,6 +83,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   if (!user) return null;
 
+  const { open } = useSidebar();
+
   // Determine visible menu items based on the user's role
   // Role 1: Super Admin - can see all
   // Role 2: ICODSA Admin - can only see ICODSA
@@ -114,9 +117,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar variant="inset" collapsible="icon" {...props}>
       <SidebarContent>
-        <div className="px-4 py-4">
-          <Logo className="mx-auto" />
-        </div>
+        {open ? (
+          <div className="px-4 py-4">
+            <Logo className="mx-auto" />
+          </div>
+        ) : null}
         <NavMain items={getNavItems()} />
       </SidebarContent>
       <SidebarFooter>
