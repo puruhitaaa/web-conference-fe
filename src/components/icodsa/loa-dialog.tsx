@@ -71,7 +71,6 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
     },
   })
 
-  // Reset form when dialog opens with loa data
   useEffect(() => {
     if (open && loa) {
       form.reset({
@@ -98,10 +97,9 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
     }
   }, [open, loa, form])
 
-  // Create mutation
   const createMutation = useMutation({
     mutationFn: async (values: LoaFormValues) => {
-      const response = await api.post(loaRoutes.create, {
+      const response = await api.post(loaRoutes.createICODSA, {
         ...values,
         id: crypto.randomUUID(),
       })
@@ -120,10 +118,9 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
     },
   })
 
-  // Update mutation
   const updateMutation = useMutation({
     mutationFn: async (values: LoaFormValues & { id: string }) => {
-      const response = await api.put(loaRoutes.update(values.id), values)
+      const response = await api.put(loaRoutes.updateICODSA(values.id), values)
       return response.data
     },
     onSuccess: () => {
@@ -186,7 +183,7 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -203,7 +200,7 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -223,7 +220,7 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -240,7 +237,7 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -259,7 +256,7 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
                       disabled={isViewMode}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className='text-red-500' />
                 </FormItem>
               )}
             />
@@ -286,7 +283,7 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
                         <SelectItem value='rejected'>Rejected</SelectItem>
                       </SelectContent>
                     </Select>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -303,7 +300,7 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -322,7 +319,7 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
                       disabled={isViewMode}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className='text-red-500' />
                 </FormItem>
               )}
             />

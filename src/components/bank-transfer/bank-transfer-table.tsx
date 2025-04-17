@@ -64,7 +64,6 @@ export function BankTransferTable() {
   const user = useAuthStore((state) => state.user)
   const isSuperAdmin = user?.role === 1
 
-  // Fetch Bank Transfers
   const { data: bankTransfers = [], isLoading } = useQuery<BankTransfer[]>({
     queryKey: ["bank-transfers"],
     queryFn: async () => {
@@ -73,7 +72,6 @@ export function BankTransferTable() {
     },
   })
 
-  // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       await api.delete(bankTransferRoutes.delete(id))

@@ -68,19 +68,17 @@ export function InvoiceTable() {
 
   const queryClient = useQueryClient()
 
-  // Fetch Invoices
   const { data: invoices = [], isLoading } = useQuery<Invoice[]>({
     queryKey: ["icodsa-invoices"],
     queryFn: async () => {
-      const response = await api.get(invoiceRoutes.listAll)
+      const response = await api.get(invoiceRoutes.listICODSA)
       return response.data
     },
   })
 
-  // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(invoiceRoutes.updateICODSA(id))
+      await api.delete(invoiceRoutes.deleteICODSA(id))
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["icodsa-invoices"] })

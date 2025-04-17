@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { bankTransferRoutes } from "@/api";
-import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { bankTransferRoutes } from "@/api"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -12,7 +12,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/components/ui/dialog"
 import {
   Form,
   FormControl,
@@ -20,12 +20,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import toast from "react-hot-toast";
-import { BankTransfer } from "./bank-transfer-table";
-import { useAuthStore } from "@/lib/auth/authStore";
-import api from "@/lib/axios-config";
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import toast from "react-hot-toast"
+import { BankTransfer } from "./bank-transfer-table"
+import { useAuthStore } from "@/lib/auth/authStore"
+import api from "@/lib/axios-config"
 
 const formSchema = z.object({
   nama_bank: z.string().min(1, "Bank name is required"),
@@ -36,15 +36,15 @@ const formSchema = z.object({
   bank_address: z.string().min(1, "Bank address is required"),
   city: z.string().min(1, "City is required"),
   country: z.string().min(1, "Country is required"),
-});
+})
 
-type BankTransferFormValues = z.infer<typeof formSchema>;
+type BankTransferFormValues = z.infer<typeof formSchema>
 
 interface BankTransferDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  mode: "create" | "edit" | "view";
-  bankTransfer: BankTransfer | null;
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  mode: "create" | "edit" | "view"
+  bankTransfer: BankTransfer | null
 }
 
 export function BankTransferDialog({
@@ -53,9 +53,9 @@ export function BankTransferDialog({
   mode,
   bankTransfer,
 }: BankTransferDialogProps) {
-  const queryClient = useQueryClient();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const user = useAuthStore((state) => state.user);
+  const queryClient = useQueryClient()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const user = useAuthStore((state) => state.user)
 
   const form = useForm<BankTransferFormValues>({
     resolver: zodResolver(formSchema),
@@ -69,7 +69,7 @@ export function BankTransferDialog({
       city: "",
       country: "",
     },
-  });
+  })
 
   // Reset form when dialog opens with bank transfer data
   useEffect(() => {
@@ -83,7 +83,7 @@ export function BankTransferDialog({
         bank_address: bankTransfer.bank_address,
         city: bankTransfer.city,
         country: bankTransfer.country,
-      });
+      })
     } else if (open && !bankTransfer) {
       form.reset({
         nama_bank: "",
@@ -94,9 +94,9 @@ export function BankTransferDialog({
         bank_address: "",
         city: "",
         country: "",
-      });
+      })
     }
-  }, [open, bankTransfer, form]);
+  }, [open, bankTransfer, form])
 
   // Create mutation
   const createMutation = useMutation({
@@ -104,21 +104,21 @@ export function BankTransferDialog({
       const response = await api.post(bankTransferRoutes.create, {
         ...values,
         created_by: user?.id,
-      });
-      return response.data;
+      })
+      return response.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["bank-transfers"] });
-      toast.success("Bank transfer created successfully");
-      onOpenChange(false);
+      queryClient.invalidateQueries({ queryKey: ["bank-transfers"] })
+      toast.success("Bank transfer created successfully")
+      onOpenChange(false)
     },
     onError: () => {
-      toast.error("Failed to create bank transfer");
+      toast.error("Failed to create bank transfer")
     },
     onSettled: () => {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     },
-  });
+  })
 
   // Update mutation
   const updateMutation = useMutation({
@@ -126,44 +126,44 @@ export function BankTransferDialog({
       const response = await api.put(
         bankTransferRoutes.update(values.id),
         values
-      );
-      return response.data;
+      )
+      return response.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["bank-transfers"] });
-      toast.success("Bank transfer updated successfully");
-      onOpenChange(false);
+      queryClient.invalidateQueries({ queryKey: ["bank-transfers"] })
+      toast.success("Bank transfer updated successfully")
+      onOpenChange(false)
     },
     onError: () => {
-      toast.error("Failed to update bank transfer");
+      toast.error("Failed to update bank transfer")
     },
     onSettled: () => {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     },
-  });
+  })
 
   function onSubmit(values: BankTransferFormValues) {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
 
     if (mode === "edit" && bankTransfer) {
-      updateMutation.mutate({ ...values, id: bankTransfer.id });
+      updateMutation.mutate({ ...values, id: bankTransfer.id })
     } else {
-      createMutation.mutate(values);
+      createMutation.mutate(values)
     }
   }
 
-  const isViewMode = mode === "view";
-  const isSuperAdmin = user?.role === 1;
+  const isViewMode = mode === "view"
+  const isSuperAdmin = user?.role === 1
   const title =
     mode === "create"
       ? "Create New Bank Transfer"
       : mode === "edit"
         ? "Edit Bank Transfer"
-        : "View Bank Transfer";
+        : "View Bank Transfer"
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className='sm:max-w-[600px]'>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
@@ -175,39 +175,39 @@ export function BankTransferDialog({
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+            <div className='grid grid-cols-2 gap-4'>
               <FormField
                 control={form.control}
-                name="nama_bank"
+                name='nama_bank'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Bank Name</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Bank Name"
+                        placeholder='Bank Name'
                         {...field}
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
               <FormField
                 control={form.control}
-                name="swift_code"
+                name='swift_code'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>SWIFT Code</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="SWIFT Code"
+                        placeholder='SWIFT Code'
                         {...field}
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -215,109 +215,109 @@ export function BankTransferDialog({
 
             <FormField
               control={form.control}
-              name="recipient_name"
+              name='recipient_name'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Recipient Name</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Recipient Name"
+                      placeholder='Recipient Name'
                       {...field}
                       disabled={isViewMode}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className='text-red-500' />
                 </FormItem>
               )}
             />
 
             <FormField
               control={form.control}
-              name="beneficiary_bank_account_no"
+              name='beneficiary_bank_account_no'
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Account Number</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Account Number"
+                      placeholder='Account Number'
                       {...field}
                       disabled={isViewMode}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className='text-red-500' />
                 </FormItem>
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className='grid grid-cols-2 gap-4'>
               <FormField
                 control={form.control}
-                name="bank_branch"
+                name='bank_branch'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Bank Branch</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Bank Branch"
+                        placeholder='Bank Branch'
                         {...field}
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
               <FormField
                 control={form.control}
-                name="bank_address"
+                name='bank_address'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Bank Address</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Bank Address"
+                        placeholder='Bank Address'
                         {...field}
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className='grid grid-cols-2 gap-4'>
               <FormField
                 control={form.control}
-                name="city"
+                name='city'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>City</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="City"
+                        placeholder='City'
                         {...field}
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
               <FormField
                 control={form.control}
-                name="country"
+                name='country'
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Country</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Country"
+                        placeholder='Country'
                         {...field}
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -325,7 +325,7 @@ export function BankTransferDialog({
 
             {!isViewMode && isSuperAdmin && (
               <DialogFooter>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type='submit' disabled={isSubmitting}>
                   {mode === "create" ? "Create" : "Save Changes"}
                 </Button>
               </DialogFooter>
@@ -334,5 +334,5 @@ export function BankTransferDialog({
         </Form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

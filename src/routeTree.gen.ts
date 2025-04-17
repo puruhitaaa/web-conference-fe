@@ -8,22 +8,27 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
+import { createFileRoute } from '@tanstack/react-router'
+
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as AuthImport } from './routes/_auth'
 import { Route as AppImport } from './routes/_app'
-import { Route as AppIndexImport } from './routes/_app/index'
-import { Route as AuthLoginImport } from './routes/_auth/login'
-import { Route as AppVirtualAccountsImport } from './routes/_app/virtual-accounts'
-import { Route as AppManageAccountImport } from './routes/_app/manage-account'
-import { Route as AppBankTransferImport } from './routes/_app/bank-transfer'
-import { Route as AppIcodsaReceiptImport } from './routes/_app/icodsa/receipt'
-import { Route as AppIcodsaLoaImport } from './routes/_app/icodsa/loa'
-import { Route as AppIcodsaInvoiceImport } from './routes/_app/icodsa/invoice'
-import { Route as AppIcicytaReceiptImport } from './routes/_app/icicyta/receipt'
-import { Route as AppIcicytaLoaImport } from './routes/_app/icicyta/loa'
-import { Route as AppIcicytaInvoiceImport } from './routes/_app/icicyta/invoice'
+
+// Create Virtual Routes
+
+const AppIndexLazyImport = createFileRoute('/_app/')()
+const AuthLoginLazyImport = createFileRoute('/_auth/login')()
+const AppVirtualAccountsLazyImport = createFileRoute('/_app/virtual-accounts')()
+const AppManageAccountLazyImport = createFileRoute('/_app/manage-account')()
+const AppBankTransferLazyImport = createFileRoute('/_app/bank-transfer')()
+const AppIcodsaReceiptLazyImport = createFileRoute('/_app/icodsa/receipt')()
+const AppIcodsaLoaLazyImport = createFileRoute('/_app/icodsa/loa')()
+const AppIcodsaInvoiceLazyImport = createFileRoute('/_app/icodsa/invoice')()
+const AppIcicytaReceiptLazyImport = createFileRoute('/_app/icicyta/receipt')()
+const AppIcicytaLoaLazyImport = createFileRoute('/_app/icicyta/loa')()
+const AppIcicytaInvoiceLazyImport = createFileRoute('/_app/icicyta/invoice')()
 
 // Create/Update Routes
 
@@ -37,71 +42,89 @@ const AppRoute = AppImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const AppIndexRoute = AppIndexImport.update({
+const AppIndexLazyRoute = AppIndexLazyImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppRoute,
-} as any)
+} as any).lazy(() => import('./routes/_app/index.lazy').then((d) => d.Route))
 
-const AuthLoginRoute = AuthLoginImport.update({
+const AuthLoginLazyRoute = AuthLoginLazyImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => AuthRoute,
-} as any)
+} as any).lazy(() => import('./routes/_auth/login.lazy').then((d) => d.Route))
 
-const AppVirtualAccountsRoute = AppVirtualAccountsImport.update({
+const AppVirtualAccountsLazyRoute = AppVirtualAccountsLazyImport.update({
   id: '/virtual-accounts',
   path: '/virtual-accounts',
   getParentRoute: () => AppRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/_app/virtual-accounts.lazy').then((d) => d.Route),
+)
 
-const AppManageAccountRoute = AppManageAccountImport.update({
+const AppManageAccountLazyRoute = AppManageAccountLazyImport.update({
   id: '/manage-account',
   path: '/manage-account',
   getParentRoute: () => AppRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/_app/manage-account.lazy').then((d) => d.Route),
+)
 
-const AppBankTransferRoute = AppBankTransferImport.update({
+const AppBankTransferLazyRoute = AppBankTransferLazyImport.update({
   id: '/bank-transfer',
   path: '/bank-transfer',
   getParentRoute: () => AppRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/_app/bank-transfer.lazy').then((d) => d.Route),
+)
 
-const AppIcodsaReceiptRoute = AppIcodsaReceiptImport.update({
+const AppIcodsaReceiptLazyRoute = AppIcodsaReceiptLazyImport.update({
   id: '/icodsa/receipt',
   path: '/icodsa/receipt',
   getParentRoute: () => AppRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/_app/icodsa/receipt.lazy').then((d) => d.Route),
+)
 
-const AppIcodsaLoaRoute = AppIcodsaLoaImport.update({
+const AppIcodsaLoaLazyRoute = AppIcodsaLoaLazyImport.update({
   id: '/icodsa/loa',
   path: '/icodsa/loa',
   getParentRoute: () => AppRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/_app/icodsa/loa.lazy').then((d) => d.Route),
+)
 
-const AppIcodsaInvoiceRoute = AppIcodsaInvoiceImport.update({
+const AppIcodsaInvoiceLazyRoute = AppIcodsaInvoiceLazyImport.update({
   id: '/icodsa/invoice',
   path: '/icodsa/invoice',
   getParentRoute: () => AppRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/_app/icodsa/invoice.lazy').then((d) => d.Route),
+)
 
-const AppIcicytaReceiptRoute = AppIcicytaReceiptImport.update({
+const AppIcicytaReceiptLazyRoute = AppIcicytaReceiptLazyImport.update({
   id: '/icicyta/receipt',
   path: '/icicyta/receipt',
   getParentRoute: () => AppRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/_app/icicyta/receipt.lazy').then((d) => d.Route),
+)
 
-const AppIcicytaLoaRoute = AppIcicytaLoaImport.update({
+const AppIcicytaLoaLazyRoute = AppIcicytaLoaLazyImport.update({
   id: '/icicyta/loa',
   path: '/icicyta/loa',
   getParentRoute: () => AppRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/_app/icicyta/loa.lazy').then((d) => d.Route),
+)
 
-const AppIcicytaInvoiceRoute = AppIcicytaInvoiceImport.update({
+const AppIcicytaInvoiceLazyRoute = AppIcicytaInvoiceLazyImport.update({
   id: '/icicyta/invoice',
   path: '/icicyta/invoice',
   getParentRoute: () => AppRoute,
-} as any)
+} as any).lazy(() =>
+  import('./routes/_app/icicyta/invoice.lazy').then((d) => d.Route),
+)
 
 // Populate the FileRoutesByPath interface
 
@@ -125,77 +148,77 @@ declare module '@tanstack/react-router' {
       id: '/_app/bank-transfer'
       path: '/bank-transfer'
       fullPath: '/bank-transfer'
-      preLoaderRoute: typeof AppBankTransferImport
+      preLoaderRoute: typeof AppBankTransferLazyImport
       parentRoute: typeof AppImport
     }
     '/_app/manage-account': {
       id: '/_app/manage-account'
       path: '/manage-account'
       fullPath: '/manage-account'
-      preLoaderRoute: typeof AppManageAccountImport
+      preLoaderRoute: typeof AppManageAccountLazyImport
       parentRoute: typeof AppImport
     }
     '/_app/virtual-accounts': {
       id: '/_app/virtual-accounts'
       path: '/virtual-accounts'
       fullPath: '/virtual-accounts'
-      preLoaderRoute: typeof AppVirtualAccountsImport
+      preLoaderRoute: typeof AppVirtualAccountsLazyImport
       parentRoute: typeof AppImport
     }
     '/_auth/login': {
       id: '/_auth/login'
       path: '/login'
       fullPath: '/login'
-      preLoaderRoute: typeof AuthLoginImport
+      preLoaderRoute: typeof AuthLoginLazyImport
       parentRoute: typeof AuthImport
     }
     '/_app/': {
       id: '/_app/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof AppIndexImport
+      preLoaderRoute: typeof AppIndexLazyImport
       parentRoute: typeof AppImport
     }
     '/_app/icicyta/invoice': {
       id: '/_app/icicyta/invoice'
       path: '/icicyta/invoice'
       fullPath: '/icicyta/invoice'
-      preLoaderRoute: typeof AppIcicytaInvoiceImport
+      preLoaderRoute: typeof AppIcicytaInvoiceLazyImport
       parentRoute: typeof AppImport
     }
     '/_app/icicyta/loa': {
       id: '/_app/icicyta/loa'
       path: '/icicyta/loa'
       fullPath: '/icicyta/loa'
-      preLoaderRoute: typeof AppIcicytaLoaImport
+      preLoaderRoute: typeof AppIcicytaLoaLazyImport
       parentRoute: typeof AppImport
     }
     '/_app/icicyta/receipt': {
       id: '/_app/icicyta/receipt'
       path: '/icicyta/receipt'
       fullPath: '/icicyta/receipt'
-      preLoaderRoute: typeof AppIcicytaReceiptImport
+      preLoaderRoute: typeof AppIcicytaReceiptLazyImport
       parentRoute: typeof AppImport
     }
     '/_app/icodsa/invoice': {
       id: '/_app/icodsa/invoice'
       path: '/icodsa/invoice'
       fullPath: '/icodsa/invoice'
-      preLoaderRoute: typeof AppIcodsaInvoiceImport
+      preLoaderRoute: typeof AppIcodsaInvoiceLazyImport
       parentRoute: typeof AppImport
     }
     '/_app/icodsa/loa': {
       id: '/_app/icodsa/loa'
       path: '/icodsa/loa'
       fullPath: '/icodsa/loa'
-      preLoaderRoute: typeof AppIcodsaLoaImport
+      preLoaderRoute: typeof AppIcodsaLoaLazyImport
       parentRoute: typeof AppImport
     }
     '/_app/icodsa/receipt': {
       id: '/_app/icodsa/receipt'
       path: '/icodsa/receipt'
       fullPath: '/icodsa/receipt'
-      preLoaderRoute: typeof AppIcodsaReceiptImport
+      preLoaderRoute: typeof AppIcodsaReceiptLazyImport
       parentRoute: typeof AppImport
     }
   }
@@ -204,88 +227,88 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface AppRouteChildren {
-  AppBankTransferRoute: typeof AppBankTransferRoute
-  AppManageAccountRoute: typeof AppManageAccountRoute
-  AppVirtualAccountsRoute: typeof AppVirtualAccountsRoute
-  AppIndexRoute: typeof AppIndexRoute
-  AppIcicytaInvoiceRoute: typeof AppIcicytaInvoiceRoute
-  AppIcicytaLoaRoute: typeof AppIcicytaLoaRoute
-  AppIcicytaReceiptRoute: typeof AppIcicytaReceiptRoute
-  AppIcodsaInvoiceRoute: typeof AppIcodsaInvoiceRoute
-  AppIcodsaLoaRoute: typeof AppIcodsaLoaRoute
-  AppIcodsaReceiptRoute: typeof AppIcodsaReceiptRoute
+  AppBankTransferLazyRoute: typeof AppBankTransferLazyRoute
+  AppManageAccountLazyRoute: typeof AppManageAccountLazyRoute
+  AppVirtualAccountsLazyRoute: typeof AppVirtualAccountsLazyRoute
+  AppIndexLazyRoute: typeof AppIndexLazyRoute
+  AppIcicytaInvoiceLazyRoute: typeof AppIcicytaInvoiceLazyRoute
+  AppIcicytaLoaLazyRoute: typeof AppIcicytaLoaLazyRoute
+  AppIcicytaReceiptLazyRoute: typeof AppIcicytaReceiptLazyRoute
+  AppIcodsaInvoiceLazyRoute: typeof AppIcodsaInvoiceLazyRoute
+  AppIcodsaLoaLazyRoute: typeof AppIcodsaLoaLazyRoute
+  AppIcodsaReceiptLazyRoute: typeof AppIcodsaReceiptLazyRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppBankTransferRoute: AppBankTransferRoute,
-  AppManageAccountRoute: AppManageAccountRoute,
-  AppVirtualAccountsRoute: AppVirtualAccountsRoute,
-  AppIndexRoute: AppIndexRoute,
-  AppIcicytaInvoiceRoute: AppIcicytaInvoiceRoute,
-  AppIcicytaLoaRoute: AppIcicytaLoaRoute,
-  AppIcicytaReceiptRoute: AppIcicytaReceiptRoute,
-  AppIcodsaInvoiceRoute: AppIcodsaInvoiceRoute,
-  AppIcodsaLoaRoute: AppIcodsaLoaRoute,
-  AppIcodsaReceiptRoute: AppIcodsaReceiptRoute,
+  AppBankTransferLazyRoute: AppBankTransferLazyRoute,
+  AppManageAccountLazyRoute: AppManageAccountLazyRoute,
+  AppVirtualAccountsLazyRoute: AppVirtualAccountsLazyRoute,
+  AppIndexLazyRoute: AppIndexLazyRoute,
+  AppIcicytaInvoiceLazyRoute: AppIcicytaInvoiceLazyRoute,
+  AppIcicytaLoaLazyRoute: AppIcicytaLoaLazyRoute,
+  AppIcicytaReceiptLazyRoute: AppIcicytaReceiptLazyRoute,
+  AppIcodsaInvoiceLazyRoute: AppIcodsaInvoiceLazyRoute,
+  AppIcodsaLoaLazyRoute: AppIcodsaLoaLazyRoute,
+  AppIcodsaReceiptLazyRoute: AppIcodsaReceiptLazyRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 interface AuthRouteChildren {
-  AuthLoginRoute: typeof AuthLoginRoute
+  AuthLoginLazyRoute: typeof AuthLoginLazyRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
-  AuthLoginRoute: AuthLoginRoute,
+  AuthLoginLazyRoute: AuthLoginLazyRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 export interface FileRoutesByFullPath {
   '': typeof AuthRouteWithChildren
-  '/bank-transfer': typeof AppBankTransferRoute
-  '/manage-account': typeof AppManageAccountRoute
-  '/virtual-accounts': typeof AppVirtualAccountsRoute
-  '/login': typeof AuthLoginRoute
-  '/': typeof AppIndexRoute
-  '/icicyta/invoice': typeof AppIcicytaInvoiceRoute
-  '/icicyta/loa': typeof AppIcicytaLoaRoute
-  '/icicyta/receipt': typeof AppIcicytaReceiptRoute
-  '/icodsa/invoice': typeof AppIcodsaInvoiceRoute
-  '/icodsa/loa': typeof AppIcodsaLoaRoute
-  '/icodsa/receipt': typeof AppIcodsaReceiptRoute
+  '/bank-transfer': typeof AppBankTransferLazyRoute
+  '/manage-account': typeof AppManageAccountLazyRoute
+  '/virtual-accounts': typeof AppVirtualAccountsLazyRoute
+  '/login': typeof AuthLoginLazyRoute
+  '/': typeof AppIndexLazyRoute
+  '/icicyta/invoice': typeof AppIcicytaInvoiceLazyRoute
+  '/icicyta/loa': typeof AppIcicytaLoaLazyRoute
+  '/icicyta/receipt': typeof AppIcicytaReceiptLazyRoute
+  '/icodsa/invoice': typeof AppIcodsaInvoiceLazyRoute
+  '/icodsa/loa': typeof AppIcodsaLoaLazyRoute
+  '/icodsa/receipt': typeof AppIcodsaReceiptLazyRoute
 }
 
 export interface FileRoutesByTo {
   '': typeof AuthRouteWithChildren
-  '/bank-transfer': typeof AppBankTransferRoute
-  '/manage-account': typeof AppManageAccountRoute
-  '/virtual-accounts': typeof AppVirtualAccountsRoute
-  '/login': typeof AuthLoginRoute
-  '/': typeof AppIndexRoute
-  '/icicyta/invoice': typeof AppIcicytaInvoiceRoute
-  '/icicyta/loa': typeof AppIcicytaLoaRoute
-  '/icicyta/receipt': typeof AppIcicytaReceiptRoute
-  '/icodsa/invoice': typeof AppIcodsaInvoiceRoute
-  '/icodsa/loa': typeof AppIcodsaLoaRoute
-  '/icodsa/receipt': typeof AppIcodsaReceiptRoute
+  '/bank-transfer': typeof AppBankTransferLazyRoute
+  '/manage-account': typeof AppManageAccountLazyRoute
+  '/virtual-accounts': typeof AppVirtualAccountsLazyRoute
+  '/login': typeof AuthLoginLazyRoute
+  '/': typeof AppIndexLazyRoute
+  '/icicyta/invoice': typeof AppIcicytaInvoiceLazyRoute
+  '/icicyta/loa': typeof AppIcicytaLoaLazyRoute
+  '/icicyta/receipt': typeof AppIcicytaReceiptLazyRoute
+  '/icodsa/invoice': typeof AppIcodsaInvoiceLazyRoute
+  '/icodsa/loa': typeof AppIcodsaLoaLazyRoute
+  '/icodsa/receipt': typeof AppIcodsaReceiptLazyRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_app': typeof AppRouteWithChildren
   '/_auth': typeof AuthRouteWithChildren
-  '/_app/bank-transfer': typeof AppBankTransferRoute
-  '/_app/manage-account': typeof AppManageAccountRoute
-  '/_app/virtual-accounts': typeof AppVirtualAccountsRoute
-  '/_auth/login': typeof AuthLoginRoute
-  '/_app/': typeof AppIndexRoute
-  '/_app/icicyta/invoice': typeof AppIcicytaInvoiceRoute
-  '/_app/icicyta/loa': typeof AppIcicytaLoaRoute
-  '/_app/icicyta/receipt': typeof AppIcicytaReceiptRoute
-  '/_app/icodsa/invoice': typeof AppIcodsaInvoiceRoute
-  '/_app/icodsa/loa': typeof AppIcodsaLoaRoute
-  '/_app/icodsa/receipt': typeof AppIcodsaReceiptRoute
+  '/_app/bank-transfer': typeof AppBankTransferLazyRoute
+  '/_app/manage-account': typeof AppManageAccountLazyRoute
+  '/_app/virtual-accounts': typeof AppVirtualAccountsLazyRoute
+  '/_auth/login': typeof AuthLoginLazyRoute
+  '/_app/': typeof AppIndexLazyRoute
+  '/_app/icicyta/invoice': typeof AppIcicytaInvoiceLazyRoute
+  '/_app/icicyta/loa': typeof AppIcicytaLoaLazyRoute
+  '/_app/icicyta/receipt': typeof AppIcicytaReceiptLazyRoute
+  '/_app/icodsa/invoice': typeof AppIcodsaInvoiceLazyRoute
+  '/_app/icodsa/loa': typeof AppIcodsaLoaLazyRoute
+  '/_app/icodsa/receipt': typeof AppIcodsaReceiptLazyRoute
 }
 
 export interface FileRouteTypes {
@@ -381,47 +404,47 @@ export const routeTree = rootRoute
       ]
     },
     "/_app/bank-transfer": {
-      "filePath": "_app/bank-transfer.tsx",
+      "filePath": "_app/bank-transfer.lazy.tsx",
       "parent": "/_app"
     },
     "/_app/manage-account": {
-      "filePath": "_app/manage-account.tsx",
+      "filePath": "_app/manage-account.lazy.tsx",
       "parent": "/_app"
     },
     "/_app/virtual-accounts": {
-      "filePath": "_app/virtual-accounts.tsx",
+      "filePath": "_app/virtual-accounts.lazy.tsx",
       "parent": "/_app"
     },
     "/_auth/login": {
-      "filePath": "_auth/login.tsx",
+      "filePath": "_auth/login.lazy.tsx",
       "parent": "/_auth"
     },
     "/_app/": {
-      "filePath": "_app/index.tsx",
+      "filePath": "_app/index.lazy.tsx",
       "parent": "/_app"
     },
     "/_app/icicyta/invoice": {
-      "filePath": "_app/icicyta/invoice.tsx",
+      "filePath": "_app/icicyta/invoice.lazy.tsx",
       "parent": "/_app"
     },
     "/_app/icicyta/loa": {
-      "filePath": "_app/icicyta/loa.tsx",
+      "filePath": "_app/icicyta/loa.lazy.tsx",
       "parent": "/_app"
     },
     "/_app/icicyta/receipt": {
-      "filePath": "_app/icicyta/receipt.tsx",
+      "filePath": "_app/icicyta/receipt.lazy.tsx",
       "parent": "/_app"
     },
     "/_app/icodsa/invoice": {
-      "filePath": "_app/icodsa/invoice.tsx",
+      "filePath": "_app/icodsa/invoice.lazy.tsx",
       "parent": "/_app"
     },
     "/_app/icodsa/loa": {
-      "filePath": "_app/icodsa/loa.tsx",
+      "filePath": "_app/icodsa/loa.lazy.tsx",
       "parent": "/_app"
     },
     "/_app/icodsa/receipt": {
-      "filePath": "_app/icodsa/receipt.tsx",
+      "filePath": "_app/icodsa/receipt.lazy.tsx",
       "parent": "/_app"
     }
   }
