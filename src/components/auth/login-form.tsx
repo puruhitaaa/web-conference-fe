@@ -30,7 +30,7 @@ import { useState } from "react";
 import { useAuthStore } from "@/lib/auth/authStore";
 
 const formSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+  username: z.string().min(0, "Please enter a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
@@ -41,7 +41,7 @@ export function LoginForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
@@ -60,7 +60,7 @@ export function LoginForm({
           res.data.token_type,
           res.data.user
         );
-
+        console.log(loginSuccess);
         if (loginSuccess) {
           toast.success(res.data.message || "Login successful");
           navigate({
@@ -106,12 +106,12 @@ export function LoginForm({
             >
               <FormField
                 control={form.control}
-                name="email"
+                name="username"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input type="email" {...field} />
+                      <Input type="username" {...field} />
                     </FormControl>
                     <FormMessage className="text-red-500" />
                   </FormItem>
