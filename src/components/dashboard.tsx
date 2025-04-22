@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button"
 import { CheckCircle, XCircle, Clock, AlertCircle } from "lucide-react"
 import { useAuthStore } from "@/lib/auth/authStore"
 
-// Define types for our history items based on the data structure
 type LoaHistoryItem = {
   id: string
   paperId: string
@@ -44,13 +43,12 @@ type ReceiptHistoryItem = {
 
 export function Dashboard() {
   const user = useAuthStore((state) => state.user)
-  // Fetch data for all history sections using useQueries
   const results = useQueries({
     queries: [
       {
         queryKey: ["icodsa-loa-history"],
         queryFn: async () => {
-          const response = await api.get(loaRoutes.list)
+          const response = await api.get(loaRoutes.listICODSA)
           return response.data.slice(0, 10).map((item: any) => ({
             id: item.id,
             paperId: item.paperId,
@@ -64,7 +62,7 @@ export function Dashboard() {
       {
         queryKey: ["icodsa-invoice-history"],
         queryFn: async () => {
-          const response = await api.get(invoiceRoutes.listAll)
+          const response = await api.get(invoiceRoutes.listICODSA)
           return response.data.slice(0, 10).map((item: any) => ({
             id: item.id,
             invoiceNumber: item.invoiceNumber,
@@ -80,7 +78,7 @@ export function Dashboard() {
       {
         queryKey: ["icodsa-receipt-history"],
         queryFn: async () => {
-          const response = await api.get(paymentRoutes.listAll)
+          const response = await api.get(paymentRoutes.listICODSA)
           return response.data.slice(0, 10).map((item: any) => ({
             id: item.id,
             invoiceNumber: item.invoiceNumber,
@@ -96,7 +94,7 @@ export function Dashboard() {
       {
         queryKey: ["icicyta-loa-history"],
         queryFn: async () => {
-          const response = await api.get(loaRoutes.list)
+          const response = await api.get(loaRoutes.listICICYTA)
           return response.data
             .filter((item: any) => item.conferenceType === "ICICYTA")
             .slice(0, 10)
@@ -113,7 +111,7 @@ export function Dashboard() {
       {
         queryKey: ["icicyta-invoice-history"],
         queryFn: async () => {
-          const response = await api.get(invoiceRoutes.listAll)
+          const response = await api.get(invoiceRoutes.listICICYTA)
           return response.data
             .filter((item: any) => item.conferenceType === "ICICYTA")
             .slice(0, 10)
@@ -132,7 +130,7 @@ export function Dashboard() {
       {
         queryKey: ["icicyta-receipt-history"],
         queryFn: async () => {
-          const response = await api.get(paymentRoutes.listAll)
+          const response = await api.get(paymentRoutes.listICICYTA)
           return response.data
             .filter((item: any) => item.conferenceTitle === "ICICYTA")
             .slice(0, 10)
@@ -160,7 +158,6 @@ export function Dashboard() {
     icicytaReceiptHistory,
   ] = results
 
-  // Helper function to render status icon
   const renderStatusIcon = (status: string) => {
     switch (status?.toLowerCase()) {
       case "accepted":
@@ -179,7 +176,6 @@ export function Dashboard() {
     }
   }
 
-  // Helper function to render LoA history card
   const renderLoaHistoryCard = (
     title: string,
     data: LoaHistoryItem[],
@@ -244,7 +240,6 @@ export function Dashboard() {
     )
   }
 
-  // Helper function to render Invoice history card
   const renderInvoiceHistoryCard = (
     title: string,
     data: InvoiceHistoryItem[],
@@ -310,7 +305,6 @@ export function Dashboard() {
     )
   }
 
-  // Helper function to render Receipt history card
   const renderReceiptHistoryCard = (
     title: string,
     data: ReceiptHistoryItem[],

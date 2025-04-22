@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from "react"
 import {
   useReactTable,
   getCoreRowModel,
@@ -9,12 +9,12 @@ import {
   ColumnDef,
   SortingState,
   ColumnFiltersState,
-} from "@tanstack/react-table";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import api from "@/lib/axios-config";
-import { adminRoutes, bankTransferRoutes } from "@/api";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+} from "@tanstack/react-table"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import api from "@/lib/axios-config"
+import { adminRoutes, bankTransferRoutes } from "@/api"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -22,7 +22,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/ui/table"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,84 +30,81 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Plus } from "lucide-react";
+} from "@/components/ui/dropdown-menu"
+import { MoreHorizontal, Plus } from "lucide-react"
 // import { BankTransferDialog } from "./bank-transfer-dialog"
-import toast from "react-hot-toast";
-import { useAuthStore } from "@/lib/auth/authStore";
-import { DataTablePagination } from "../data-table-pagination";
-import { AccountUserDialog } from "./accounts-dialog";
+import toast from "react-hot-toast"
+import { useAuthStore } from "@/lib/auth/authStore"
+import { DataTablePagination } from "../data-table-pagination"
+import { AccountUserDialog } from "./accounts-dialog"
 
 export type AccountUsers = {
-  id: string;
-  name: string;
-  username: string;
-  email: string;
-  password: string;
-  role: "icicyta" | "icodsa";
-};
+  id: string
+  name: string
+  username: string
+  email: string
+  password: string
+  role: "icicyta" | "icodsa"
+}
 
 export function AccountManagementTable() {
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [currentAccountUser, setCurrentAccountUser] =
-    useState<AccountUsers | null>(null);
+    useState<AccountUsers | null>(null)
   const [dialogMode, setDialogMode] = useState<"create" | "edit" | "view">(
     "create"
-  );
+  )
 
-  const queryClient = useQueryClient();
-  const user = useAuthStore((state) => state.user);
-  const isSuperAdmin = user?.role === 1;
+  const queryClient = useQueryClient()
+  const user = useAuthStore((state) => state.user)
+  const isSuperAdmin = user?.role === 1
 
-  // Fetch Bank Transfers
   const { data: accountUsers = [], isLoading } = useQuery<AccountUsers[]>({
     queryKey: ["account-management"],
     queryFn: async () => {
-      const response = await api.get(adminRoutes.listAllAdmins);
-      console.log(response.data.admin);
-      return response.data.admin;
+      const response = await api.get(adminRoutes.listAllAdmins)
+      return response.data.admin
     },
-  });
+  })
 
-  // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(bankTransferRoutes.delete(id));
+      await api.delete(bankTransferRoutes.delete(id))
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["account-management"] });
-      toast.success("user account deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["account-management"] })
+      toast.success("user account deleted successfully")
     },
     onError: () => {
-      toast.error("Failed to delete user account");
+      toast.error("Failed to delete user account")
     },
-  });
+  })
 
   const handleDelete = (id: string) => {
     if (confirm("Are you sure you want to delete this user account?")) {
-      deleteMutation.mutate(id);
+      deleteMutation.mutate(id)
     }
-  };
+  }
 
   const handleEdit = (accountUser: AccountUsers) => {
-    setCurrentAccountUser(accountUser);
-    setDialogMode("edit");
-    setIsDialogOpen(true);
-  };
+    setCurrentAccountUser(accountUser)
+    setDialogMode("edit")
+    setIsDialogOpen(true)
+  }
 
   const handleView = (accountUser: AccountUsers) => {
-    setCurrentAccountUser(accountUser);
-    setDialogMode("view");
-    setIsDialogOpen(true);
-  };
+    setCurrentAccountUser(accountUser)
+    setDialogMode("view")
+    setIsDialogOpen(true)
+  }
 
   const handleCreate = () => {
-    setCurrentAccountUser(null);
-    setDialogMode("create");
-    setIsDialogOpen(true);
-  };
+    setCurrentAccountUser(null)
+    setDialogMode("create")
+    setIsDialogOpen(true)
+  }
 
   const columns: ColumnDef<AccountUsers>[] = [
     {
@@ -131,17 +128,17 @@ export function AccountManagementTable() {
       id: "actions",
       header: "Actions",
       cell: ({ row }) => {
-        const accountUser = row.original;
+        const accountUser = row.original
 
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
+              <Button variant='ghost' className='h-8 w-8 p-0'>
+                <span className='sr-only'>Open menu</span>
+                <MoreHorizontal className='h-4 w-4' />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align='end'>
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => handleView(accountUser)}>
                 View
@@ -154,7 +151,7 @@ export function AccountManagementTable() {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={() => handleDelete(accountUser.id)}
-                    className="text-red-600"
+                    className='text-red-600'
                   >
                     Delete
                   </DropdownMenuItem>
@@ -162,10 +159,10 @@ export function AccountManagementTable() {
               )}
             </DropdownMenuContent>
           </DropdownMenu>
-        );
+        )
       },
     },
-  ];
+  ]
 
   const table = useReactTable({
     data: accountUsers,
@@ -180,29 +177,29 @@ export function AccountManagementTable() {
       sorting,
       columnFilters,
     },
-  });
+  })
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className='space-y-4'>
+      <div className='flex items-center justify-between'>
         <Input
-          placeholder="filter by username.."
+          placeholder='filter by username..'
           value={
             (table.getColumn("username")?.getFilterValue() as string) ?? ""
           }
           onChange={(e) =>
             table.getColumn("username")?.setFilterValue(e.target.value)
           }
-          className="max-w-sm"
+          className='max-w-sm'
         />
         {isSuperAdmin && (
           <Button onClick={handleCreate}>
-            <Plus className="mr-2 h-4 w-4" /> Add Account
+            <Plus className='mr-2 h-4 w-4' /> Add Account
           </Button>
         )}
       </div>
 
-      <div className="rounded-md border">
+      <div className='rounded-md border'>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -225,7 +222,7 @@ export function AccountManagementTable() {
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className='h-24 text-center'
                 >
                   Loading...
                 </TableCell>
@@ -250,7 +247,7 @@ export function AccountManagementTable() {
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className='h-24 text-center'
                 >
                   No user found.
                 </TableCell>
@@ -269,5 +266,5 @@ export function AccountManagementTable() {
         userAccount={currentAccountUser}
       />
     </div>
-  );
+  )
 }

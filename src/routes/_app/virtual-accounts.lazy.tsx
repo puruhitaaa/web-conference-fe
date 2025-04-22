@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createLazyFileRoute } from "@tanstack/react-router"
 import { VirtualAccountTable } from "@/components/virtual-account/virtual-account-table"
 
-export const Route = createFileRoute("/_app/virtual-accounts")({
+export const Route = createLazyFileRoute("/_app/virtual-accounts")({
   component: RouteComponent,
 })
 

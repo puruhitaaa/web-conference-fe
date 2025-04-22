@@ -61,19 +61,17 @@ export function LoaTable() {
   const [printMode, setPrintMode] = useState<"single" | "all">("all")
   const queryClient = useQueryClient()
 
-  // Fetch LoAs
   const { data: loas = [], isLoading } = useQuery<Loa[]>({
     queryKey: ["icodsa-loas"],
     queryFn: async () => {
-      const response = await api.get(loaRoutes.adminList)
+      const response = await api.get(loaRoutes.listICODSA)
       return response.data
     },
   })
 
-  // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(loaRoutes.delete(id))
+      await api.delete(loaRoutes.deleteICODSA(id))
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["icodsa-loas"] })

@@ -68,19 +68,17 @@ export function ReceiptTable() {
 
   const queryClient = useQueryClient()
 
-  // Fetch Receipts
   const { data: receipts = [], isLoading } = useQuery<Receipt[]>({
     queryKey: ["icicyta-receipts"],
     queryFn: async () => {
-      const response = await api.get(paymentRoutes.listAll)
+      const response = await api.get(paymentRoutes.listICICYTA)
       return response.data
     },
   })
 
-  // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(paymentRoutes.show(id))
+      await api.delete(paymentRoutes.deleteICICYTA(id))
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["icicyta-receipts"] })
@@ -116,6 +114,8 @@ export function ReceiptTable() {
   }
 
   const handlePrint = () => {
+    if (!receipts.length) return toast.error("No receipts found")
+
     setPrintMode("all")
     setCurrentPrintReceipt(null)
     setIsPrintDialogOpen(true)
@@ -251,10 +251,12 @@ export function ReceiptTable() {
           className='max-w-sm'
         />
         <div className='flex gap-2'>
-          <Button variant='outline' onClick={handlePrint}>
-            <Printer className='mr-2 h-4 w-4' />
-            Print All
-          </Button>
+          {receipts.length ? (
+            <Button variant='outline' onClick={handlePrint}>
+              <Printer className='mr-2 h-4 w-4' />
+              Print All
+            </Button>
+          ) : null}
           <Button onClick={handleCreate}>
             <Plus className='mr-2 h-4 w-4' /> Add New Receipt
           </Button>

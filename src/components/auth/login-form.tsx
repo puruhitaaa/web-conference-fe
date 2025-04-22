@@ -30,7 +30,7 @@ import { useState } from "react";
 import { useAuthStore } from "@/lib/auth/authStore";
 
 const formSchema = z.object({
-  username: z.string().min(0, "Please enter a valid email address"),
+  username: z.string().min(1, "Username is required"),
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
@@ -53,20 +53,18 @@ export function LoginForm({
       api.post(authRoutes.login, values),
     onSuccess: (res) => {
       if (res.status === 200) {
-        console.log("Login response:", res.data);
-
         const loginSuccess = loginAction(
           res.data.token,
           res.data.token_type,
           res.data.user
         );
-        console.log(loginSuccess);
+
         if (loginSuccess) {
           toast.success(res.data.message || "Login successful");
           navigate({
             to: "/",
             replace: true,
-            ignoreBlocker: true,
+            // ignoreBlocker: true,
           });
         } else {
           toast.error("Failed to authenticate");
@@ -95,7 +93,7 @@ export function LoginForm({
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account
+            Enter your credentials below to login to your account
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -109,9 +107,9 @@ export function LoginForm({
                 name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input type="username" {...field} />
+                      <Input {...field} />
                     </FormControl>
                     <FormMessage className="text-red-500" />
                   </FormItem>
@@ -122,15 +120,7 @@ export function LoginForm({
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <div className="flex items-center">
-                      <FormLabel>Password</FormLabel>
-                      <a
-                        href="#"
-                        className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                      >
-                        Forgot your password?
-                      </a>
-                    </div>
+                    <FormLabel>Password</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
