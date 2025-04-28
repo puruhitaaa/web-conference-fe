@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import api from "@/lib/axios-config"
-import { invoiceRoutes } from "@/api"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import api from "@/lib/axios-config";
+import { invoiceRoutes } from "@/api";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -13,7 +13,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -21,34 +21,37 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import toast from "react-hot-toast"
-import { Invoice } from "./invoice-table"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import toast from "react-hot-toast";
+import { Invoice } from "./invoice-table"; // Assuming the Invoice type is used here
 
 const formSchema = z.object({
-  invoiceNumber: z.string().min(1, "Invoice number is required"),
-  placeAndDate: z.string().min(1, "Place and date is required"),
-  authorName: z.string().min(1, "Author name is required"),
-  institution: z.string().min(1, "Institution is required"),
-  email: z.string().email("Invalid email address"),
-  paperId: z.string().min(1, "Paper ID is required"),
-  paperTitle: z.string().min(1, "Paper title is required"),
-  description: z.string().min(1, "Description is required"),
-  quantity: z.coerce.number().positive("Quantity must be positive"),
-  price: z.coerce.number().positive("Price must be positive"),
-  total: z.coerce.number().positive("Total must be positive"),
-  department: z.string().min(1, "Department is required"),
-  signature: z.string().min(1, "Signature is required"),
-})
+  invoice_no: z.string().min(1, "Invoice number is required"),
+  loa_id: z.string().min(1, "LOA ID is required"),
+  institution: z.string().nullable(),
+  email: z.string().email("Invalid email address").nullable(),
+  presentation_type: z.string().nullable(),
+  member_type: z.string().nullable(),
+  author_type: z.string().nullable(),
+  amount: z.number().nullable(),
+  date_of_issue: z.date().nullable(),
+  signature_id: z.string().min(1, "Signature ID is required"),
+  virtual_account_id: z.string().nullable(),
+  bank_transfer_id: z.string().nullable(),
+  created_by: z.string().min(1, "Created by is required"),
+  status: z.enum(["Pending", "Paid"]),
+  created_at: z.date().nullable(),
+  updated_at: z.date().nullable(),
+});
 
-type InvoiceFormValues = z.infer<typeof formSchema>
+type InvoiceFormValues = z.infer<typeof formSchema>;
 
 interface InvoiceDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  mode: "create" | "edit" | "view"
-  invoice: Invoice | null
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  mode: "create" | "edit" | "view";
+  invoice: Invoice | null;
 }
 
 export function InvoiceDialog({
@@ -57,135 +60,138 @@ export function InvoiceDialog({
   mode,
   invoice,
 }: InvoiceDialogProps) {
-  const queryClient = useQueryClient()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const queryClient = useQueryClient();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      invoiceNumber: "",
-      placeAndDate: "",
-      authorName: "",
-      institution: "",
-      email: "",
-      paperId: "",
-      paperTitle: "",
-      description: "",
-      quantity: 1,
-      price: 0,
-      total: 0,
-      department: "",
-      signature: "",
+      invoice_no: "",
+      loa_id: "",
+      institution: null,
+      email: null,
+      presentation_type: null,
+      member_type: null,
+      author_type: null,
+      amount: null,
+      date_of_issue: null,
+      signature_id: "",
+      virtual_account_id: null,
+      bank_transfer_id: null,
+      created_by: "",
+      status: "Pending",
+      created_at: null,
+      updated_at: null,
     },
-  })
+  });
 
   useEffect(() => {
     if (open && invoice) {
       form.reset({
-        invoiceNumber: invoice.invoiceNumber,
-        placeAndDate: invoice.placeAndDate,
-        authorName: invoice.authorName,
+        invoice_no: invoice.invoice_no,
+        loa_id: invoice.loa_id,
         institution: invoice.institution,
         email: invoice.email,
-        paperId: invoice.paperId,
-        paperTitle: invoice.paperTitle,
-        description: invoice.description,
-        quantity: invoice.quantity,
-        price: invoice.price,
-        total: invoice.total,
-        department: invoice.department,
-        signature: invoice.signature,
-      })
+        presentation_type: invoice.presentation_type,
+        member_type: invoice.member_type,
+        author_type: invoice.author_type,
+        amount: invoice.amount,
+        date_of_issue: invoice.date_of_issue
+          ? new Date(invoice.date_of_issue)
+          : null,
+        signature_id: invoice.signature_id,
+        virtual_account_id: invoice.virtual_account_id,
+        bank_transfer_id: invoice.bank_transfer_id,
+        created_by: invoice.created_by,
+        status: invoice.status,
+        created_at: invoice.created_at ? new Date(invoice.created_at) : null,
+        updated_at: invoice.updated_at ? new Date(invoice.updated_at) : null,
+      });
     } else if (open && !invoice) {
       form.reset({
-        invoiceNumber: `INV-${new Date().getTime().toString().slice(-6)}`,
-        placeAndDate: new Date().toLocaleDateString(),
-        authorName: "",
-        institution: "",
-        email: "",
-        paperId: "",
-        paperTitle: "",
-        description: "Conference registration fee",
-        quantity: 1,
-        price: 0,
-        total: 0,
-        department: "",
-        signature: "",
-      })
+        invoice_no: `INV-${new Date().getTime().toString().slice(-6)}`,
+        loa_id: "",
+        institution: null,
+        email: null,
+        presentation_type: null,
+        member_type: null,
+        author_type: null,
+        amount: null,
+        date_of_issue: new Date(),
+        signature_id: "",
+        virtual_account_id: null,
+        bank_transfer_id: null,
+        created_by: "",
+        status: "Pending",
+        created_at: new Date(),
+        updated_at: null,
+      });
     }
-  }, [open, invoice, form])
-
-  const quantity = form.watch("quantity")
-  const price = form.watch("price")
-
-  useEffect(() => {
-    const total = quantity * price
-    form.setValue("total", total)
-  }, [quantity, price, form])
+  }, [open, invoice, form]);
 
   const createMutation = useMutation({
     mutationFn: async (values: InvoiceFormValues) => {
       const response = await api.post(invoiceRoutes.updateICODSA("create"), {
         ...values,
         id: crypto.randomUUID(),
-      })
-      return response.data
+      });
+      return response.data.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["icodsa-invoices"] })
-      toast.success("Invoice created successfully")
-      onOpenChange(false)
+      queryClient.invalidateQueries({ queryKey: ["icodsa-invoices"] });
+      toast.success("Invoice created successfully");
+      onOpenChange(false);
     },
     onError: () => {
-      toast.error("Failed to create invoice")
+      toast.error("Failed to create invoice");
     },
     onSettled: () => {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     },
-  })
+  });
 
   const updateMutation = useMutation({
     mutationFn: async (values: InvoiceFormValues & { id: string }) => {
       const response = await api.put(
         invoiceRoutes.updateICODSA(values.id),
         values
-      )
-      return response.data
+      );
+      return response.data.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["icodsa-invoices"] })
-      toast.success("Invoice updated successfully")
-      onOpenChange(false)
+      queryClient.invalidateQueries({ queryKey: ["icodsa-invoices"] });
+      toast.success("Invoice updated successfully");
+      onOpenChange(false);
     },
     onError: () => {
-      toast.error("Failed to update invoice")
+      toast.error("Failed to update invoice");
     },
     onSettled: () => {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     },
-  })
+  });
 
   function onSubmit(values: InvoiceFormValues) {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     if (mode === "edit" && invoice) {
-      updateMutation.mutate({ ...values, id: invoice.id })
+      updateMutation.mutate({ ...values, id: invoice.id });
     } else {
-      createMutation.mutate(values)
+      createMutation.mutate(values);
     }
   }
 
-  const isViewMode = mode === "view"
+  const isViewMode = mode === "view";
   const title =
     mode === "create"
       ? "Create New Invoice"
       : mode === "edit"
         ? "Edit Invoice"
-        : "View Invoice"
+        : "View Invoice";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-[700px]'>
+      <DialogContent className="sm:max-w-[700px]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
@@ -197,254 +203,49 @@ export function InvoiceDialog({
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
-            <div className='grid grid-cols-2 gap-4'>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name='invoiceNumber'
+                name="invoice_no"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Invoice Number</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='INV-123456'
+                        placeholder="INV-123456"
                         {...field}
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage className='text-red-500' />
+                    <FormMessage className="text-red-500" />
                   </FormItem>
                 )}
               />
               <FormField
                 control={form.control}
-                name='placeAndDate'
+                name="loa_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Place and Date</FormLabel>
+                    <FormLabel>LOA ID</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='Jakarta, January 1, 2023'
+                        placeholder="LOA-123456"
                         {...field}
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage className='text-red-500' />
+                    <FormMessage className="text-red-500" />
                   </FormItem>
                 )}
               />
             </div>
 
-            <div className='grid grid-cols-2 gap-4'>
-              <FormField
-                control={form.control}
-                name='authorName'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Author Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='John Doe'
-                        {...field}
-                        disabled={isViewMode}
-                      />
-                    </FormControl>
-                    <FormMessage className='text-red-500' />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='institution'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Institution</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='University of Example'
-                        {...field}
-                        disabled={isViewMode}
-                      />
-                    </FormControl>
-                    <FormMessage className='text-red-500' />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name='email'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='john.doe@example.com'
-                      type='email'
-                      {...field}
-                      disabled={isViewMode}
-                    />
-                  </FormControl>
-                  <FormMessage className='text-red-500' />
-                </FormItem>
-              )}
-            />
-
-            <div className='grid grid-cols-2 gap-4'>
-              <FormField
-                control={form.control}
-                name='paperId'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Paper ID</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='PP-123'
-                        {...field}
-                        disabled={isViewMode}
-                      />
-                    </FormControl>
-                    <FormMessage className='text-red-500' />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='paperTitle'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Paper Title</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='Research on Example Topic'
-                        {...field}
-                        disabled={isViewMode}
-                      />
-                    </FormControl>
-                    <FormMessage className='text-red-500' />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name='description'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='Conference registration fee'
-                      {...field}
-                      disabled={isViewMode}
-                    />
-                  </FormControl>
-                  <FormMessage className='text-red-500' />
-                </FormItem>
-              )}
-            />
-
-            <div className='grid grid-cols-3 gap-4'>
-              <FormField
-                control={form.control}
-                name='quantity'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Quantity</FormLabel>
-                    <FormControl>
-                      <Input
-                        type='number'
-                        min='1'
-                        {...field}
-                        disabled={isViewMode}
-                      />
-                    </FormControl>
-                    <FormMessage className='text-red-500' />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='price'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Price</FormLabel>
-                    <FormControl>
-                      <Input
-                        type='number'
-                        min='0'
-                        step='0.01'
-                        {...field}
-                        disabled={isViewMode}
-                      />
-                    </FormControl>
-                    <FormMessage className='text-red-500' />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='total'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Total</FormLabel>
-                    <FormControl>
-                      <Input
-                        type='number'
-                        min='0'
-                        step='0.01'
-                        {...field}
-                        disabled={true}
-                      />
-                    </FormControl>
-                    <FormMessage className='text-red-500' />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className='grid grid-cols-2 gap-4'>
-              <FormField
-                control={form.control}
-                name='department'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Department</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='Computer Science'
-                        {...field}
-                        disabled={isViewMode}
-                      />
-                    </FormControl>
-                    <FormMessage className='text-red-500' />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='signature'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Signature</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='Dr. John Smith'
-                        {...field}
-                        disabled={isViewMode}
-                      />
-                    </FormControl>
-                    <FormMessage className='text-red-500' />
-                  </FormItem>
-                )}
-              />
-            </div>
+            {/* Other form fields similar to above, you can add inputs for institution, email, amount, etc. */}
 
             <DialogFooter>
               {!isViewMode ? (
-                <Button type='submit' disabled={isSubmitting}>
+                <Button type="submit" disabled={isSubmitting}>
                   {isSubmitting
                     ? "Saving..."
                     : mode === "create"
@@ -452,7 +253,7 @@ export function InvoiceDialog({
                       : "Save changes"}
                 </Button>
               ) : (
-                <Button type='button' onClick={() => onOpenChange(false)}>
+                <Button type="button" onClick={() => onOpenChange(false)}>
                   Close
                 </Button>
               )}
@@ -461,5 +262,5 @@ export function InvoiceDialog({
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

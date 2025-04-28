@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -9,12 +9,12 @@ import {
   ColumnDef,
   SortingState,
   ColumnFiltersState,
-} from "@tanstack/react-table"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import api from "@/lib/axios-config"
-import { invoiceRoutes } from "@/api"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+} from "@tanstack/react-table";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import api from "@/lib/axios-config";
+import { invoiceRoutes } from "@/api";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -22,7 +22,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,100 +30,102 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, Plus, Printer, FileText } from "lucide-react"
-import { InvoiceDialog } from "./invoice-dialog"
-import { InvoicePrintDialog } from "./invoice-print-dialog"
-import toast from "react-hot-toast"
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal, Plus, Printer, FileText } from "lucide-react";
+import { InvoiceDialog } from "./invoice-dialog";
+import { InvoicePrintDialog } from "./invoice-print-dialog";
+import toast from "react-hot-toast";
+import { useAuthStore } from "@/lib/auth/authStore";
 
 export type Invoice = {
-  id: string
-  invoiceNumber: string
-  placeAndDate: string
-  authorName: string
-  institution: string
-  email: string
-  paperId: string
-  paperTitle: string
-  description: string
-  quantity: number
-  price: number
-  total: number
-  department: string
-  signature: string
-}
+  id: string;
+  invoiceNumber: string;
+  placeAndDate: string;
+  authorName: string;
+  institution: string;
+  email: string;
+  paperId: string;
+  paperTitle: string;
+  description: string;
+  quantity: number;
+  price: number;
+  total: number;
+  department: string;
+  signature: string;
+};
 
 export function InvoiceTable() {
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [currentInvoice, setCurrentInvoice] = useState<Invoice | null>(null)
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [currentInvoice, setCurrentInvoice] = useState<Invoice | null>(null);
   const [dialogMode, setDialogMode] = useState<"create" | "edit" | "view">(
     "create"
-  )
-  const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false)
+  );
+  const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
   const [currentPrintInvoice, setCurrentPrintInvoice] =
-    useState<Invoice | null>(null)
-  const [printMode, setPrintMode] = useState<"single" | "all">("all")
+    useState<Invoice | null>(null);
+  const [printMode, setPrintMode] = useState<"single" | "all">("all");
 
-  const queryClient = useQueryClient()
+  const user = useAuthStore((state) => state.user);
+  const queryClient = useQueryClient();
 
   const { data: invoices = [], isLoading } = useQuery<Invoice[]>({
     queryKey: ["icicyta-invoices"],
     queryFn: async () => {
-      const response = await api.get(invoiceRoutes.listICICYTA)
-      return response.data
+      const response = await api.get(invoiceRoutes.listICICYTA);
+      return response.data;
     },
-  })
+  });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(invoiceRoutes.updateICICYTA(id))
+      await api.delete(invoiceRoutes.updateICICYTA(id));
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["icicyta-invoices"] })
-      toast.success("Invoice deleted successfully")
+      queryClient.invalidateQueries({ queryKey: ["icicyta-invoices"] });
+      toast.success("Invoice deleted successfully");
     },
     onError: () => {
-      toast.error("Failed to delete invoice")
+      toast.error("Failed to delete invoice");
     },
-  })
+  });
 
   const handleDelete = (id: string) => {
     if (confirm("Are you sure you want to delete this invoice?")) {
-      deleteMutation.mutate(id)
+      deleteMutation.mutate(id);
     }
-  }
+  };
 
   const handleEdit = (invoice: Invoice) => {
-    setCurrentInvoice(invoice)
-    setDialogMode("edit")
-    setIsDialogOpen(true)
-  }
+    setCurrentInvoice(invoice);
+    setDialogMode("edit");
+    setIsDialogOpen(true);
+  };
 
   const handleView = (invoice: Invoice) => {
-    setCurrentInvoice(invoice)
-    setDialogMode("view")
-    setIsDialogOpen(true)
-  }
+    setCurrentInvoice(invoice);
+    setDialogMode("view");
+    setIsDialogOpen(true);
+  };
 
   const handleCreate = () => {
-    setCurrentInvoice(null)
-    setDialogMode("create")
-    setIsDialogOpen(true)
-  }
+    setCurrentInvoice(null);
+    setDialogMode("create");
+    setIsDialogOpen(true);
+  };
 
   const handlePrint = () => {
-    setPrintMode("all")
-    setCurrentPrintInvoice(null)
-    setIsPrintDialogOpen(true)
-  }
+    setPrintMode("all");
+    setCurrentPrintInvoice(null);
+    setIsPrintDialogOpen(true);
+  };
 
   const handlePrintSingle = (invoice: Invoice) => {
-    setPrintMode("single")
-    setCurrentPrintInvoice(invoice)
-    setIsPrintDialogOpen(true)
-  }
+    setPrintMode("single");
+    setCurrentPrintInvoice(invoice);
+    setIsPrintDialogOpen(true);
+  };
 
   const columns: ColumnDef<Invoice>[] = [
     {
@@ -146,14 +148,14 @@ export function InvoiceTable() {
       accessorKey: "total",
       header: "Total",
       cell: ({ row }) => {
-        const amount = parseFloat(row.getValue("total"))
+        const amount = parseFloat(row.getValue("total"));
         const formatted = new Intl.NumberFormat("id-ID", {
           style: "currency",
           currency: "IDR",
           minimumFractionDigits: 0,
           maximumFractionDigits: 0,
-        }).format(amount)
-        return <div className='font-medium'>{formatted}</div>
+        }).format(amount);
+        return <div className="font-medium">{formatted}</div>;
       },
     },
     {
@@ -164,17 +166,17 @@ export function InvoiceTable() {
       id: "actions",
       header: "Actions",
       cell: ({ row }) => {
-        const invoice = row.original
+        const invoice = row.original;
 
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant='ghost' className='h-8 w-8 p-0'>
-                <span className='sr-only'>Open menu</span>
-                <MoreHorizontal className='h-4 w-4' />
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align='end'>
+            <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => handleView(invoice)}>
                 View
@@ -183,22 +185,22 @@ export function InvoiceTable() {
                 Edit
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handlePrintSingle(invoice)}>
-                <FileText className='mr-2 h-4 w-4' />
+                <FileText className="mr-2 h-4 w-4" />
                 Print PDF
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => handleDelete(invoice.id)}
-                className='text-red-600'
+                className="text-red-600"
               >
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        )
+        );
       },
     },
-  ]
+  ];
 
   const table = useReactTable({
     data: invoices,
@@ -213,34 +215,36 @@ export function InvoiceTable() {
       sorting,
       columnFilters,
     },
-  })
+  });
 
   return (
     <div>
-      <div className='flex items-center justify-between py-4'>
+      <div className="flex items-center justify-between py-4">
         <Input
-          placeholder='Filter by author name...'
+          placeholder="Filter by author name..."
           value={
             (table.getColumn("authorName")?.getFilterValue() as string) ?? ""
           }
           onChange={(event) =>
             table.getColumn("authorName")?.setFilterValue(event.target.value)
           }
-          className='max-w-sm'
+          className="max-w-sm"
         />
-        <div className='flex gap-2'>
+        <div className="flex gap-2">
           {invoices.length ? (
-            <Button variant='outline' onClick={handlePrint}>
-              <Printer className='mr-2 h-4 w-4' />
+            <Button variant="outline" onClick={handlePrint}>
+              <Printer className="mr-2 h-4 w-4" />
               Print All
             </Button>
           ) : null}
-          <Button onClick={handleCreate}>
-            <Plus className='mr-2 h-4 w-4' /> Add New Invoice
-          </Button>
+          {user?.role === 3 ? (
+            <Button onClick={handleCreate}>
+              <Plus className="mr-2 h-4 w-4" /> Add New Invoice
+            </Button>
+          ) : null}
         </div>
       </div>
-      <div className='rounded-md border'>
+      <div className="rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -263,7 +267,7 @@ export function InvoiceTable() {
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className='h-24 text-center'
+                  className="h-24 text-center"
                 >
                   Loading...
                 </TableCell>
@@ -288,7 +292,7 @@ export function InvoiceTable() {
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className='h-24 text-center'
+                  className="h-24 text-center"
                 >
                   No invoices found.
                 </TableCell>
@@ -297,18 +301,18 @@ export function InvoiceTable() {
           </TableBody>
         </Table>
       </div>
-      <div className='flex items-center justify-end space-x-2 py-4'>
+      <div className="flex items-center justify-end space-x-2 py-4">
         <Button
-          variant='outline'
-          size='sm'
+          variant="outline"
+          size="sm"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
         >
           Previous
         </Button>
         <Button
-          variant='outline'
-          size='sm'
+          variant="outline"
+          size="sm"
           onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
         >
@@ -340,5 +344,5 @@ export function InvoiceTable() {
         singleMode={printMode === "single"}
       />
     </div>
-  )
+  );
 }

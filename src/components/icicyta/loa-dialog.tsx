@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import api from "@/lib/axios-config"
-import { loaRoutes } from "@/api"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import api from "@/lib/axios-config";
+import { loaRoutes } from "@/api";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -13,7 +13,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -21,142 +21,137 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import toast from "react-hot-toast"
-import { Loa } from "./loa-table"
+} from "@/components/ui/select";
+import toast from "react-hot-toast";
+import { Loa } from "./loa-table";
 
 const formSchema = z.object({
-  paperId: z.string().min(1, "Paper ID is required"),
-  authorName: z.string().min(1, "Author name is required"),
-  time: z.string().min(1, "Time is required"),
-  conferenceTitle: z.string().min(1, "Conference title is required"),
-  placeAndDate: z.string().min(1, "Place and date is required"),
+  paper_id: z.string().min(1, "Paper ID is required"),
+  paper_title: z.string().min(1, "Conference title is required"),
+  author_names: z.string().min(1, "Author name is required"),
   status: z.enum(["accepted", "rejected"]),
-  signature: z.string().min(1, "Signature is required"),
-  department: z.string().min(1, "Department is required"),
-})
+  tempat_tanggal: z.string().min(1, "Place and date is required"),
+  signature_id: z.string().min(1, "Signature is required"),
+});
 
-type LoaFormValues = z.infer<typeof formSchema>
+type LoaFormValues = z.infer<typeof formSchema>;
 
 interface LoaDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  mode: "create" | "edit" | "view"
-  loa: Loa | null
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  mode: "create" | "edit" | "view";
+  loa: Loa | null;
 }
 
 export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
-  const queryClient = useQueryClient()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const queryClient = useQueryClient();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<LoaFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      paperId: "",
-      authorName: "",
-      time: "",
-      conferenceTitle: "",
-      placeAndDate: "",
+      paper_id: "",
+      paper_title: "",
+      author_names: "",
       status: "accepted",
-      signature: "",
-      department: "",
+      tempat_tanggal: "",
+      signature_id: "",
     },
-  })
+  });
 
   useEffect(() => {
     if (open && loa) {
       form.reset({
-        paperId: loa.paperId,
-        authorName: loa.authorName,
-        time: loa.time,
-        conferenceTitle: loa.conferenceTitle,
-        placeAndDate: loa.placeAndDate,
+        paper_id: loa.paper_id,
+        paper_title: loa.paper_title,
+        author_names: loa.author_names,
         status: loa.status,
-        signature: loa.signature,
-        department: loa.department,
-      })
+        tempat_tanggal: loa.tempat_tanggal,
+        signature_id: loa.signature_id,
+      });
     } else if (open && !loa) {
       form.reset({
-        paperId: "",
-        authorName: "",
-        time: "",
-        conferenceTitle: "ICICYTA 2023",
-        placeAndDate: "",
+        paper_id: "",
+        paper_title: "ICICYTA 2023",
+        author_names: "",
+        tempat_tanggal: "",
         status: "accepted",
-        signature: "",
-        department: "",
-      })
+        signature_id: "",
+      });
     }
-  }, [open, loa, form])
+  }, [open, loa, form]);
 
   const createMutation = useMutation({
     mutationFn: async (values: LoaFormValues) => {
       const response = await api.post(loaRoutes.createICICYTA, {
         ...values,
         id: crypto.randomUUID(),
-      })
-      return response.data
+      });
+      return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["icicyta-loas"] })
-      toast.success("LoA created successfully")
-      onOpenChange(false)
+      queryClient.invalidateQueries({ queryKey: ["icicyta-loas"] });
+      toast.success("LoA created successfully");
+      onOpenChange(false);
     },
     onError: () => {
-      toast.error("Failed to create LoA")
+      toast.error("Failed to create LoA");
     },
     onSettled: () => {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     },
-  })
+  });
 
   const updateMutation = useMutation({
     mutationFn: async (values: LoaFormValues & { id: string }) => {
-      const response = await api.put(loaRoutes.updateICICYTA(values.id), values)
-      return response.data
+      const response = await api.put(
+        loaRoutes.updateICICYTA(values.id),
+        values
+      );
+      return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["icicyta-loas"] })
-      toast.success("LoA updated successfully")
-      onOpenChange(false)
+      queryClient.invalidateQueries({ queryKey: ["icicyta-loas"] });
+      toast.success("LoA updated successfully");
+      onOpenChange(false);
     },
     onError: () => {
-      toast.error("Failed to update LoA")
+      toast.error("Failed to update LoA");
     },
     onSettled: () => {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     },
-  })
+  });
 
   function onSubmit(values: LoaFormValues) {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     if (mode === "edit" && loa) {
-      updateMutation.mutate({ ...values, id: loa.id })
+      updateMutation.mutate({ ...values, id: loa.id });
     } else {
-      createMutation.mutate(values)
+      createMutation.mutate(values);
     }
   }
 
-  const isViewMode = mode === "view"
+  const isViewMode = mode === "view";
   const title =
     mode === "create"
       ? "Create New LoA"
       : mode === "edit"
         ? "Edit LoA"
-        : "View LoA"
+        : "View LoA";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-[600px]'>
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>
@@ -168,39 +163,39 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
-            <div className='grid grid-cols-2 gap-4'>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name='paperId'
+                name="paper_id"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Paper ID</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='ICICYTA-123'
+                        placeholder="ICICYTA-123"
                         {...field}
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage className='text-red-500' />
+                    <FormMessage className="text-red-500" />
                   </FormItem>
                 )}
               />
               <FormField
                 control={form.control}
-                name='authorName'
+                name="author_names"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Author Name</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='John Doe'
+                        placeholder="John Doe"
                         {...field}
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage className='text-red-500' />
+                    <FormMessage className="text-red-500" />
                   </FormItem>
                 )}
               />
@@ -208,61 +203,43 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
 
             <FormField
               control={form.control}
-              name='time'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Time</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='10:00 AM - 11:00 AM'
-                      {...field}
-                      disabled={isViewMode}
-                    />
-                  </FormControl>
-                  <FormMessage className='text-red-500' />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name='conferenceTitle'
+              name="paper_title"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Conference Title</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder='ICICYTA 2023'
+                      placeholder="ICICYTA 2023"
                       {...field}
                       disabled={isViewMode}
                     />
                   </FormControl>
-                  <FormMessage className='text-red-500' />
+                  <FormMessage className="text-red-500" />
                 </FormItem>
               )}
             />
 
             <FormField
               control={form.control}
-              name='placeAndDate'
+              name="tempat_tanggal"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Place and Date</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder='Jakarta, January 1, 2023'
+                      placeholder="Jakarta, 1 January 2023"
                       {...field}
                       disabled={isViewMode}
                     />
                   </FormControl>
-                  <FormMessage className='text-red-500' />
+                  <FormMessage className="text-red-500" />
                 </FormItem>
               )}
             />
 
             <FormField
               control={form.control}
-              name='status'
+              name="status"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Status</FormLabel>
@@ -274,51 +251,34 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder='Select status' />
+                        <SelectValue placeholder="Select status" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value='accepted'>Accepted</SelectItem>
-                      <SelectItem value='rejected'>Rejected</SelectItem>
+                      <SelectItem value="accepted">Accepted</SelectItem>
+                      <SelectItem value="rejected">Rejected</SelectItem>
                     </SelectContent>
                   </Select>
-                  <FormMessage className='text-red-500' />
+                  <FormMessage className="text-red-500" />
                 </FormItem>
               )}
             />
 
-            <div className='grid grid-cols-2 gap-4'>
+            <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name='signature'
+                name="signature_id"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Signature</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='Dr. Jane Smith'
+                        placeholder="Dr. Jane Smith"
                         {...field}
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage className='text-red-500' />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='department'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Department</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='Computer Science'
-                        {...field}
-                        disabled={isViewMode}
-                      />
-                    </FormControl>
-                    <FormMessage className='text-red-500' />
+                    <FormMessage className="text-red-500" />
                   </FormItem>
                 )}
               />
@@ -326,7 +286,7 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
 
             <DialogFooter>
               {!isViewMode ? (
-                <Button type='submit' disabled={isSubmitting}>
+                <Button type="submit" disabled={isSubmitting}>
                   {isSubmitting
                     ? "Saving..."
                     : mode === "create"
@@ -334,7 +294,7 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
                       : "Save changes"}
                 </Button>
               ) : (
-                <Button type='button' onClick={() => onOpenChange(false)}>
+                <Button type="button" onClick={() => onOpenChange(false)}>
                   Close
                 </Button>
               )}
@@ -343,5 +303,5 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
