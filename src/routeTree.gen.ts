@@ -21,6 +21,7 @@ import { Route as AppImport } from './routes/_app'
 const AppIndexLazyImport = createFileRoute('/_app/')()
 const AuthLoginLazyImport = createFileRoute('/_auth/login')()
 const AppVirtualAccountsLazyImport = createFileRoute('/_app/virtual-accounts')()
+const AppSettingAccountLazyImport = createFileRoute('/_app/setting-account')()
 const AppManageAccountLazyImport = createFileRoute('/_app/manage-account')()
 const AppBankTransferLazyImport = createFileRoute('/_app/bank-transfer')()
 const AppIcodsaReceiptLazyImport = createFileRoute('/_app/icodsa/receipt')()
@@ -60,6 +61,14 @@ const AppVirtualAccountsLazyRoute = AppVirtualAccountsLazyImport.update({
   getParentRoute: () => AppRoute,
 } as any).lazy(() =>
   import('./routes/_app/virtual-accounts.lazy').then((d) => d.Route),
+)
+
+const AppSettingAccountLazyRoute = AppSettingAccountLazyImport.update({
+  id: '/setting-account',
+  path: '/setting-account',
+  getParentRoute: () => AppRoute,
+} as any).lazy(() =>
+  import('./routes/_app/setting-account.lazy').then((d) => d.Route),
 )
 
 const AppManageAccountLazyRoute = AppManageAccountLazyImport.update({
@@ -158,6 +167,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppManageAccountLazyImport
       parentRoute: typeof AppImport
     }
+    '/_app/setting-account': {
+      id: '/_app/setting-account'
+      path: '/setting-account'
+      fullPath: '/setting-account'
+      preLoaderRoute: typeof AppSettingAccountLazyImport
+      parentRoute: typeof AppImport
+    }
     '/_app/virtual-accounts': {
       id: '/_app/virtual-accounts'
       path: '/virtual-accounts'
@@ -229,6 +245,7 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppBankTransferLazyRoute: typeof AppBankTransferLazyRoute
   AppManageAccountLazyRoute: typeof AppManageAccountLazyRoute
+  AppSettingAccountLazyRoute: typeof AppSettingAccountLazyRoute
   AppVirtualAccountsLazyRoute: typeof AppVirtualAccountsLazyRoute
   AppIndexLazyRoute: typeof AppIndexLazyRoute
   AppIcicytaInvoiceLazyRoute: typeof AppIcicytaInvoiceLazyRoute
@@ -242,6 +259,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppBankTransferLazyRoute: AppBankTransferLazyRoute,
   AppManageAccountLazyRoute: AppManageAccountLazyRoute,
+  AppSettingAccountLazyRoute: AppSettingAccountLazyRoute,
   AppVirtualAccountsLazyRoute: AppVirtualAccountsLazyRoute,
   AppIndexLazyRoute: AppIndexLazyRoute,
   AppIcicytaInvoiceLazyRoute: AppIcicytaInvoiceLazyRoute,
@@ -268,6 +286,7 @@ export interface FileRoutesByFullPath {
   '': typeof AuthRouteWithChildren
   '/bank-transfer': typeof AppBankTransferLazyRoute
   '/manage-account': typeof AppManageAccountLazyRoute
+  '/setting-account': typeof AppSettingAccountLazyRoute
   '/virtual-accounts': typeof AppVirtualAccountsLazyRoute
   '/login': typeof AuthLoginLazyRoute
   '/': typeof AppIndexLazyRoute
@@ -283,6 +302,7 @@ export interface FileRoutesByTo {
   '': typeof AuthRouteWithChildren
   '/bank-transfer': typeof AppBankTransferLazyRoute
   '/manage-account': typeof AppManageAccountLazyRoute
+  '/setting-account': typeof AppSettingAccountLazyRoute
   '/virtual-accounts': typeof AppVirtualAccountsLazyRoute
   '/login': typeof AuthLoginLazyRoute
   '/': typeof AppIndexLazyRoute
@@ -300,6 +320,7 @@ export interface FileRoutesById {
   '/_auth': typeof AuthRouteWithChildren
   '/_app/bank-transfer': typeof AppBankTransferLazyRoute
   '/_app/manage-account': typeof AppManageAccountLazyRoute
+  '/_app/setting-account': typeof AppSettingAccountLazyRoute
   '/_app/virtual-accounts': typeof AppVirtualAccountsLazyRoute
   '/_auth/login': typeof AuthLoginLazyRoute
   '/_app/': typeof AppIndexLazyRoute
@@ -317,6 +338,7 @@ export interface FileRouteTypes {
     | ''
     | '/bank-transfer'
     | '/manage-account'
+    | '/setting-account'
     | '/virtual-accounts'
     | '/login'
     | '/'
@@ -331,6 +353,7 @@ export interface FileRouteTypes {
     | ''
     | '/bank-transfer'
     | '/manage-account'
+    | '/setting-account'
     | '/virtual-accounts'
     | '/login'
     | '/'
@@ -346,6 +369,7 @@ export interface FileRouteTypes {
     | '/_auth'
     | '/_app/bank-transfer'
     | '/_app/manage-account'
+    | '/_app/setting-account'
     | '/_app/virtual-accounts'
     | '/_auth/login'
     | '/_app/'
@@ -387,6 +411,7 @@ export const routeTree = rootRoute
       "children": [
         "/_app/bank-transfer",
         "/_app/manage-account",
+        "/_app/setting-account",
         "/_app/virtual-accounts",
         "/_app/",
         "/_app/icicyta/invoice",
@@ -409,6 +434,10 @@ export const routeTree = rootRoute
     },
     "/_app/manage-account": {
       "filePath": "_app/manage-account.lazy.tsx",
+      "parent": "/_app"
+    },
+    "/_app/setting-account": {
+      "filePath": "_app/setting-account.lazy.tsx",
       "parent": "/_app"
     },
     "/_app/virtual-accounts": {

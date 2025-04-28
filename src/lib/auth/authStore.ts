@@ -1,51 +1,70 @@
-import { create } from "zustand"
-import { persist } from "zustand/middleware"
-import type { User } from "@/types/auth"
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import type { User } from "@/types/auth";
 
-// Types for our authentication state
+// Store terpisah untuk kredensial sementara (tidak di-persist ke localStorage)
+export const useCredentialsStore = create<{
+  email: string;
+  password: string;
+  setCredentials: (email: string, password: string) => void;
+  clearCredentials: () => void;
+}>((set) => ({
+  email: "",
+  password: "",
+  setCredentials: (email, password) => set({ email, password }),
+  clearCredentials: () => set({ email: "", password: "" }),
+}));
+
+// Store utama yang di-persist (tanpa kredensial sensitif)
 export interface AuthState {
-  token: string | null
-  tokenType: string | null
-  user: User | null
-  isAuthenticated: boolean
+  token: string | null;
+  tokenType: string | null;
+  user: User | null;
+  isAuthenticated: boolean;
 
   // Actions
-  login: (token: string, tokenType: string, user: User) => boolean
-  logout: () => void
+  login: (token: string, tokenType: string, user: User) => boolean;
+  logout: () => void;
 }
 
-// Create auth store with localStorage persistence
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
-      // Initial state
       token: null,
       tokenType: null,
       user: null,
       isAuthenticated: false,
 
-      // Actions
       login: (token, tokenType, user) => {
         set({
           token,
           tokenType,
           user,
           isAuthenticated: true,
-        })
-        return true
+        });
+        return true;
       },
 
       logout: () => {
+        console.log("Logged out");
+        // Bersihkan kredensial dari store terpisah saat logout
+        useCredentialsStore.getState().clearCredentials();
         set({
           token: null,
           tokenType: null,
           user: null,
           isAuthenticated: false,
-        })
+        });
       },
     }),
     {
       name: "auth", // localStorage key
+      partialize: (state) => ({
+        token: state.token,
+        tokenType: state.tokenType,
+        user: state.user,
+        isAuthenticated: state.isAuthenticated,
+      }),
     }
   )
-)
+);

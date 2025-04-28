@@ -1,5 +1,12 @@
 import * as React from "react";
-import { Banknote, Circle, CreditCard, Home, Plus } from "lucide-react";
+import {
+  Banknote,
+  Circle,
+  CreditCard,
+  Home,
+  Plus,
+  Settings,
+} from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
@@ -78,6 +85,12 @@ const ACCOUNT_MANAGEMENT = {
   icon: Plus,
 };
 
+const ACCOUNT_SETTING = {
+  title: "Setting",
+  url: "/setting-account",
+  icon: Settings,
+};
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useAuthStore((state) => state.user);
 
@@ -99,16 +112,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ICICYTA_ITEM,
         BANK_TRANSFER_ITEM,
         VIRTUAL_ACCOUNT_ITEM,
-        ACCOUNT_MANAGEMENT
+        ACCOUNT_MANAGEMENT,
+        ACCOUNT_SETTING
       );
     }
     // ICODSA Admin can only access ICODSA
     else if (user.role === 2) {
-      items.push(ICODSA_ITEM, BANK_TRANSFER_ITEM);
+      items.push(ICODSA_ITEM, BANK_TRANSFER_ITEM, ACCOUNT_SETTING);
     }
     // ICICYTA Admin can only access ICICYTA
     else if (user.role === 3) {
-      items.push(ICICYTA_ITEM, BANK_TRANSFER_ITEM);
+      items.push(ICICYTA_ITEM, BANK_TRANSFER_ITEM, ACCOUNT_SETTING);
     }
 
     return items;

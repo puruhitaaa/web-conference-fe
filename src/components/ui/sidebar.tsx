@@ -301,6 +301,7 @@ const SidebarInset = React.forwardRef<
       )}
       {...props}
     />
+    
   );
 });
 SidebarInset.displayName = "SidebarInset";
