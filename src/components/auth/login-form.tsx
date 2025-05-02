@@ -27,7 +27,7 @@ import { authRoutes } from "@/api";
 import { useMutation } from "@tanstack/react-query";
 import { Logo } from "../ui/logo";
 import { useState } from "react";
-import { useAuthStore, useCredentialsStore } from "@/lib/auth/authStore";
+import { useAuthStore } from "@/lib/auth/authStore";
 
 const formSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -46,15 +46,11 @@ export function LoginForm({
     },
   });
   const loginAction = useAuthStore((state) => state.login);
-  const setCredentials = useCredentialsStore((state) => state.setCredentials);
   const navigate = useNavigate({ from: "/login" });
 
   const loginMutation = useMutation({
-    mutationFn: (values: z.infer<typeof formSchema>) => {
-      setCredentials(values.username, values.password);
-
-      return api.post(authRoutes.login, values);
-    },
+    mutationFn: (values: z.infer<typeof formSchema>) =>
+      api.post(authRoutes.login, values),
     onSuccess: (res) => {
       if (res.status === 200) {
         const loginSuccess = loginAction(

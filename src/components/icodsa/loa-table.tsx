@@ -45,6 +45,7 @@ export type Loa = {
   status: "Accepted" | "Rejected";
   tempat_tanggal: string;
   signature_id: number;
+  created_at: Date;
 };
 
 export function LoaTable() {

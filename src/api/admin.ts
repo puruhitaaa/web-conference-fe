@@ -1,4 +1,4 @@
-import { apiConfig } from "./config"
+import { apiConfig } from "./config";
 
 export const adminRoutes = {
   createAdminICODSA: `${apiConfig.baseUrl}/admin/icodsa/create`,
@@ -10,4 +10,4 @@ export const adminRoutes = {
   listAllAdmins: `${apiConfig.baseUrl}/admin/list`,
   listICODSAAdmins: `${apiConfig.baseUrl}/admin/list/icodsa`,
   listICICYTAAdmins: `${apiConfig.baseUrl}/admin/list/icicyta`,
-}
+};

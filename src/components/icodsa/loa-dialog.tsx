@@ -43,6 +43,7 @@ const formSchema = z.object({
   status: z.enum(["Accepted", "Rejected"]),
   tempat_tanggal: z.string().min(1, "Place and date is required"),
   signature_id: z.string().min(1).transform(Number),
+  created_by: z.number().optional(), // Added to match backend schema
 });
 
 type LoaFormValues = z.infer<typeof formSchema>;
@@ -51,7 +52,7 @@ interface LoaDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   mode: "create" | "edit" | "view";
-  loa: Loa | null; // Adjusted to LoaICODSA model
+  loa: Loa | null;
 }
 
 export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
@@ -64,7 +65,7 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
       paper_id: "",
       paper_title: "",
       author_names: ["Dr. Abdi", "Prof. Samu", "Dr. Alex"],
-      status: "Accepted",
+      status: "Accepted", // Make sure this is uppercase
       tempat_tanggal: "",
       signature_id: 0,
     },
@@ -72,18 +73,47 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
 
   useEffect(() => {
     if (open && loa) {
+      // Ensure status is properly capitalized when loading from existing loa
+      const status =
+        typeof loa.status === "string"
+          ? loa.status.toLowerCase() === "accepted"
+            ? "Accepted"
+            : loa.status.toLowerCase() === "rejected"
+              ? "Rejected"
+              : "Accepted" // Default to Accepted if unknown
+          : "Accepted";
+
+      // Handle author_names which is JSON in the backend - could be string or array
+      let authorNames;
+      if (typeof loa.author_names === "string") {
+        try {
+          // Try to parse if it's JSON string
+          const parsed = JSON.parse(loa.author_names);
+          authorNames = Array.isArray(parsed) ? parsed : [parsed];
+        } catch {
+          // If parsing fails, split by comma
+          authorNames = loa.author_names.split(",").map((name) => name.trim());
+        }
+      } else if (Array.isArray(loa.author_names)) {
+        // Already an array
+        authorNames = loa.author_names;
+      } else {
+        // Fallback
+        authorNames = [];
+      }
+
       form.reset({
         paper_id: loa.paper_id,
         paper_title: loa.paper_title,
-        author_names: loa.author_names?.split(",").map((name) => name.trim()),
-        status: loa.status,
+        author_names: authorNames,
+        status: status as "Accepted" | "Rejected",
         tempat_tanggal: loa.tempat_tanggal,
         signature_id: loa.signature_id,
       });
     } else if (open && !loa) {
       form.reset({
         paper_id: "",
-        paper_title: "ICICYTA 2023",
+        paper_title: "ICODSA 2023",
         author_names: [],
         tempat_tanggal: "",
         status: "Accepted",
@@ -94,12 +124,14 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
 
   const createMutation = useMutation({
     mutationFn: async (values: LoaFormValues) => {
-      // Convert author_names array back to comma-separated string
+      const userId = localStorage.getItem("userId") || "1";
+
       const processedValues = {
         ...values,
         author_names: Array.isArray(values.author_names)
-          ? values.author_names.join(", ")
+          ? values.author_names
           : values.author_names,
+        created_by: parseInt(userId),
       };
 
       const response = await api.post(loaRoutes.createICODSA, processedValues);
@@ -120,11 +152,43 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
 
   const updateMutation = useMutation({
     mutationFn: async (values: LoaFormValues & { id: string }) => {
-      const response = await api.put(loaRoutes.updateICODSA(values.id), values);
+      const userId = localStorage.getItem("userId") || "1";
+
+      const processedValues = {
+        ...values,
+        author_names: Array.isArray(values.author_names)
+          ? values.author_names
+          : values.author_names,
+        created_by: parseInt(userId),
+      };
+
+      const response = await api.put(
+        loaRoutes.updateICODSA(values.id), // Changed to ICODSA
+        processedValues
+      );
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Force a complete refetch of the data instead of just invalidating
       queryClient.invalidateQueries({ queryKey: ["icodsa-loas"] });
+
+      // Optionally, update the cache with the returned data to avoid flickering
+      // This assumes your API returns the updated record
+      try {
+        const previousData = queryClient.getQueryData<Array<Loa>>([
+          "icodsa-loas",
+        ]);
+        if (previousData) {
+          const updatedData = previousData.map((item) =>
+            item.id === data.id ? data : item
+          );
+          queryClient.setQueryData(["icodsa-loas"], updatedData);
+        }
+      } catch (error) {
+        console.error("Error updating cache:", error);
+        // If updating the cache fails, we still have the invalidation as fallback
+      }
+
       toast.success("LoA updated successfully");
       onOpenChange(false);
     },

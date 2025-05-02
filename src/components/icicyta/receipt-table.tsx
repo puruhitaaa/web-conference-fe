@@ -31,7 +31,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Plus, Printer, FileText } from "lucide-react";
+import { MoreHorizontal, Plus, FileText } from "lucide-react";
 import { ReceiptDialog } from "./receipt-dialog";
 import { ReceiptPrintDialog } from "./receipt-print-dialog";
 import toast from "react-hot-toast";
@@ -114,13 +114,13 @@ export function ReceiptTable() {
     setIsDialogOpen(true);
   };
 
-  const handlePrint = () => {
-    if (!receipts.length) return toast.error("No receipts found");
+  // const handlePrint = () => {
+  //   if (!receipts.length) return toast.error("No receipts found");
 
-    setPrintMode("all");
-    setCurrentPrintReceipt(null);
-    setIsPrintDialogOpen(true);
-  };
+  //   setPrintMode("all");
+  //   setCurrentPrintReceipt(null);
+  //   setIsPrintDialogOpen(true);
+  // };
 
   const handlePrintSingle = (receipt: Receipt) => {
     setPrintMode("single");
@@ -252,12 +252,12 @@ export function ReceiptTable() {
           className="max-w-sm"
         />
         <div className="flex gap-2">
-          {receipts.length ? (
+          {/* {receipts.length ? (
             <Button variant="outline" onClick={handlePrint}>
               <Printer className="mr-2 h-4 w-4" />
               Print All
             </Button>
-          ) : null}
+          ) : null} */}
           {user?.role === 3 ? (
             <Button onClick={handleCreate}>
               <Plus className="mr-2 h-4 w-4" /> Add New Receipt

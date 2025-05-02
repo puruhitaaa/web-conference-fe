@@ -42,9 +42,10 @@ export type Loa = {
   paper_id: string;
   paper_title: string;
   author_names: string;
-  status: "accepted" | "rejected";
+  status: "Accepted" | "Rejected";
   tempat_tanggal: string;
-  signature_id: string;
+  signature_id: number;
+  created_at: Date;
 };
 
 export function LoaTable() {
@@ -61,6 +62,7 @@ export function LoaTable() {
   const user = useAuthStore((state) => state.user);
   const queryClient = useQueryClient();
 
+  // Fetch LOAs
   const { data: loas = [], isLoading } = useQuery<Loa[]>({
     queryKey: ["icicyta-loas"],
     queryFn: async () => {
@@ -69,6 +71,7 @@ export function LoaTable() {
     },
   });
 
+  // Mutation for deleting an LOA
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       await api.delete(loaRoutes.deleteICICYTA(id));
@@ -139,7 +142,7 @@ export function LoaTable() {
         return (
           <div
             className={`px-2 py-1 rounded-full text-xs font-medium inline-block ${
-              status === "accepted"
+              status === "Accepted"
                 ? "bg-green-100 text-green-800"
                 : "bg-red-100 text-red-800"
             }`}
@@ -230,7 +233,8 @@ export function LoaTable() {
           ) : null}
           {user?.role === 3 ? (
             <Button onClick={handleCreate}>
-              <Plus className="mr-2 h-4 w-4" /> Add New LoA
+              <Plus className="mr-2 h-4 w-4" />
+              Add New LoA
             </Button>
           ) : null}
         </div>
@@ -324,11 +328,15 @@ export function LoaTable() {
         data={
           printMode === "single" && currentPrintLoa ? currentPrintLoa : loas
         }
-        title={printMode === "single" ? "Print LoA" : "Print All LoAs"}
+        title={
+          printMode === "single"
+            ? "Print Letter of Acceptance"
+            : "Print Letters of Acceptance"
+        }
         description={
           printMode === "single"
-            ? "Preview and print this letter of acceptance"
-            : "Preview and print all letters of acceptance"
+            ? "Preview and print this Letter of Acceptance"
+            : "Preview and print all Letters of Acceptance"
         }
         singleMode={printMode === "single"}
       />

@@ -31,11 +31,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Plus, Printer, FileText } from "lucide-react";
+import { MoreHorizontal, FileText } from "lucide-react";
 import { InvoiceDialog } from "./invoice-dialog";
 import { InvoicePrintDialog } from "./invoice-print-dialog";
 import toast from "react-hot-toast";
-import { useAuthStore } from "@/lib/auth/authStore";
 
 export type Invoice = {
   id: string;
@@ -69,14 +68,13 @@ export function InvoiceTable() {
   const [currentPrintInvoice, setCurrentPrintInvoice] =
     useState<Invoice | null>(null);
   const [printMode, setPrintMode] = useState<"single" | "all">("all");
-  const user = useAuthStore((state) => state.user);
+  // const user = useAuthStore((state) => state.user);
   const queryClient = useQueryClient();
 
   const { data: invoices = [], isLoading } = useQuery<Invoice[]>({
     queryKey: ["icodsa-invoices"],
     queryFn: async () => {
       const response = await api.get(invoiceRoutes.listICODSA);
-      console.log(response);
       return response.data;
     },
   });
@@ -112,17 +110,17 @@ export function InvoiceTable() {
     setIsDialogOpen(true);
   };
 
-  const handleCreate = () => {
-    setCurrentInvoice(null);
-    setDialogMode("create");
-    setIsDialogOpen(true);
-  };
+  // const handleCreate = () => {
+  //   setCurrentInvoice(null);
+  //   setDialogMode("create");
+  //   setIsDialogOpen(true);
+  // };
 
-  const handlePrint = () => {
-    setPrintMode("all");
-    setCurrentPrintInvoice(null);
-    setIsPrintDialogOpen(true);
-  };
+  // const handlePrint = () => {
+  //   setPrintMode("all");
+  //   setCurrentPrintInvoice(null);
+  //   setIsPrintDialogOpen(true);
+  // };
 
   const handlePrintSingle = (invoice: Invoice) => {
     setPrintMode("single");
@@ -132,26 +130,42 @@ export function InvoiceTable() {
 
   const columns: ColumnDef<Invoice>[] = [
     {
-      accessorKey: "invoiceNumber",
+      accessorKey: "invoice_no",
       header: "Invoice #",
     },
     {
-      accessorKey: "authorName",
-      header: "Author Name",
+      accessorKey: "loa_id",
+      header: "LoA ID",
     },
     {
-      accessorKey: "paperId",
-      header: "Paper ID",
+      accessorKey: "institution",
+      header: "Institution",
     },
     {
-      accessorKey: "paperTitle",
-      header: "Paper Title",
+      accessorKey: "email",
+      header: "Email",
+    },
+    {
+      accessorKey: "presentation_type",
+      header: "Presentation Type",
+    },
+    {
+      accessorKey: "member_type",
+      header: "Member Type",
+    },
+    {
+      accessorKey: "author_type",
+      header: "Author Type",
+    },
+    {
+      accessorKey: "amount",
+      header: "Amount",
     },
     {
       accessorKey: "total",
       header: "Total",
       cell: ({ row }) => {
-        const amount = parseFloat(row.getValue("total"));
+        const amount = parseFloat(row.getValue("amount"));
         const formatted = new Intl.NumberFormat("id-ID", {
           style: "currency",
           currency: "IDR",
@@ -160,10 +174,6 @@ export function InvoiceTable() {
         }).format(amount);
         return <div className="font-medium">{formatted}</div>;
       },
-    },
-    {
-      accessorKey: "placeAndDate",
-      header: "Date",
     },
     {
       id: "actions",
@@ -226,14 +236,14 @@ export function InvoiceTable() {
         <Input
           placeholder="Filter by author name..."
           value={
-            (table.getColumn("author_names")?.getFilterValue() as string) ?? ""
+            (table.getColumn("author_type")?.getFilterValue() as string) ?? ""
           }
           onChange={(event) =>
-            table.getColumn("author_names")?.setFilterValue(event.target.value)
+            table.getColumn("author_type")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
-        <div className="flex gap-2">
+        {/* <div className="flex gap-2">
           {invoices.length ? (
             <Button variant="outline" onClick={handlePrint}>
               <Printer className="mr-2 h-4 w-4" />
@@ -245,7 +255,7 @@ export function InvoiceTable() {
               <Plus className="mr-2 h-4 w-4" /> Add New Invoice
             </Button>
           ) : null}
-        </div>
+        </div> */}
       </div>
       <div className="rounded-md border">
         <Table>
