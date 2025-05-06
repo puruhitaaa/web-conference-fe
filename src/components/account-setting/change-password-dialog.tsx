@@ -30,7 +30,7 @@ type LocalAcc = {
   name: string;
   username: string;
   email: string;
-  role: "icodsa" | "icicyta";
+  role: "icodsa" | "icicyta" | "superadmin";
 };
 
 interface PasswordUsersDialogProps {

@@ -31,7 +31,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Plus, Printer, FileText } from "lucide-react";
+import { MoreHorizontal, Plus, FileText } from "lucide-react";
 import { LoaDialog } from "./loa-dialog";
 import { PrintDialog } from "./print-dialog";
 import toast from "react-hot-toast";
@@ -109,11 +109,11 @@ export function LoaTable() {
     setIsDialogOpen(true);
   };
 
-  const handlePrint = () => {
-    setPrintMode("all");
-    setCurrentPrintLoa(null);
-    setIsPrintDialogOpen(true);
-  };
+  // const handlePrint = () => {
+  //   setPrintMode("all");
+  //   setCurrentPrintLoa(null);
+  //   setIsPrintDialogOpen(true);
+  // };
 
   const handlePrintSingle = (loa: Loa) => {
     setPrintMode("single");
@@ -225,12 +225,12 @@ export function LoaTable() {
           className="max-w-sm"
         />
         <div className="flex gap-2">
-          {loas.length ? (
+          {/* {loas.length ? (
             <Button variant="outline" onClick={handlePrint}>
               <Printer className="mr-2 h-4 w-4" />
               Print All
             </Button>
-          ) : null}
+          ) : null} */}
           {user?.role === 2 ? (
             <Button onClick={handleCreate}>
               <Plus className="mr-2 h-4 w-4" />

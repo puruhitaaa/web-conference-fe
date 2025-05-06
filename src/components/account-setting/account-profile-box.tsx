@@ -22,14 +22,13 @@ export function UserProfile() {
 
   if (!user) return <div>Loading...</div>;
 
-  // 🔁 Ubah user object agar sesuai AccountUsers
   type LocalAccountUser = {
     id: string | number;
     name: string;
     username: string;
     email: string;
     password: string;
-    role: "icicyta" | "icodsa";
+    role: "icicyta" | "icodsa" | "superadmin";
   };
 
   const userAccount: LocalAccountUser = {
@@ -38,7 +37,8 @@ export function UserProfile() {
     username: user.username,
     email: user.email,
     password: "", // dummy
-    role: user.role === 2 ? "icodsa" : "icicyta",
+    role:
+      user.role === 1 ? "superadmin" : user.role === 2 ? "icodsa" : "icicyta",
   };
 
   return (
