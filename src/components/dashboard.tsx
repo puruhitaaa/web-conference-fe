@@ -16,6 +16,7 @@ import { useAuthStore } from "@/lib/auth/authStore";
 type LoaHistoryItem = {
   id: string;
   paper_id: string;
+  paper_title: string;
   author_names: string;
   tempat_tanggal: string;
   status: string;
@@ -48,19 +49,23 @@ export function Dashboard() {
       {
         queryKey: ["icodsa-loa-history"],
         queryFn: async () => {
-          const response = await api.get(loaRoutes.listICODSA);
-
-          console.log("ICODSA LOA response:", response.data);
-
-          return response.data.slice(0, 10).map((item: any) => ({
-            id: item.id,
-            paper_id: item.paper_id,
-            paper_title: item.paper_title,
-            author_names: item.author_names,
-            status: item.status,
-            tempat_tanggal: item.tempat_tanggal,
-            signature_id: item.signature_id,
-          }));
+          try {
+            const response = await api.get(loaRoutes.listICODSA);
+            if (!response.data) {
+              throw new Error("No data returned from the API");
+            }
+            return response.data.slice(0, 10).map((item: any) => ({
+              paper_id: item.paper_id,
+              paper_title: item.paper_title,
+              author_names: item.author_names,
+              status: item.status,
+              tempat_tanggal: item.tempat_tanggal,
+              signature_id: item.signature_id,
+            }));
+          } catch (error) {
+            console.error("Error fetching LOA history:", error);
+            throw error; // Rethrow to propagate the error to the query
+          }
         },
         enabled: user?.role === 1 || user?.role === 2,
       },
@@ -99,20 +104,27 @@ export function Dashboard() {
       {
         queryKey: ["icicyta-loa-history"],
         queryFn: async () => {
-          const response = await api.get(loaRoutes.listICICYTA);
-          return response.data
-            .filter((item: any) => item.conferenceType === "ICICYTA")
-            .slice(0, 10)
-            .map((item: any) => ({
-              id: item.id,
+          try {
+            const response = await api.get(loaRoutes.listICICYTA);
+            if (!response.data) {
+              throw new Error("No data returned from the api");
+            }
+            return response.data.slice(0, 10).map((item: any) => ({
               paper_id: item.paper_id,
+              paper_title: item.paper_title,
               author_names: item.author_names,
-              tempat_tanggal: item.tempat_tanggal,
               status: item.status,
+              tempat_tanggal: item.tempat_tanggal,
+              signature_id: item.signature_id,
             }));
+          } catch (error) {
+            console.error("Error fetching LOA history:", error);
+            throw error;
+          }
         },
         enabled: user?.role === 1 || user?.role === 3,
       },
+
       {
         queryKey: ["icicyta-invoice-history"],
         queryFn: async () => {
@@ -206,7 +218,7 @@ export function Dashboard() {
               {data.length ? (
                 data.map((item) => (
                   <li
-                    key={item.id}
+                    key={item.id || item.paper_id}
                     className="flex items-center justify-between py-2"
                   >
                     <span>

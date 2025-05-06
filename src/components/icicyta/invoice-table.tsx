@@ -31,27 +31,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Plus, Printer, FileText } from "lucide-react";
+import { MoreHorizontal, FileText } from "lucide-react";
 import { InvoiceDialog } from "./invoice-dialog";
 import { InvoicePrintDialog } from "./invoice-print-dialog";
 import toast from "react-hot-toast";
-import { useAuthStore } from "@/lib/auth/authStore";
+// import { useAuthStore } from "@/lib/auth/authStore";
 
 export type Invoice = {
   id: string;
-  invoiceNumber: string;
-  placeAndDate: string;
-  authorName: string;
+  invoice_no: string;
+  status: "Pending" | "Paid";
   institution: string;
   email: string;
-  paperId: string;
-  paperTitle: string;
-  description: string;
-  quantity: number;
-  price: number;
-  total: number;
-  department: string;
-  signature: string;
+  presentatiion_type: string;
+  member_type: string;
+  author_type: string;
+  amount: number;
+  date_of_issue: Date;
+  virtual_account_id: string;
+  bank_transfer_id: string;
 };
 
 export function InvoiceTable() {
@@ -67,7 +65,7 @@ export function InvoiceTable() {
     useState<Invoice | null>(null);
   const [printMode, setPrintMode] = useState<"single" | "all">("all");
 
-  const user = useAuthStore((state) => state.user);
+  // const user = useAuthStore((state) => state.user);
   const queryClient = useQueryClient();
 
   const { data: invoices = [], isLoading } = useQuery<Invoice[]>({
@@ -109,17 +107,17 @@ export function InvoiceTable() {
     setIsDialogOpen(true);
   };
 
-  const handleCreate = () => {
-    setCurrentInvoice(null);
-    setDialogMode("create");
-    setIsDialogOpen(true);
-  };
+  // const handleCreate = () => {
+  //   setCurrentInvoice(null);
+  //   setDialogMode("create");
+  //   setIsDialogOpen(true);
+  // };
 
-  const handlePrint = () => {
-    setPrintMode("all");
-    setCurrentPrintInvoice(null);
-    setIsPrintDialogOpen(true);
-  };
+  // const handlePrint = () => {
+  //   setPrintMode("all");
+  //   setCurrentPrintInvoice(null);
+  //   setIsPrintDialogOpen(true);
+  // };
 
   const handlePrintSingle = (invoice: Invoice) => {
     setPrintMode("single");
@@ -129,12 +127,12 @@ export function InvoiceTable() {
 
   const columns: ColumnDef<Invoice>[] = [
     {
-      accessorKey: "invoiceNumber",
+      accessorKey: "invoice_no",
       header: "Invoice #",
     },
     {
-      accessorKey: "authorName",
-      header: "Author Name",
+      accessorKey: "status",
+      header: "Status",
     },
     {
       accessorKey: "paperId",
@@ -230,7 +228,7 @@ export function InvoiceTable() {
           }
           className="max-w-sm"
         />
-        <div className="flex gap-2">
+        {/* <div className="flex gap-2">
           {invoices.length ? (
             <Button variant="outline" onClick={handlePrint}>
               <Printer className="mr-2 h-4 w-4" />
@@ -242,7 +240,7 @@ export function InvoiceTable() {
               <Plus className="mr-2 h-4 w-4" /> Add New Invoice
             </Button>
           ) : null}
-        </div>
+        </div> */}
       </div>
       <div className="rounded-md border">
         <Table>

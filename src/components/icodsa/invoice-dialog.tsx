@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import toast from "react-hot-toast";
 import { Invoice } from "./invoice-table"; // Assuming the Invoice type is used here
+import { Separator } from "@radix-ui/react-separator";
 
 const formSchema = z.object({
   invoice_no: z.string().min(1, "Invoice number is required"),
@@ -149,7 +150,7 @@ export function InvoiceDialog({
       setIsSubmitting(false);
     },
   });
-
+  console.log(createMutation);
   const updateMutation = useMutation({
     mutationFn: async (values: InvoiceFormValues & { id: string }) => {
       const response = await api.put(
@@ -172,6 +173,7 @@ export function InvoiceDialog({
   });
 
   function onSubmit(values: InvoiceFormValues) {
+    console.log("submit values", values);
     setIsSubmitting(true);
 
     if (mode === "edit" && invoice) {
@@ -224,14 +226,69 @@ export function InvoiceDialog({
               />
               <FormField
                 control={form.control}
-                name="loa_id"
+                name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>LOA ID</FormLabel>
+                    <FormLabel>Email</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="LOA-123456"
+                        placeholder="user@email.com"
                         {...field}
+                        value={field.value ?? ""}
+                        disabled={isViewMode}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="presentation_type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Presentation Type</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Onsite/Online"
+                        {...field}
+                        value={field.value ?? ""}
+                        disabled={isViewMode}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="member_type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Member Type</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="IEEE Member/IEEE Non Member"
+                        {...field}
+                        value={field.value ?? ""}
+                        disabled={isViewMode}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="author_type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Author Type</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Author/Student Author"
+                        {...field}
+                        value={field.value ?? ""}
                         disabled={isViewMode}
                       />
                     </FormControl>
@@ -240,6 +297,27 @@ export function InvoiceDialog({
                 )}
               />
             </div>
+            <Separator className="my-4 h-px bg-gray-300" />
+            <FormField
+              control={form.control}
+              name="amount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Amount</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="IDR 5xxxxx"
+                      {...field}
+                      value={field.value ?? ""}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                      disabled={isViewMode}
+                      className="w-1/2"
+                    />
+                  </FormControl>
+                  <FormMessage className="text-red-500" />
+                </FormItem>
+              )}
+            />
 
             {/* Other form fields similar to above, you can add inputs for institution, email, amount, etc. */}
 

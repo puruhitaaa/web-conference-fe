@@ -2,20 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { User } from "@/types/auth";
 
-// Store terpisah untuk kredensial sementara (tidak di-persist ke localStorage)
-export const useCredentialsStore = create<{
-  email: string;
-  password: string;
-  setCredentials: (email: string, password: string) => void;
-  clearCredentials: () => void;
-}>((set) => ({
-  email: "",
-  password: "",
-  setCredentials: (email, password) => set({ email, password }),
-  clearCredentials: () => set({ email: "", password: "" }),
-}));
-
-// Store utama yang di-persist (tanpa kredensial sensitif)
+// Types for our authentication state
 export interface AuthState {
   token: string | null;
   tokenType: string | null;
@@ -27,14 +14,17 @@ export interface AuthState {
   logout: () => void;
 }
 
+// Create auth store with localStorage persistence
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
+      // Initial state
       token: null,
       tokenType: null,
       user: null,
       isAuthenticated: false,
 
+      // Actions
       login: (token, tokenType, user) => {
         set({
           token,
@@ -46,9 +36,6 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
-        console.log("Logged out");
-        // Bersihkan kredensial dari store terpisah saat logout
-        useCredentialsStore.getState().clearCredentials();
         set({
           token: null,
           tokenType: null,
@@ -59,12 +46,6 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: "auth", // localStorage key
-      partialize: (state) => ({
-        token: state.token,
-        tokenType: state.tokenType,
-        user: state.user,
-        isAuthenticated: state.isAuthenticated,
-      }),
     }
   )
 );
