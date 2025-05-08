@@ -23,25 +23,42 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 import toast from "react-hot-toast";
-import { Invoice } from "./invoice-table"; // Assuming the Invoice type is used here
+import { Invoice } from "./invoice-table";
 import { Separator } from "@radix-ui/react-separator";
+import { useAuthStore } from "@/lib/auth/authStore";
 
 const formSchema = z.object({
   invoice_no: z.string().min(1, "Invoice number is required"),
-  loa_id: z.string().min(1, "LOA ID is required"),
+  loa_id: z.coerce.string().min(1, "LOA ID is required"),
   institution: z.string().nullable(),
   email: z.string().email("Invalid email address").nullable(),
-  presentation_type: z.string().nullable(),
-  member_type: z.string().nullable(),
-  author_type: z.string().nullable(),
+  presentation_type: z.enum(["Onsite", "Online", ""]).nullable(),
+  member_type: z.enum(["IEEE Member", "IEEE Non Member", ""]).nullable(),
+  author_type: z.enum(["Author", "Student Author", ""]).nullable(),
   amount: z.number().nullable(),
   date_of_issue: z.date().nullable(),
-  signature_id: z.string().min(1, "Signature ID is required"),
+  signature_id: z.coerce.string().min(1, "Signature ID is required"),
   virtual_account_id: z.string().nullable(),
   bank_transfer_id: z.string().nullable(),
-  created_by: z.string().min(1, "Created by is required"),
-  status: z.enum(["Pending", "Paid"]),
+  created_by: z.coerce.string().nullable(),
+  status: z.enum(["Pending", "Paid", "Unpaid"]),
   created_at: z.date().nullable(),
   updated_at: z.date().nullable(),
 });
@@ -63,6 +80,7 @@ export function InvoiceDialog({
 }: InvoiceDialogProps) {
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const user = useAuthStore((state) => state.user);
 
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(formSchema),
@@ -79,7 +97,7 @@ export function InvoiceDialog({
       signature_id: "",
       virtual_account_id: null,
       bank_transfer_id: null,
-      created_by: "",
+      created_by: null,
       status: "Pending",
       created_at: null,
       updated_at: null,
@@ -93,9 +111,21 @@ export function InvoiceDialog({
         loa_id: invoice.loa_id,
         institution: invoice.institution,
         email: invoice.email,
-        presentation_type: invoice.presentation_type,
-        member_type: invoice.member_type,
-        author_type: invoice.author_type,
+        presentation_type: invoice.presentation_type as
+          | ""
+          | "Onsite"
+          | "Online"
+          | null,
+        member_type: invoice.member_type as
+          | ""
+          | "IEEE Member"
+          | "IEEE Non Member"
+          | null,
+        author_type: invoice.author_type as
+          | ""
+          | "Author"
+          | "Student Author"
+          | null,
         amount: invoice.amount,
         date_of_issue: invoice.date_of_issue
           ? new Date(invoice.date_of_issue)
@@ -122,7 +152,7 @@ export function InvoiceDialog({
         signature_id: "",
         virtual_account_id: null,
         bank_transfer_id: null,
-        created_by: "",
+        created_by: null,
         status: "Pending",
         created_at: new Date(),
         updated_at: null,
@@ -130,42 +160,35 @@ export function InvoiceDialog({
     }
   }, [open, invoice, form]);
 
-  const createMutation = useMutation({
-    mutationFn: async (values: InvoiceFormValues) => {
-      const response = await api.post(invoiceRoutes.updateICICYTA("create"), {
-        ...values,
-        id: crypto.randomUUID(),
-      });
-      return response.data.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["icicyta-invoices"] });
-      toast.success("Invoice created successfully");
-      onOpenChange(false);
-    },
-    onError: () => {
-      toast.error("Failed to create invoice");
-    },
-    onSettled: () => {
-      setIsSubmitting(false);
-    },
-  });
-
   const updateMutation = useMutation({
     mutationFn: async (values: InvoiceFormValues & { id: string }) => {
-      const response = await api.post(
+      const formattedValues = {
+        ...values,
+        created_by: user?.id,
+        date_of_issue: values.date_of_issue
+          ? values.date_of_issue.toISOString().split("T")[0]
+          : null,
+      };
+
+      const response = await api.put(
         invoiceRoutes.updateICICYTA(values.id),
-        values
+        formattedValues
       );
       return response.data.data;
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["icicyta-invoices"] });
-      toast.success("Invoice updated successfully");
+      if (variables.status === "Paid") {
+        queryClient.invalidateQueries({ queryKey: ["icicyta-receipts"] });
+        toast.success("Invoice updated successfully and payment generated");
+      } else {
+        toast.success("Invoice updated successfully");
+      }
       onOpenChange(false);
     },
-    onError: () => {
-      toast.error("Failed to update invoice");
+    onError: (error: any) => {
+      console.error("Error updating invoice:", error);
+      toast.error(error?.response?.data?.message || "Failed to update invoice");
     },
     onSettled: () => {
       setIsSubmitting(false);
@@ -178,8 +201,6 @@ export function InvoiceDialog({
 
     if (mode === "edit" && invoice) {
       updateMutation.mutate({ ...values, id: invoice.id });
-    } else {
-      createMutation.mutate(values);
     }
   }
 
@@ -248,14 +269,22 @@ export function InvoiceDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Presentation Type</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Onsite/Online"
-                        {...field}
-                        value={field.value ?? ""}
-                        disabled={isViewMode}
-                      />
-                    </FormControl>
+                    <Select
+                      disabled={isViewMode}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value ?? ""}
+                      value={field.value ?? ""}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select presentation type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Onsite">Onsite</SelectItem>
+                        <SelectItem value="Online">Online</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage className="text-red-500" />
                   </FormItem>
                 )}
@@ -266,9 +295,168 @@ export function InvoiceDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Member Type</FormLabel>
+                    <Select
+                      disabled={isViewMode}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value ?? ""}
+                      value={field.value ?? ""}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select member type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="IEEE Member">IEEE Member</SelectItem>
+                        <SelectItem value="IEEE Non Member">
+                          IEEE Non Member
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="author_type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Author Type</FormLabel>
+                    <Select
+                      disabled={isViewMode}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value ?? ""}
+                      value={field.value ?? ""}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select author type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Author">Author</SelectItem>
+                        <SelectItem value="Student Author">
+                          Student Author
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <Separator className="my-4 h-px bg-gray-300" />
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Amount</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="IEEE Member/IEEE Non Member"
+                        placeholder="IDR 5xxxxx"
+                        type="number"
+                        min="0"
+                        {...field}
+                        value={field.value ?? ""}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        disabled={isViewMode}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="loa_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>LOA ID</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="LOA-123"
+                        {...field}
+                        value={field.value ?? ""}
+                        disabled={isViewMode}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="date_of_issue"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>Date of Issue</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                            disabled={isViewMode}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value as Date | undefined}
+                          onSelect={field.onChange}
+                          disabled={isViewMode}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="signature_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Signature ID</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Signature reference"
+                        {...field}
+                        disabled={isViewMode}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="institution"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Institution</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="University/Organization"
                         {...field}
                         value={field.value ?? ""}
                         disabled={isViewMode}
@@ -280,46 +468,36 @@ export function InvoiceDialog({
               />
               <FormField
                 control={form.control}
-                name="author_type"
+                name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Author Type</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Author/Student Author"
-                        {...field}
-                        value={field.value ?? ""}
-                        disabled={isViewMode}
-                      />
-                    </FormControl>
+                    <FormLabel>Status</FormLabel>
+                    <Select
+                      disabled={isViewMode}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      value={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Pending">Pending</SelectItem>
+                        <SelectItem value="Paid">Paid</SelectItem>
+                        <SelectItem value="Unpaid">Unpaid</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {field.value === "Paid" &&
+                        "Payment will be automatically created when status is set to Paid"}
+                    </p>
                     <FormMessage className="text-red-500" />
                   </FormItem>
                 )}
               />
             </div>
-            <Separator className="my-4 h-px bg-gray-300" />
-            <FormField
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Amount</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="IDR 5xxxxx"
-                      {...field}
-                      value={field.value ?? ""}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                      disabled={isViewMode}
-                      className="w-1/2"
-                    />
-                  </FormControl>
-                  <FormMessage className="text-red-500" />
-                </FormItem>
-              )}
-            />
-
-            {/* Other form fields similar to above, you can add inputs for institution, email, amount, etc. */}
 
             <DialogFooter>
               {!isViewMode ? (

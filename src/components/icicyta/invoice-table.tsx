@@ -35,6 +35,7 @@ import { MoreHorizontal, FileText } from "lucide-react";
 import { InvoiceDialog } from "./invoice-dialog";
 import { InvoicePrintDialog } from "./invoice-print-dialog";
 import toast from "react-hot-toast";
+// import { useAuthStore } from "@/lib/auth/authStore";
 
 export type Invoice = {
   id: string;
@@ -51,7 +52,7 @@ export type Invoice = {
   virtual_account_id: string | null;
   bank_transfer_id: string | null;
   created_by: string;
-  status: "Pending" | "Paid";
+  status: "Pending" | "Paid" | "Unpaid";
   created_at: Date | null;
   updated_at: Date | null;
 };
@@ -68,6 +69,7 @@ export function InvoiceTable() {
   const [currentPrintInvoice, setCurrentPrintInvoice] =
     useState<Invoice | null>(null);
   const [printMode, setPrintMode] = useState<"single" | "all">("all");
+
   // const user = useAuthStore((state) => state.user);
   const queryClient = useQueryClient();
 
@@ -81,7 +83,7 @@ export function InvoiceTable() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(invoiceRoutes.deleteICICYTA(id));
+      await api.delete(invoiceRoutes.updateICICYTA(id));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["icicyta-invoices"] });
@@ -165,7 +167,7 @@ export function InvoiceTable() {
       accessorKey: "total",
       header: "Total",
       cell: ({ row }) => {
-        const amount = parseFloat(row.getValue("amount"));
+        const amount = parseFloat(row.getValue("amount")) || 0;
         const formatted = new Intl.NumberFormat("id-ID", {
           style: "currency",
           currency: "IDR",
@@ -173,6 +175,26 @@ export function InvoiceTable() {
           maximumFractionDigits: 0,
         }).format(amount);
         return <div className="font-medium">{formatted}</div>;
+      },
+    },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => {
+        const status = row.getValue("status") as string;
+        return (
+          <div
+            className={`px-2 py-1 rounded-full text-xs font-medium inline-block ${
+              status === "Paid"
+                ? "bg-green-100 text-green-800"
+                : status === "Pending"
+                  ? "bg-yellow-100 text-yellow-800"
+                  : "bg-red-100 text-red-800"
+            }`}
+          >
+            {status}
+          </div>
+        );
       },
     },
     {
@@ -243,19 +265,19 @@ export function InvoiceTable() {
           }
           className="max-w-sm"
         />
-        {/* <div className="flex gap-2">
-          {invoices.length ? (
+        <div className="flex gap-2">
+          {/* {invoices.length ? (
             <Button variant="outline" onClick={handlePrint}>
               <Printer className="mr-2 h-4 w-4" />
               Print All
             </Button>
-          ) : null}
-          {user?.role === 2 ? (
+          ) : null} */}
+          {/* {user?.role === 3 ? (
             <Button onClick={handleCreate}>
               <Plus className="mr-2 h-4 w-4" /> Add New Invoice
             </Button>
-          ) : null}
-        </div> */}
+          ) : null} */}
+        </div>
       </div>
       <div className="rounded-md border">
         <Table>
