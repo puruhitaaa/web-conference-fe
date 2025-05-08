@@ -196,7 +196,6 @@ export function InvoiceDialog({
   });
 
   function onSubmit(values: InvoiceFormValues) {
-    console.log("submit values", values);
     setIsSubmitting(true);
 
     if (mode === "edit" && invoice) {
@@ -379,7 +378,6 @@ export function InvoiceDialog({
                       <Input
                         placeholder="LOA-123"
                         {...field}
-                        value={field.value ?? ""}
                         disabled={isViewMode}
                       />
                     </FormControl>

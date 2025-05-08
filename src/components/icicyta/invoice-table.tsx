@@ -74,7 +74,7 @@ export function InvoiceTable() {
   const queryClient = useQueryClient();
 
   const { data: invoices = [], isLoading } = useQuery<Invoice[]>({
-    queryKey: ["iciyta-invoices"],
+    queryKey: ["icicyta-invoices"],
     queryFn: async () => {
       const response = await api.get(invoiceRoutes.listICICYTA);
       return response.data;
