@@ -35,21 +35,25 @@ import { MoreHorizontal, FileText } from "lucide-react";
 import { InvoiceDialog } from "./invoice-dialog";
 import { InvoicePrintDialog } from "./invoice-print-dialog";
 import toast from "react-hot-toast";
-// import { useAuthStore } from "@/lib/auth/authStore";
 
 export type Invoice = {
   id: string;
   invoice_no: string;
+  loa_id: string;
+  institution: string | null;
+  email: string | null;
+  presentation_type: string | null;
+  member_type: string | null;
+  author_type: string | null;
+  amount: number | null;
+  date_of_issue: Date | null;
+  signature_id: string;
+  virtual_account_id: string | null;
+  bank_transfer_id: string | null;
+  created_by: string;
   status: "Pending" | "Paid";
-  institution: string;
-  email: string;
-  presentatiion_type: string;
-  member_type: string;
-  author_type: string;
-  amount: number;
-  date_of_issue: Date;
-  virtual_account_id: string;
-  bank_transfer_id: string;
+  created_at: Date | null;
+  updated_at: Date | null;
 };
 
 export function InvoiceTable() {
@@ -64,12 +68,11 @@ export function InvoiceTable() {
   const [currentPrintInvoice, setCurrentPrintInvoice] =
     useState<Invoice | null>(null);
   const [printMode, setPrintMode] = useState<"single" | "all">("all");
-
   // const user = useAuthStore((state) => state.user);
   const queryClient = useQueryClient();
 
   const { data: invoices = [], isLoading } = useQuery<Invoice[]>({
-    queryKey: ["icicyta-invoices"],
+    queryKey: ["iciyta-invoices"],
     queryFn: async () => {
       const response = await api.get(invoiceRoutes.listICICYTA);
       return response.data;
@@ -78,7 +81,7 @@ export function InvoiceTable() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(invoiceRoutes.updateICICYTA(id));
+      await api.delete(invoiceRoutes.deleteICICYTA(id));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["icicyta-invoices"] });
@@ -131,22 +134,38 @@ export function InvoiceTable() {
       header: "Invoice #",
     },
     {
-      accessorKey: "status",
-      header: "Status",
+      accessorKey: "loa_id",
+      header: "LoA ID",
     },
     {
-      accessorKey: "paperId",
-      header: "Paper ID",
+      accessorKey: "institution",
+      header: "Institution",
     },
     {
-      accessorKey: "paperTitle",
-      header: "Paper Title",
+      accessorKey: "email",
+      header: "Email",
+    },
+    {
+      accessorKey: "presentation_type",
+      header: "Presentation Type",
+    },
+    {
+      accessorKey: "member_type",
+      header: "Member Type",
+    },
+    {
+      accessorKey: "author_type",
+      header: "Author Type",
+    },
+    {
+      accessorKey: "amount",
+      header: "Amount",
     },
     {
       accessorKey: "total",
       header: "Total",
       cell: ({ row }) => {
-        const amount = parseFloat(row.getValue("total"));
+        const amount = parseFloat(row.getValue("amount"));
         const formatted = new Intl.NumberFormat("id-ID", {
           style: "currency",
           currency: "IDR",
@@ -155,10 +174,6 @@ export function InvoiceTable() {
         }).format(amount);
         return <div className="font-medium">{formatted}</div>;
       },
-    },
-    {
-      accessorKey: "placeAndDate",
-      header: "Date",
     },
     {
       id: "actions",
@@ -221,10 +236,10 @@ export function InvoiceTable() {
         <Input
           placeholder="Filter by author name..."
           value={
-            (table.getColumn("authorName")?.getFilterValue() as string) ?? ""
+            (table.getColumn("author_type")?.getFilterValue() as string) ?? ""
           }
           onChange={(event) =>
-            table.getColumn("authorName")?.setFilterValue(event.target.value)
+            table.getColumn("author_type")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -235,7 +250,7 @@ export function InvoiceTable() {
               Print All
             </Button>
           ) : null}
-          {user?.role === 3 ? (
+          {user?.role === 2 ? (
             <Button onClick={handleCreate}>
               <Plus className="mr-2 h-4 w-4" /> Add New Invoice
             </Button>

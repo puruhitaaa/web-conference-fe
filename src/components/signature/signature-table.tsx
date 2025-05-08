@@ -1,20 +1,4 @@
-import { useState } from "react";
-import {
-  useReactTable,
-  getCoreRowModel,
-  getSortedRowModel,
-  getPaginationRowModel,
-  getFilteredRowModel,
-  flexRender,
-  ColumnDef,
-  SortingState,
-  ColumnFiltersState,
-} from "@tanstack/react-table";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import api from "@/lib/axios-config";
-import { virtualAccountRoutes } from "@/api";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { signatureRoutes } from "@/api";
 import {
   Table,
   TableBody,
@@ -24,37 +8,45 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  getPaginationRowModel,
+  getFilteredRowModel,
+  flexRender,
+  ColumnDef,
+} from "@tanstack/react-table";
+import { useAuthStore } from "@/lib/auth/authStore";
+import api from "@/lib/axios-config";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "../ui/dropdown-menu";
+import { Button } from "../ui/button";
 import { MoreHorizontal, Plus } from "lucide-react";
-import { VirtualAccountDialog } from "@/components/virtual-account/virtual-account-dialog";
-import toast from "react-hot-toast";
-import { useAuthStore } from "@/lib/auth/authStore";
-import { DataTablePagination } from "@/components/data-table-pagination";
+import { DataTablePagination } from "../data-table-pagination";
+import { SignatureUploadDialog } from "./upload-signature-dialog";
 
-export type VirtualAccount = {
+export type Signature = {
   id: string;
-  nomor_virtual_akun: string;
-  account_holder_name: string;
-  bank_name: string;
-  bank_branch: string;
-  token: string;
-  created_by: number;
-  created_at: string;
-  updated_at: string;
+  picture: string;
+  nama_penandatangan: string;
+  jabatan_penandatangan: string;
+  tanggal_dibuat: string;
 };
 
-export function VirtualAccountTable() {
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+export function SignatureTable() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [currentVirtualAccount, setCurrentVirtualAccount] =
-    useState<VirtualAccount | null>(null);
+  const [currentSignature, setCurrentSignature] = useState<Signature | null>(
+    null
+  );
   const [dialogMode, setDialogMode] = useState<"create" | "edit" | "view">(
     "create"
   );
@@ -63,75 +55,115 @@ export function VirtualAccountTable() {
   const user = useAuthStore((state) => state.user);
   const isSuperAdmin = user?.role === 1;
 
-  // Fetch Virtual Accounts
-  const { data: virtualAccounts = [], isLoading } = useQuery<VirtualAccount[]>({
-    queryKey: ["virtual-accounts"],
+  const { data: signatureUser = [], isLoading } = useQuery<Signature[]>({
+    queryKey: ["signature-users"],
     queryFn: async () => {
-      const response = await api.get(virtualAccountRoutes.list);
+      const response = await api.get(signatureRoutes.list);
       return response.data;
     },
   });
 
-  // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(virtualAccountRoutes.delete(id));
+      await api.delete(signatureRoutes.delete(id));
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["virtual-accounts"] });
-      toast.success("Virtual account deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["signature-users"] });
+      toast.success("Signature deleted successfully");
     },
     onError: () => {
-      toast.error("Failed to delete virtual account");
+      toast.error("Failed to delete signature");
     },
   });
 
   const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this virtual account?")) {
+    if (confirm("Are you sure you want to delete this signature?")) {
       deleteMutation.mutate(id);
     }
   };
 
-  const handleEdit = (virtualAccount: VirtualAccount) => {
-    setCurrentVirtualAccount(virtualAccount);
+  const handleEdit = (signatureUser: Signature) => {
+    setCurrentSignature(signatureUser);
     setDialogMode("edit");
     setIsDialogOpen(true);
   };
 
-  const handleView = (virtualAccount: VirtualAccount) => {
-    setCurrentVirtualAccount(virtualAccount);
+  const handleView = (signatureUser: Signature) => {
+    setCurrentSignature(signatureUser);
     setDialogMode("view");
     setIsDialogOpen(true);
   };
 
   const handleCreate = () => {
-    setCurrentVirtualAccount(null);
+    setCurrentSignature(null);
     setDialogMode("create");
     setIsDialogOpen(true);
   };
 
-  const columns: ColumnDef<VirtualAccount>[] = [
+  // Format the date string if it exists
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return "-";
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString();
+    } catch (e) {
+      return dateString;
+    }
+  };
+
+  const columns: ColumnDef<Signature>[] = [
     {
-      accessorKey: "nomor_virtual_akun",
-      header: "Account Number",
+      accessorKey: "picture",
+      header: "Signature",
+      cell: ({ row }) => {
+        const signature = row.original;
+        // Check if we have a valid image URL
+        if (signature.picture) {
+          return (
+            <div className="flex items-center justify-center">
+              <img
+                src={signature.picture}
+                alt={`Signature of ${signature.nama_penandatangan}`}
+                className="max-h-16 max-w-24 object-contain"
+                onError={(e) => {
+                  // If image fails to load, show alt text instead
+                  const imgElement = e.target as HTMLImageElement;
+                  imgElement.style.display = "none";
+                  const parent = imgElement.parentNode as HTMLElement;
+                  if (parent) {
+                    const textNode = document.createElement("span");
+                    textNode.textContent = "Image not available";
+                    textNode.className = "text-sm text-gray-500";
+                    parent.appendChild(textNode);
+                  }
+                }}
+              />
+            </div>
+          );
+        }
+        return <span className="text-gray-500">No image</span>;
+      },
     },
     {
-      accessorKey: "account_holder_name",
-      header: "Account Holder",
+      accessorKey: "nama_penandatangan",
+      header: "Signatory Name",
     },
     {
-      accessorKey: "bank_name",
-      header: "Bank Name",
+      accessorKey: "jabatan_penandatangan",
+      header: "Signatory's Position",
     },
     {
-      accessorKey: "bank_branch",
-      header: "Bank Branch",
+      accessorKey: "tanggal_dibuat",
+      header: "Date Created",
+      cell: ({ row }) => {
+        return formatDate(row.original.tanggal_dibuat);
+      },
     },
     {
       id: "actions",
       header: "Actions",
       cell: ({ row }) => {
-        const virtualAccount = row.original;
+        const signatureUser = row.original;
 
         return (
           <DropdownMenu>
@@ -143,17 +175,17 @@ export function VirtualAccountTable() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => handleView(virtualAccount)}>
+              <DropdownMenuItem onClick={() => handleView(signatureUser)}>
                 View
               </DropdownMenuItem>
               {isSuperAdmin && (
                 <>
-                  <DropdownMenuItem onClick={() => handleEdit(virtualAccount)}>
+                  <DropdownMenuItem onClick={() => handleEdit(signatureUser)}>
                     Edit
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
-                    onClick={() => handleDelete(virtualAccount.id)}
+                    onClick={() => handleDelete(signatureUser.id)}
                     className="text-red-600"
                   >
                     Delete
@@ -168,36 +200,20 @@ export function VirtualAccountTable() {
   ];
 
   const table = useReactTable({
-    data: virtualAccounts,
+    data: signatureUser,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    state: {
-      sorting,
-      columnFilters,
-    },
   });
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <Input
-          placeholder="Filter by bank name..."
-          value={
-            (table.getColumn("bank_name")?.getFilterValue() as string) ?? ""
-          }
-          onChange={(e) =>
-            table.getColumn("bank_name")?.setFilterValue(e.target.value)
-          }
-          className="max-w-sm"
-        />
         {isSuperAdmin && (
           <Button onClick={handleCreate}>
-            <Plus className="mr-2 h-4 w-4" /> Add Virtual Account
+            <Plus className="mr-2 h-4 w-4" /> Add Signature
           </Button>
         )}
       </div>
@@ -252,22 +268,23 @@ export function VirtualAccountTable() {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No virtual accounts found.
+                  No signatures found.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
+        <DataTablePagination table={table} />
+
+        <>
+          <SignatureUploadDialog
+            open={isDialogOpen}
+            onOpenChange={setIsDialogOpen}
+            mode={dialogMode}
+            signatureUser={currentSignature}
+          />
+        </>
       </div>
-
-      <DataTablePagination table={table} />
-
-      <VirtualAccountDialog
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        mode={dialogMode}
-        virtualAccount={currentVirtualAccount}
-      />
     </div>
   );
 }

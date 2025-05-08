@@ -133,6 +133,14 @@ export function LoaTable() {
     {
       accessorKey: "paper_title",
       header: "Conference Title",
+      cell: ({ row }) => {
+        const title = row.getValue("paper_title") as string;
+        return (
+          <div className="max-w-[250px] truncate whitespace-nowrap overflow-hidden">
+            {title}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "status",
