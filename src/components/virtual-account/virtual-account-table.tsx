@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -92,23 +92,29 @@ export function VirtualAccountTable() {
     }
   };
 
-  const handleEdit = (virtualAccount: VirtualAccount) => {
+  const handleEdit = useCallback((virtualAccount: VirtualAccount) => {
     setCurrentVirtualAccount(virtualAccount);
     setDialogMode("edit");
-    setIsDialogOpen(true);
-  };
+    setTimeout(() => {
+      setIsDialogOpen(true);
+    }, 0);
+  }, []);
 
-  const handleView = (virtualAccount: VirtualAccount) => {
+  const handleView = useCallback((virtualAccount: VirtualAccount) => {
     setCurrentVirtualAccount(virtualAccount);
     setDialogMode("view");
-    setIsDialogOpen(true);
-  };
+    setTimeout(() => {
+      setIsDialogOpen(true);
+    }, 0);
+  }, []);
 
-  const handleCreate = () => {
+  const handleCreate = useCallback(() => {
     setCurrentVirtualAccount(null);
     setDialogMode("create");
-    setIsDialogOpen(true);
-  };
+    setTimeout(() => {
+      setIsDialogOpen(true);
+    }, 0);
+  }, []);
 
   const columns: ColumnDef<VirtualAccount>[] = [
     {
@@ -182,6 +188,8 @@ export function VirtualAccountTable() {
     },
   });
 
+  const showAddButton = isSuperAdmin && !isLoading;
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -195,7 +203,7 @@ export function VirtualAccountTable() {
           }
           className="max-w-sm"
         />
-        {isSuperAdmin && (
+        {showAddButton && (
           <Button onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" /> Add Virtual Account
           </Button>

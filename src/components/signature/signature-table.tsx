@@ -15,11 +15,13 @@ import {
   getFilteredRowModel,
   flexRender,
   ColumnDef,
+  SortingState,
+  ColumnFiltersState,
 } from "@tanstack/react-table";
 import { useAuthStore } from "@/lib/auth/authStore";
 import api from "@/lib/axios-config";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import toast from "react-hot-toast";
 import {
   DropdownMenu,
@@ -33,6 +35,7 @@ import { Button } from "../ui/button";
 import { MoreHorizontal, Plus } from "lucide-react";
 import { DataTablePagination } from "../data-table-pagination";
 import { SignatureUploadDialog } from "./upload-signature-dialog";
+import { Input } from "../ui/input";
 
 export type Signature = {
   id: string;
@@ -43,6 +46,8 @@ export type Signature = {
 };
 
 export function SignatureTable() {
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentSignature, setCurrentSignature] = useState<Signature | null>(
     null
@@ -61,6 +66,8 @@ export function SignatureTable() {
       const response = await api.get(signatureRoutes.list);
       return response.data;
     },
+    // Add staleTime to prevent unnecessary refetches
+    staleTime: 30000,
   });
 
   const deleteMutation = useMutation({
@@ -82,23 +89,29 @@ export function SignatureTable() {
     }
   };
 
-  const handleEdit = (signatureUser: Signature) => {
+  const handleEdit = useCallback((signatureUser: Signature) => {
     setCurrentSignature(signatureUser);
     setDialogMode("edit");
-    setIsDialogOpen(true);
-  };
+    setTimeout(() => {
+      setIsDialogOpen(true);
+    }, 0);
+  }, []);
 
-  const handleView = (signatureUser: Signature) => {
+  const handleView = useCallback((signatureUser: Signature) => {
     setCurrentSignature(signatureUser);
     setDialogMode("view");
-    setIsDialogOpen(true);
-  };
+    setTimeout(() => {
+      setIsDialogOpen(true);
+    }, 0);
+  }, []);
 
-  const handleCreate = () => {
+  const handleCreate = useCallback(() => {
     setCurrentSignature(null);
     setDialogMode("create");
-    setIsDialogOpen(true);
-  };
+    setTimeout(() => {
+      setIsDialogOpen(true);
+    }, 0);
+  }, []);
 
   // Format the date string if it exists
   const formatDate = (dateString: string | null) => {
@@ -125,6 +138,7 @@ export function SignatureTable() {
                 src={signature.picture}
                 alt={`Signature of ${signature.nama_penandatangan}`}
                 className="max-h-16 max-w-24 object-contain"
+                loading="lazy" // Add lazy loading
                 onError={(e) => {
                   // If image fails to load, show alt text instead
                   const imgElement = e.target as HTMLImageElement;
@@ -206,13 +220,39 @@ export function SignatureTable() {
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    initialState: {
+      sorting,
+      columnFilters,
+      pagination: {
+        pageSize: 10, // Set a reasonable default page size
+      },
+    },
   });
+
+  // Don't show add button during loading to prevent immediate interactions
+  const showAddButton = isSuperAdmin && !isLoading;
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        {isSuperAdmin && (
-          <Button onClick={handleCreate}>
+        <Input
+          placeholder="filter by signatory name"
+          value={
+            (table
+              .getColumn("nama_penandatangan")
+              ?.getFilterValue() as string) ?? ""
+          }
+          onChange={(e) =>
+            table
+              .getColumn("nama_penandatangan")
+              ?.setFilterValue(e.target.value)
+          }
+          className="max-w-sm"
+        />
+        {showAddButton && (
+          <Button onClick={handleCreate} disabled={isLoading || isDialogOpen}>
             <Plus className="mr-2 h-4 w-4" /> Add Signature
           </Button>
         )}
@@ -276,14 +316,14 @@ export function SignatureTable() {
         </Table>
         <DataTablePagination table={table} />
 
-        <>
+        {isDialogOpen && (
           <SignatureUploadDialog
             open={isDialogOpen}
             onOpenChange={setIsDialogOpen}
             mode={dialogMode}
             signatureUser={currentSignature}
           />
-        </>
+        )}
       </div>
     </div>
   );

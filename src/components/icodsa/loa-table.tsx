@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -31,7 +31,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Plus, FileText } from "lucide-react";
+import { MoreHorizontal, Plus, FileText, Printer } from "lucide-react";
 import { LoaDialog } from "./loa-dialog";
 import { PrintDialog } from "./print-dialog";
 import toast from "react-hot-toast";
@@ -44,7 +44,7 @@ export type Loa = {
   author_names: string;
   status: "Accepted" | "Rejected";
   tempat_tanggal: string;
-  signature_id: number;
+  signature_id: string;
   created_at: Date;
 };
 
@@ -91,35 +91,45 @@ export function LoaTable() {
     }
   };
 
-  const handleEdit = (loa: Loa) => {
+  const handleEdit = useCallback((loa: Loa) => {
     setCurrentLoa(loa);
     setDialogMode("edit");
-    setIsDialogOpen(true);
-  };
+    setTimeout(() => {
+      setIsDialogOpen(true);
+    }, 0);
+  }, []);
 
-  const handleView = (loa: Loa) => {
+  const handleView = useCallback((loa: Loa) => {
     setCurrentLoa(loa);
     setDialogMode("view");
-    setIsDialogOpen(true);
-  };
+    setTimeout(() => {
+      setIsDialogOpen(true);
+    }, 0);
+  }, []);
 
-  const handleCreate = () => {
+  const handleCreate = useCallback(() => {
     setCurrentLoa(null);
     setDialogMode("create");
-    setIsDialogOpen(true);
-  };
+    setTimeout(() => {
+      setIsDialogOpen(true);
+    }, 0);
+  }, []);
 
-  // const handlePrint = () => {
-  //   setPrintMode("all");
-  //   setCurrentPrintLoa(null);
-  //   setIsPrintDialogOpen(true);
-  // };
+  const handlePrint = useCallback(() => {
+    setPrintMode("all");
+    setCurrentPrintLoa(null);
+    setTimeout(() => {
+      setIsPrintDialogOpen(true);
+    }, 0);
+  }, []);
 
-  const handlePrintSingle = (loa: Loa) => {
+  const handlePrintSingle = useCallback((loa: Loa) => {
     setPrintMode("single");
     setCurrentPrintLoa(loa);
-    setIsPrintDialogOpen(true);
-  };
+    setTimeout(() => {
+      setIsPrintDialogOpen(true);
+    }, 0);
+  }, []);
 
   const columns: ColumnDef<Loa>[] = [
     {
@@ -183,20 +193,27 @@ export function LoaTable() {
               <DropdownMenuItem onClick={() => handleView(loa)}>
                 View
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleEdit(loa)}>
-                Edit
-              </DropdownMenuItem>
+              {user?.role !== 1 && (
+                <DropdownMenuItem onClick={() => handleEdit(loa)}>
+                  Edit
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={() => handlePrintSingle(loa)}>
                 <FileText className="mr-2 h-4 w-4" />
                 Print PDF
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => handleDelete(loa.id)}
-                className="text-red-600"
-              >
-                Delete
-              </DropdownMenuItem>
+
+              {user?.role !== 1 && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => handleDelete(loa.id)}
+                    className="text-red-600"
+                  >
+                    Delete
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -219,6 +236,8 @@ export function LoaTable() {
     },
   });
 
+  const showAddButton = user?.role !== 1 && user?.role !== 3 && !isLoading;
+
   return (
     <div>
       <div className="flex items-center justify-between py-4">
@@ -233,18 +252,18 @@ export function LoaTable() {
           className="max-w-sm"
         />
         <div className="flex gap-2">
-          {/* {loas.length ? (
+          {loas.length ? (
             <Button variant="outline" onClick={handlePrint}>
               <Printer className="mr-2 h-4 w-4" />
               Print All
             </Button>
-          ) : null} */}
-          {user?.role === 2 ? (
+          ) : null}
+          {showAddButton && (
             <Button onClick={handleCreate}>
               <Plus className="mr-2 h-4 w-4" />
               Add New LoA
             </Button>
-          ) : null}
+          )}
         </div>
       </div>
       <div className="rounded-md border">
