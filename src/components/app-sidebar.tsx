@@ -114,8 +114,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     // Super Admin can access everything
     if (user.role === 1) {
       items.push(
-        ICODSA_ITEM,
-        ICICYTA_ITEM,
         BANK_TRANSFER_ITEM,
         VIRTUAL_ACCOUNT_ITEM,
         ACCOUNT_MANAGEMENT,

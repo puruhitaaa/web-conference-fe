@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -31,7 +31,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Plus, FileText, Printer } from "lucide-react";
+import { MoreHorizontal, Plus, Printer, FileText } from "lucide-react";
 import { LoaDialog } from "./loa-dialog";
 import { PrintDialog } from "./print-dialog";
 import toast from "react-hot-toast";
@@ -44,7 +44,7 @@ export type Loa = {
   author_names: string;
   status: "Accepted" | "Rejected";
   tempat_tanggal: string;
-  signature_id: string;
+  signature_id: number;
   created_at: Date;
 };
 
@@ -91,45 +91,35 @@ export function LoaTable() {
     }
   };
 
-  const handleEdit = useCallback((loa: Loa) => {
+  const handleEdit = (loa: Loa) => {
     setCurrentLoa(loa);
     setDialogMode("edit");
-    setTimeout(() => {
-      setIsDialogOpen(true);
-    }, 0);
-  }, []);
+    setIsDialogOpen(true);
+  };
 
-  const handleView = useCallback((loa: Loa) => {
+  const handleView = (loa: Loa) => {
     setCurrentLoa(loa);
     setDialogMode("view");
-    setTimeout(() => {
-      setIsDialogOpen(true);
-    }, 0);
-  }, []);
+    setIsDialogOpen(true);
+  };
 
-  const handleCreate = useCallback(() => {
+  const handleCreate = () => {
     setCurrentLoa(null);
     setDialogMode("create");
-    setTimeout(() => {
-      setIsDialogOpen(true);
-    }, 0);
-  }, []);
+    setIsDialogOpen(true);
+  };
 
-  const handlePrint = useCallback(() => {
+  const handlePrint = () => {
     setPrintMode("all");
     setCurrentPrintLoa(null);
-    setTimeout(() => {
-      setIsPrintDialogOpen(true);
-    }, 0);
-  }, []);
+    setIsPrintDialogOpen(true);
+  };
 
-  const handlePrintSingle = useCallback((loa: Loa) => {
+  const handlePrintSingle = (loa: Loa) => {
     setPrintMode("single");
     setCurrentPrintLoa(loa);
-    setTimeout(() => {
-      setIsPrintDialogOpen(true);
-    }, 0);
-  }, []);
+    setIsPrintDialogOpen(true);
+  };
 
   const columns: ColumnDef<Loa>[] = [
     {
@@ -143,14 +133,6 @@ export function LoaTable() {
     {
       accessorKey: "paper_title",
       header: "Conference Title",
-      cell: ({ row }) => {
-        const title = row.getValue("paper_title") as string;
-        return (
-          <div className="max-w-[250px] truncate whitespace-nowrap overflow-hidden">
-            {title}
-          </div>
-        );
-      },
     },
     {
       accessorKey: "status",
@@ -193,27 +175,20 @@ export function LoaTable() {
               <DropdownMenuItem onClick={() => handleView(loa)}>
                 View
               </DropdownMenuItem>
-              {user?.role !== 1 && (
-                <DropdownMenuItem onClick={() => handleEdit(loa)}>
-                  Edit
-                </DropdownMenuItem>
-              )}
+              <DropdownMenuItem onClick={() => handleEdit(loa)}>
+                Edit
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handlePrintSingle(loa)}>
                 <FileText className="mr-2 h-4 w-4" />
                 Print PDF
               </DropdownMenuItem>
-
-              {user?.role !== 1 && (
-                <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={() => handleDelete(loa.id)}
-                    className="text-red-600"
-                  >
-                    Delete
-                  </DropdownMenuItem>
-                </>
-              )}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => handleDelete(loa.id)}
+                className="text-red-600"
+              >
+                Delete
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -236,8 +211,6 @@ export function LoaTable() {
     },
   });
 
-  const showAddButton = user?.role !== 1 && user?.role !== 3 && !isLoading;
-
   return (
     <div>
       <div className="flex items-center justify-between py-4">
@@ -258,12 +231,12 @@ export function LoaTable() {
               Print All
             </Button>
           ) : null}
-          {showAddButton && (
+          {user?.role === 2 ? (
             <Button onClick={handleCreate}>
               <Plus className="mr-2 h-4 w-4" />
               Add New LoA
             </Button>
-          )}
+          ) : null}
         </div>
       </div>
       <div className="rounded-md border">

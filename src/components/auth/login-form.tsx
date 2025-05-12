@@ -74,8 +74,9 @@ export function LoginForm({
       }
     },
     onError: (error) => {
+      setIsLoading(false);
       console.error("Login error:", error);
-      toast.error("Login failed");
+      toast.error("username or password is invalid");
     },
   });
 

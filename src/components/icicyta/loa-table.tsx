@@ -44,7 +44,7 @@ export type Loa = {
   author_names: string | string[];
   status: "Accepted" | "Rejected";
   tempat_tanggal: string;
-  signature_id: string;
+  signature_id: number;
   created_at: Date;
 };
 

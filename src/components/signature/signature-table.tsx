@@ -126,6 +126,10 @@ export function SignatureTable() {
 
   const columns: ColumnDef<Signature>[] = [
     {
+      accessorKey: "id",
+      header: "Signature ID",
+    },
+    {
       accessorKey: "picture",
       header: "Signature",
       cell: ({ row }) => {
