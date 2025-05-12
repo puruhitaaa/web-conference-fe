@@ -3,8 +3,8 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import axios from "axios"
-import { protectedRoutes } from "@/api"
+import api from "@/lib/axios-config"
+import { paymentRoutes } from "@/api"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -87,7 +87,6 @@ export function ReceiptDialog({
     },
   })
 
-  // Reset form when dialog opens with receipt data
   useEffect(() => {
     if (open && receipt) {
       form.reset({
@@ -124,10 +123,9 @@ export function ReceiptDialog({
     }
   }, [open, receipt, form])
 
-  // Create mutation
   const createMutation = useMutation({
     mutationFn: async (values: ReceiptFormValues) => {
-      const response = await axios.post(protectedRoutes.receipts, {
+      const response = await api.post(paymentRoutes.listICICYTA, {
         ...values,
         id: crypto.randomUUID(),
       })
@@ -146,11 +144,10 @@ export function ReceiptDialog({
     },
   })
 
-  // Update mutation
   const updateMutation = useMutation({
     mutationFn: async (values: ReceiptFormValues & { id: string }) => {
-      const response = await axios.put(
-        `${protectedRoutes.receipts}/${values.id}`,
+      const response = await api.put(
+        paymentRoutes.updateICICYTA(values.id),
         values
       )
       return response.data
@@ -215,7 +212,7 @@ export function ReceiptDialog({
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -232,7 +229,7 @@ export function ReceiptDialog({
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -252,7 +249,7 @@ export function ReceiptDialog({
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -269,7 +266,7 @@ export function ReceiptDialog({
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -289,7 +286,7 @@ export function ReceiptDialog({
                       disabled={isViewMode}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className='text-red-500' />
                 </FormItem>
               )}
             />
@@ -308,7 +305,7 @@ export function ReceiptDialog({
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -325,7 +322,7 @@ export function ReceiptDialog({
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -344,7 +341,7 @@ export function ReceiptDialog({
                       disabled={isViewMode}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className='text-red-500' />
                 </FormItem>
               )}
             />
@@ -365,7 +362,7 @@ export function ReceiptDialog({
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -382,7 +379,7 @@ export function ReceiptDialog({
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -399,7 +396,7 @@ export function ReceiptDialog({
                         disabled={isViewMode}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className='text-red-500' />
                   </FormItem>
                 )}
               />
@@ -428,7 +425,7 @@ export function ReceiptDialog({
                       <SelectItem value='cancelled'>Cancelled</SelectItem>
                     </SelectContent>
                   </Select>
-                  <FormMessage />
+                  <FormMessage className='text-red-500' />
                 </FormItem>
               )}
             />

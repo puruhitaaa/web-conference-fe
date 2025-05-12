@@ -1,26 +1,38 @@
 import React from "react";
-import { Document, Page, Text, View, StyleSheet, PDFViewer } from "@react-pdf/renderer";
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  PDFViewer,
+} from "@react-pdf/renderer";
 import { Loa } from "./loa-table";
 
 // Create styles
 const styles = StyleSheet.create({
   page: {
+    padding: 20,
     flexDirection: "column",
     backgroundColor: "#ffffff",
-    padding: 30,
   },
   header: {
-    marginBottom: 20,
+    color: "#ffffff",
+    padding: 20,
     textAlign: "center",
+    backgroundColor: "#5FC9D5",
   },
   title: {
+    textAlign: "left",
     fontSize: 24,
     fontWeight: "bold",
+    marginTop: 20,
     marginBottom: 10,
   },
   subtitle: {
-    fontSize: 16,
-    marginBottom: 20,
+    fontSize: 10,
+    textAlign: "left",
+    fontWeight: "bold",
   },
   table: {
     display: "flex",
@@ -28,7 +40,7 @@ const styles = StyleSheet.create({
     borderStyle: "solid",
     borderWidth: 1,
     borderColor: "#bfbfbf",
-    marginBottom: 20,
+    margin: 20,
   },
   tableRow: {
     flexDirection: "row",
@@ -72,8 +84,8 @@ const styles = StyleSheet.create({
   },
   // Add styles for single LoA view
   singleLoaContainer: {
-    marginTop: 20,
-    marginBottom: 20,
+    margin: 20,
+    paddingTop: 20,
   },
   loaHeader: {
     fontSize: 18,
@@ -84,12 +96,14 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   loaLabel: {
-    fontSize: 12,
-    fontWeight: "bold",
+    fontSize: 10,
+    marginTop: 10,
+    marginBottom: 10,
   },
   loaValue: {
-    fontSize: 12,
+    fontSize: 10,
     marginTop: 3,
+    fontWeight: "bold",
   },
   signature: {
     marginTop: 50,
@@ -99,7 +113,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     width: 200,
     textAlign: "center",
-  }
+  },
 });
 
 interface LoaPdfProps {
@@ -111,8 +125,11 @@ export const LoaPdfDocument: React.FC<LoaPdfProps> = ({ loas }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.header}>
-        <Text style={styles.title}>ICODSA Letters of Acceptance</Text>
-        <Text style={styles.subtitle}>Generated on {new Date().toLocaleDateString()}</Text>
+        <Text style={styles.title}>ICoDSA {new Date().getFullYear()}</Text>
+        <Text style={styles.subtitle}>
+          The 7th International Conference on Data Science and Its Applications
+          {new Date().getFullYear()} (ICoDSA {new Date().getFullYear()})
+        </Text>
       </View>
 
       <View style={styles.table}>
@@ -134,19 +151,21 @@ export const LoaPdfDocument: React.FC<LoaPdfProps> = ({ loas }) => (
         {loas.map((loa, i) => (
           <View key={i} style={styles.tableRow}>
             <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{loa.paperId}</Text>
+              <Text style={styles.tableCell}>{loa.paper_id}</Text>
             </View>
             <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{loa.authorName}</Text>
+              <Text style={styles.tableCell}>{loa.author_names}</Text>
             </View>
             <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{loa.conferenceTitle}</Text>
+              <Text style={styles.tableCell}>{loa.paper_title}</Text>
             </View>
             <View style={styles.tableCol}>
-              <Text 
+              <Text
                 style={[
-                  styles.tableCell, 
-                  loa.status === "accepted" ? styles.statusAccepted : styles.statusRejected
+                  styles.tableCell,
+                  loa.status === "Accepted"
+                    ? styles.statusAccepted
+                    : styles.statusRejected,
                 ]}
               >
                 {loa.status}
@@ -157,7 +176,8 @@ export const LoaPdfDocument: React.FC<LoaPdfProps> = ({ loas }) => (
       </View>
 
       <Text style={styles.footer}>
-        This is an automatically generated document. For more information, please contact the conference organizers.
+        This is an automatically generated document. For more information,
+        please contact the conference organizers.
       </Text>
     </Page>
   </Document>
@@ -179,59 +199,80 @@ export const SingleLoaPdfDocument: React.FC<SingleLoaPdfProps> = ({ loa }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.header}>
-        <Text style={styles.title}>Letter of Acceptance</Text>
-        <Text style={styles.subtitle}>ICODSA Conference</Text>
+        <Text style={styles.title}>ICoDSA {new Date().getFullYear()}</Text>
+        <Text style={styles.subtitle}>
+          The 7th International Conference on Data Science and Its Applications
+          {new Date().getFullYear()} (ICoDSA {new Date().getFullYear()})
+        </Text>
       </View>
 
-      <View style={styles.singleLoaContainer}>
-        <View style={styles.loaField}>
-          <Text style={styles.loaLabel}>Paper ID:</Text>
-          <Text style={styles.loaValue}>{loa.paperId}</Text>
+      <div className="flex justify-center m-10">
+        <View style={styles.singleLoaContainer}>
+          <View style={styles.loaField}>
+            <Text style={styles.loaLabel}>LETTER OF ACCEPTANCE</Text>
+            <Text style={styles.subtitle}>
+              The 4th International Conference on Intelligent Cybernetics
+              Technology & Application {new Date().getFullYear()} (ICODSA)
+            </Text>
+          </View>
+
+          <View style={styles.loaField}>
+            <Text style={styles.loaValue}>Dear {loa.author_names}</Text>
+          </View>
+
+          <View style={styles.loaField}>
+            <Text style={styles.loaLabel}>
+              Organizing & Program Committee is pleased to announce that your
+              paper:
+            </Text>
+            <Text style={styles.loaValue}>
+              {loa.paper_id}: {loa.paper_title}
+            </Text>
+          </View>
+
+          <View style={styles.loaField}>
+            <Text style={styles.loaLabel}>Was</Text>
+            <Text
+              style={[
+                styles.loaValue,
+                loa.status === "Accepted"
+                  ? styles.statusAccepted
+                  : styles.statusRejected,
+              ]}
+            >
+              {loa.status.toUpperCase()}
+            </Text>
+          </View>
+
+          <View style={styles.loaField}>
+            <Text style={styles.loaLabel}>
+              For The 7th International Conference on Data Science and Its
+              Applications {new Date().getFullYear()} (ICoDSA{" "}
+              {new Date().getFullYear()}). For finishing your registration
+              please follow the instruction, which has been already send by
+              e-mail to all authors of accepted papers.
+            </Text>
+            <Text style={styles.loaLabel}>
+              The 7th International Conference on Data Science and Its
+              Applications {new Date().getFullYear()} (ICoDSA{" "}
+              {new Date().getFullYear()}) with theme "Data for Good: Leveraging
+              Data Science for Social Impact" will be held on July 10-11, 2024
+              at Aston Kuta Hotel & Residence, Bali, Indonesia.
+            </Text>
+          </View>
+
+          <Text style={styles.loaValue}>{loa.tempat_tanggal}</Text>
+
+          <View style={styles.signature}>
+            <Text style={styles.loaValue}>{loa.signature_id}</Text>
+            <Text style={styles.loaLabel}>Signature</Text>
+          </View>
         </View>
-        
-        <View style={styles.loaField}>
-          <Text style={styles.loaLabel}>Author Name:</Text>
-          <Text style={styles.loaValue}>{loa.authorName}</Text>
-        </View>
-        
-        <View style={styles.loaField}>
-          <Text style={styles.loaLabel}>Conference Title:</Text>
-          <Text style={styles.loaValue}>{loa.conferenceTitle}</Text>
-        </View>
-        
-        <View style={styles.loaField}>
-          <Text style={styles.loaLabel}>Time:</Text>
-          <Text style={styles.loaValue}>{loa.time}</Text>
-        </View>
-        
-        <View style={styles.loaField}>
-          <Text style={styles.loaLabel}>Place and Date:</Text>
-          <Text style={styles.loaValue}>{loa.placeAndDate}</Text>
-        </View>
-        
-        <View style={styles.loaField}>
-          <Text style={styles.loaLabel}>Status:</Text>
-          <Text style={[
-            styles.loaValue, 
-            loa.status === "accepted" ? styles.statusAccepted : styles.statusRejected
-          ]}>
-            {loa.status.toUpperCase()}
-          </Text>
-        </View>
-        
-        <View style={styles.loaField}>
-          <Text style={styles.loaLabel}>Department:</Text>
-          <Text style={styles.loaValue}>{loa.department}</Text>
-        </View>
-        
-        <View style={styles.signature}>
-          <Text style={styles.loaValue}>{loa.signature}</Text>
-          <Text style={styles.loaLabel}>Signature</Text>
-        </View>
-      </View>
+      </div>
 
       <Text style={styles.footer}>
-        This is an officially generated Letter of Acceptance for ICODSA Conference.
+        This is an officially generated Letter of Acceptance for ICODSA
+        Conference.
       </Text>
     </Page>
   </Document>
@@ -239,7 +280,7 @@ export const SingleLoaPdfDocument: React.FC<SingleLoaPdfProps> = ({ loa }) => (
 
 // Single PDF Viewer Component
 export const SingleLoaPdfViewer: React.FC<SingleLoaPdfProps> = ({ loa }) => (
-  <PDFViewer width="100%" height="600px" className="mt-4">
+  <PDFViewer width="100%" height="400px" className="mt-4">
     <SingleLoaPdfDocument loa={loa} />
   </PDFViewer>
 );

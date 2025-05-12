@@ -1,9 +1,7 @@
-export interface AuthState {
-  user: User | null
-}
-
 export interface User {
-  id: string
-  name: string
-  email: string
+  id: number;
+  username: string;
+  name: string;
+  email: string;
+  role: number;
 }

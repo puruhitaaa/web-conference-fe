@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createLazyFileRoute } from "@tanstack/react-router"
 import { ReceiptTable } from "@/components/icicyta/receipt-table"
 
-export const Route = createFileRoute("/_app/icicyta/receipt")({
+export const Route = createLazyFileRoute("/_app/icicyta/receipt")({
   component: ReceiptComponent,
 })
 

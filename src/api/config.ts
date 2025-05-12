@@ -1,3 +1,5 @@
 export const apiConfig = {
-    baseUrl: 'http://localhost:3000',
-}
+  baseUrl: `${import.meta.env.VITE_API_URL || "http://localhost:8000/api"}`,
+};
+
+// "https://docssummit-api.humicprototyping.com/api"

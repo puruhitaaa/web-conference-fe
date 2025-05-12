@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -21,16 +21,16 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import axios from "axios";
-import useSignIn from "react-auth-kit/hooks/useSignIn";
+import api from "@/lib/axios-config";
 import toast from "react-hot-toast";
 import { authRoutes } from "@/api";
 import { useMutation } from "@tanstack/react-query";
 import { Logo } from "../ui/logo";
 import { useState } from "react";
+import { useAuthStore } from "@/lib/auth/authStore";
 
 const formSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+  username: z.string().min(1, "Username is required"),
   password: z.string().min(8, "Password must be at least 8 characters"),
 });
 
@@ -41,39 +41,40 @@ export function LoginForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
-  const signIn = useSignIn();
+  const loginAction = useAuthStore((state) => state.login);
   const navigate = useNavigate({ from: "/login" });
 
   const loginMutation = useMutation({
-    mutationFn: (values: z.infer<typeof formSchema>) =>
-      axios.post(authRoutes.login, values),
+    mutationFn: (values: z.infer<typeof formSchema>) => {
+      setIsLoading(true);
+      return api.post(authRoutes.login, values);
+    },
     onSuccess: (res) => {
       if (res.status === 200) {
-        if (
-          signIn({
-            auth: {
-              token: res.data.accessToken,
-              type: "Bearer",
-            },
-            userState: res.data.authUserState,
-          })
-        ) {
-          toast.success("Login successful");
+        const loginSuccess = loginAction(
+          res.data.token,
+          res.data.token_type,
+          res.data.user
+        );
+
+        if (loginSuccess) {
+          toast.success(res.data.message || "Login successful");
           navigate({
             to: "/",
-            ignoreBlocker: true,
             replace: true,
+            // ignoreBlocker: true,
           });
         } else {
-          toast.error("Login failed");
+          toast.error("Failed to authenticate");
         }
       }
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Login error:", error);
       toast.error("Login failed");
     },
   });
@@ -83,6 +84,7 @@ export function LoginForm({
   }
 
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <div
@@ -94,7 +96,7 @@ export function LoginForm({
         <CardHeader>
           <CardTitle>Login to your account</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account
+            Enter your credentials below to login to your account
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -105,36 +107,23 @@ export function LoginForm({
             >
               <FormField
                 control={form.control}
-                name="email"
+                name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="m@example.com"
-                        type="email"
-                        {...field}
-                      />
+                      <Input {...field} />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-red-500" />
                   </FormItem>
                 )}
               />
-              {/* password field */}
               <FormField
                 control={form.control}
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <div className="flex items-center">
-                      <FormLabel>Password</FormLabel>
-                      <a
-                        href="#"
-                        className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                      >
-                        Forgot your password?
-                      </a>
-                    </div>
+                    <FormLabel>Password</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Input
@@ -154,19 +143,13 @@ export function LoginForm({
                         </button>
                       </div>
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-red-500" />
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
-                Login
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "processing data.." : "Login"}
               </Button>
-              <div className="text-center text-sm">
-                Don&apos;t have an account?{" "}
-                <Link to="/register" className="underline underline-offset-4">
-                  Sign up
-                </Link>
-              </div>
             </form>
           </Form>
         </CardContent>
