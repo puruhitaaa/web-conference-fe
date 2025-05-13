@@ -125,7 +125,7 @@ export const LoaPdfDocument: React.FC<LoaPdfProps> = ({ loas }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.header}>
-        <Text style={styles.title}>ICODSA {new Date().getFullYear()}</Text>
+        <Text style={styles.title}>ICoDSA {new Date().getFullYear()}</Text>
         <Text style={styles.subtitle}>
           The 7th International Conference on Data Science and Its Applications
           {new Date().getFullYear()} (ICoDSA {new Date().getFullYear()})
@@ -199,7 +199,7 @@ export const SingleLoaPdfDocument: React.FC<SingleLoaPdfProps> = ({ loa }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.header}>
-        <Text style={styles.title}>ICODSA {new Date().getFullYear()}</Text>
+        <Text style={styles.title}>ICoDSA {new Date().getFullYear()}</Text>
         <Text style={styles.subtitle}>
           The 7th International Conference on Data Science and Its Applications
           {new Date().getFullYear()} (ICoDSA {new Date().getFullYear()})

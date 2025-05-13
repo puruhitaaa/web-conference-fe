@@ -24,22 +24,18 @@ type LoaHistoryItem = {
 
 type InvoiceHistoryItem = {
   id: string;
-  invoiceNumber: string;
-  authorName: string;
-  paperId: string;
-  paperTitle: string;
-  placeAndDate: string;
+  invoice_no: string;
+  institution: string;
   status: string;
+  created_at: Date;
 };
 
 type ReceiptHistoryItem = {
   id: string;
-  invoiceNumber: string;
-  receivedFrom: string;
+  invoice_no: string;
+  paper_title: string;
+  received_from: string;
   amount: number;
-  paymentDate: string;
-  placeAndDate: string;
-  status: string;
 };
 
 export function Dashboard() {
@@ -67,39 +63,51 @@ export function Dashboard() {
             throw error; // Rethrow to propagate the error to the query
           }
         },
-        enabled: user?.role === 1 || user?.role === 2,
+        enabled: user?.role === 2,
       },
       {
         queryKey: ["icodsa-invoice-history"],
         queryFn: async () => {
-          const response = await api.get(invoiceRoutes.listICODSA);
-          return response.data.slice(0, 10).map((item: any) => ({
-            id: item.id,
-            invoiceNumber: item.invoiceNumber,
-            authorName: item.authorName,
-            paperId: item.paperId,
-            paperTitle: item.paperTitle,
-            placeAndDate: item.placeAndDate,
-            status: item.status || "pending",
-          }));
+          try {
+            const response = await api.get(invoiceRoutes.listICODSA);
+            if (!response.data) {
+              throw new Error("No data returned from the API");
+            }
+            return response.data.slice(0, 10).map((item: any) => ({
+              id: item.id,
+              invoice_no: item.invoice_no,
+              institution: item.institution,
+              created_at: new Date(item.created_at),
+              status: item.status || "pending",
+            }));
+          } catch (error) {
+            console.error("Error fetching Invoice history", error);
+            throw error;
+          }
         },
-        enabled: user?.role === 1 || user?.role === 2,
+        enabled: user?.role === 2,
       },
       {
         queryKey: ["icodsa-receipt-history"],
         queryFn: async () => {
-          const response = await api.get(paymentRoutes.listICODSA);
-          return response.data.slice(0, 10).map((item: any) => ({
-            id: item.id,
-            invoiceNumber: item.invoiceNumber,
-            receivedFrom: item.receivedFrom,
-            amount: item.amount,
-            paymentDate: item.paymentDate,
-            placeAndDate: item.placeAndDate,
-            status: item.status || "pending",
-          }));
+          try {
+            const response = await api.get(paymentRoutes.listICODSA);
+            if (!response.data) {
+              throw new Error("No data returned from the API");
+            }
+            return response.data.slice(0, 10).map((item: any) => ({
+              id: item.id,
+              paper_title: item.paper_title,
+              invoice_no: item.invoice_no,
+              received_from: item.received_from,
+              amount: item.amount,
+            }));
+          } catch (error) {
+            console.error("Error fetching receipt history", error);
+            throw error;
+          }
         },
-        enabled: user?.role === 1 || user?.role === 2,
+        enabled: user?.role === 2,
       },
       {
         queryKey: ["icicyta-loa-history"],
@@ -122,47 +130,53 @@ export function Dashboard() {
             throw error;
           }
         },
-        enabled: user?.role === 1 || user?.role === 3,
+        enabled: user?.role === 3,
       },
 
       {
         queryKey: ["icicyta-invoice-history"],
         queryFn: async () => {
-          const response = await api.get(invoiceRoutes.listICICYTA);
-          return response.data
-            .filter((item: any) => item.conferenceType === "ICICYTA")
-            .slice(0, 10)
-            .map((item: any) => ({
+          try {
+            const response = await api.get(invoiceRoutes.listICICYTA);
+            if (!response.data) {
+              throw new Error("No data returned from the API");
+            }
+            return response.data.slice(0, 10).map((item: any) => ({
               id: item.id,
-              invoiceNumber: item.invoiceNumber,
-              authorName: item.authorName,
-              paperId: item.paperId,
-              paperTitle: item.paperTitle,
-              placeAndDate: item.placeAndDate,
+              invoice_no: item.invoice_no,
+              institution: item.institution,
+              created_at: item.created_at,
               status: item.status || "pending",
             }));
+          } catch (error) {
+            console.error("Error fetching Invoice history", error);
+            throw error;
+          }
         },
 
-        enabled: user?.role === 1 || user?.role === 3,
+        enabled: user?.role === 3,
       },
       {
         queryKey: ["icicyta-receipt-history"],
         queryFn: async () => {
-          const response = await api.get(paymentRoutes.listICICYTA);
-          return response.data
-            .filter((item: any) => item.conferenceTitle === "ICICYTA")
-            .slice(0, 10)
-            .map((item: any) => ({
+          try {
+            const response = await api.get(paymentRoutes.listICICYTA);
+            if (!response.data) {
+              throw new Error("No data returned from the API");
+            }
+            return response.data.slice(0, 10).map((item: any) => ({
               id: item.id,
-              invoiceNumber: item.invoiceNumber,
-              receivedFrom: item.receivedFrom,
+              paper_title: item.paper_title,
+              invoice_no: item.invoice_no,
+              received_from: item.received_from,
               amount: item.amount,
-              paymentDate: item.paymentDate,
-              placeAndDate: item.placeAndDate,
-              status: item.status || "pending",
             }));
+          } catch (error) {
+            console.error("Error fetching receipt history", error);
+            throw error;
+          }
         },
-        enabled: user?.role === 1 || user?.role === 3,
+        enabled: user?.role === 3,
       },
     ],
   });
@@ -287,8 +301,8 @@ export function Dashboard() {
                     className="flex items-center justify-between py-2"
                   >
                     <span>
-                      {item.invoiceNumber} - {item.authorName} -{" "}
-                      {item.placeAndDate}
+                      {item.invoice_no} - {item.institution} -{" "}
+                      {new Date(item.created_at).toLocaleDateString()}
                     </span>
                     <div className="flex items-center">
                       {renderStatusIcon(item.status)}
@@ -352,28 +366,12 @@ export function Dashboard() {
                     className="flex items-center justify-between py-2"
                   >
                     <span>
-                      {item.invoiceNumber} - {item.receivedFrom} -{" "}
-                      {item.paymentDate}
+                      {item.invoice_no} -{" "}
+                      {item.paper_title.length > 15
+                        ? item.paper_title.slice(0, 15) + "..."
+                        : item.paper_title}{" "}
+                      - {item.amount}
                     </span>
-                    <div className="flex items-center">
-                      {renderStatusIcon(item.status)}
-                      <span
-                        className={`ml-2 ${
-                          item.status?.toLowerCase() === "uploaded"
-                            ? "text-green-600"
-                            : item.status?.toLowerCase() === "not available"
-                              ? "text-red-600"
-                              : item.status?.toLowerCase() === "pending"
-                                ? "text-yellow-600"
-                                : item.status?.toLowerCase() === "late"
-                                  ? "text-orange-600"
-                                  : "text-gray-600"
-                        }`}
-                      >
-                        {item.status?.charAt(0).toUpperCase() +
-                          item.status?.slice(1)}
-                      </span>
-                    </div>
                   </li>
                 ))
               ) : (
@@ -398,7 +396,7 @@ export function Dashboard() {
       <h1 className="text-3xl font-bold mb-2">Welcome</h1>
       <p className="text-gray-600 mb-8">to Dashboard</p>
 
-      {user?.role === 1 || user?.role === 2 ? (
+      {user?.role === 2 && (
         <div className="mb-10">
           <h2 className="text-2xl font-bold mb-6">ICODSA</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -425,9 +423,9 @@ export function Dashboard() {
             )}
           </div>
         </div>
-      ) : null}
+      )}
 
-      {user?.role === 1 || user?.role === 3 ? (
+      {user?.role === 3 && (
         <div>
           <h2 className="text-2xl font-bold mb-6">ICICYTA</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -454,7 +452,7 @@ export function Dashboard() {
             )}
           </div>
         </div>
-      ) : null}
+      )}
     </div>
   );
 }

@@ -10,7 +10,7 @@ import {
 import { Input } from "../ui/input";
 import { AccountUpdateDialog } from "./change-password-dialog";
 import { useState } from "react";
-import { SignatureUploadDialog } from "./upload-signature-dialog";
+import { SignatureUploadDialog } from "../signature/upload-signature-dialog";
 
 export function UserProfile() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -79,7 +79,7 @@ export function UserProfile() {
             </>
           )}
 
-          {uploadSignatureAuthor && (
+          {/* {uploadSignatureAuthor && (
             <>
               <Button
                 onClick={() => setIsSignatureDialogOpen(true)}
@@ -92,7 +92,7 @@ export function UserProfile() {
                 onOpenChange={setIsSignatureDialogOpen}
               />
             </>
-          )}
+          )} */}
         </CardFooter>
       </Card>
     </>

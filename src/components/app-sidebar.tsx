@@ -6,6 +6,7 @@ import {
   Home,
   Plus,
   Settings,
+  Signature,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -85,6 +86,12 @@ const ACCOUNT_MANAGEMENT = {
   icon: Plus,
 };
 
+const SIGNATURE = {
+  title: "Signature",
+  url: "/signature",
+  icon: Signature,
+};
+
 const ACCOUNT_SETTING = {
   title: "Setting",
   url: "/setting-account",
@@ -93,10 +100,9 @@ const ACCOUNT_SETTING = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useAuthStore((state) => state.user);
+  const { open } = useSidebar();
 
   if (!user) return null;
-
-  const { open } = useSidebar();
 
   // Determine visible menu items based on the user's role
   // Role 1: Super Admin - can see all
@@ -108,11 +114,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     // Super Admin can access everything
     if (user.role === 1) {
       items.push(
-        ICODSA_ITEM,
-        ICICYTA_ITEM,
         BANK_TRANSFER_ITEM,
         VIRTUAL_ACCOUNT_ITEM,
         ACCOUNT_MANAGEMENT,
+        SIGNATURE,
         ACCOUNT_SETTING
       );
     }

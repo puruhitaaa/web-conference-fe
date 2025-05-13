@@ -25,6 +25,8 @@ import { useAuthStore } from "@/lib/auth/authStore";
 import { useTheme } from "./theme-provider";
 
 export function NavUser({ user }: { user: User }) {
+  if (!user) return null;
+
   const logout = useAuthStore((state) => state.logout);
   const { theme, setTheme } = useTheme();
   const { isMobile } = useSidebar();

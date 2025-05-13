@@ -31,42 +31,35 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Plus, FileText } from "lucide-react";
-import { ReceiptDialog } from "./receipt-dialog";
+import { MoreHorizontal, FileText } from "lucide-react";
 import { ReceiptPrintDialog } from "./receipt-print-dialog";
 import toast from "react-hot-toast";
-import { useAuthStore } from "@/lib/auth/authStore";
+// import { useAuthStore } from "@/lib/auth/authStore";
 
 export type Receipt = {
   id: string;
-  receiptNumber: string;
-  placeAndDate: string;
-  authorName: string;
-  institution: string;
-  email: string;
-  paperId: string;
-  paperTitle: string;
-  description: string;
+  invoice_no: string;
+  received_from: string;
   amount: number;
-  paymentMethod: string;
-  paymentDate: string;
-  status: "paid" | "pending" | "cancelled";
-  notes: string;
+  in_payment_of: string;
+  payment_date: Date;
+  paper_id: string;
+  paper_title: string;
+  signature_id: string;
 };
 
 export function ReceiptTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [currentReceipt, setCurrentReceipt] = useState<Receipt | null>(null);
-  const [dialogMode, setDialogMode] = useState<"create" | "edit" | "view">(
-    "create"
-  );
+  // const [, setIsDialogOpen] = useState(false);
+  // const [, setCurrentReceipt] = useState<Receipt | null>(null);
+  // const [, setDialogMode] = useState<"view">("view");
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
   const [currentPrintReceipt, setCurrentPrintReceipt] =
     useState<Receipt | null>(null);
   const [printMode, setPrintMode] = useState<"single" | "all">("all");
-  const user = useAuthStore((state) => state.user);
+
+  // const user = useAuthStore((state) => state.user);
   const queryClient = useQueryClient();
 
   const { data: receipts = [], isLoading } = useQuery<Receipt[]>({
@@ -96,23 +89,23 @@ export function ReceiptTable() {
     }
   };
 
-  const handleEdit = (receipt: Receipt) => {
-    setCurrentReceipt(receipt);
-    setDialogMode("edit");
-    setIsDialogOpen(true);
-  };
+  // const handleEdit = (receipt: Receipt) => {
+  //   setCurrentReceipt(receipt);
+  //   setDialogMode("edit");
+  //   setIsDialogOpen(true);
+  // };
 
-  const handleView = (receipt: Receipt) => {
-    setCurrentReceipt(receipt);
-    setDialogMode("view");
-    setIsDialogOpen(true);
-  };
+  // const handleView = (receipt: Receipt) => {
+  //   setCurrentReceipt(receipt);
+  //   setDialogMode("view");
+  //   setIsDialogOpen(true);
+  // };
 
-  const handleCreate = () => {
-    setCurrentReceipt(null);
-    setDialogMode("create");
-    setIsDialogOpen(true);
-  };
+  // const handleCreate = () => {
+  //   setCurrentReceipt(null);
+  //   setDialogMode("create");
+  //   setIsDialogOpen(true);
+  // };
 
   // const handlePrint = () => {
   //   if (!receipts.length) return toast.error("No receipts found");
@@ -130,20 +123,24 @@ export function ReceiptTable() {
 
   const columns: ColumnDef<Receipt>[] = [
     {
-      accessorKey: "receiptNumber",
-      header: "Receipt #",
+      accessorKey: "invoice_no",
+      header: "Invoice No",
     },
     {
-      accessorKey: "authorName",
-      header: "Author Name",
+      accessorKey: "received_from",
+      header: "Received From",
     },
     {
-      accessorKey: "paperId",
-      header: "Paper ID",
-    },
-    {
-      accessorKey: "paperTitle",
-      header: "Paper Title",
+      accessorKey: "paper_title",
+      header: "Conferece Title",
+      cell: ({ row }) => {
+        const title = row.getValue("paper_title") as string;
+        return (
+          <div className="max-w-[250px] truncate whitespace-nowrap overflow-hidden">
+            {title}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "amount",
@@ -160,28 +157,20 @@ export function ReceiptTable() {
       },
     },
     {
-      accessorKey: "status",
-      header: "Status",
+      accessorKey: "in_payment_of",
+      header: "In Payment of",
       cell: ({ row }) => {
-        const status = row.getValue("status") as string;
+        const title = row.getValue("in_payment_of") as string;
         return (
-          <div
-            className={`px-2 py-1 rounded-full text-xs font-medium inline-block ${
-              status === "paid"
-                ? "bg-green-100 text-green-800"
-                : status === "pending"
-                  ? "bg-yellow-100 text-yellow-800"
-                  : "bg-red-100 text-red-800"
-            }`}
-          >
-            {status}
+          <div className="max-w-[250px] truncate whitespace-nowrap overflow-hidden">
+            {title}
           </div>
         );
       },
     },
     {
-      accessorKey: "placeAndDate",
-      header: "Date",
+      accessorKey: "payment_date",
+      header: "Payment Date",
     },
     {
       id: "actions",
@@ -199,12 +188,12 @@ export function ReceiptTable() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => handleView(receipt)}>
+              {/* <DropdownMenuItem onClick={() => handleView(receipt)}>
                 View
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleEdit(receipt)}>
+              </DropdownMenuItem> */}
+              {/* <DropdownMenuItem onClick={() => handleEdit(receipt)}>
                 Edit
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
               <DropdownMenuItem onClick={() => handlePrintSingle(receipt)}>
                 <FileText className="mr-2 h-4 w-4" />
                 Print PDF
@@ -251,19 +240,6 @@ export function ReceiptTable() {
           }
           className="max-w-sm"
         />
-        <div className="flex gap-2">
-          {/* {receipts.length ? (
-            <Button variant="outline" onClick={handlePrint}>
-              <Printer className="mr-2 h-4 w-4" />
-              Print All
-            </Button>
-          ) : null} */}
-          {user?.role === 3 ? (
-            <Button onClick={handleCreate}>
-              <Plus className="mr-2 h-4 w-4" /> Add New Receipt
-            </Button>
-          ) : null}
-        </div>
       </div>
       <div className="rounded-md border">
         <Table>
@@ -340,13 +316,6 @@ export function ReceiptTable() {
           Next
         </Button>
       </div>
-
-      <ReceiptDialog
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        mode={dialogMode}
-        receipt={currentReceipt}
-      />
 
       <ReceiptPrintDialog
         open={isPrintDialogOpen}
