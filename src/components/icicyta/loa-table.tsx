@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -41,7 +41,7 @@ export type Loa = {
   id: string;
   paper_id: string;
   paper_title: string;
-  author_names: string;
+  author_names: string | string[];
   status: "Accepted" | "Rejected";
   tempat_tanggal: string;
   signature_id: number;
@@ -91,35 +91,45 @@ export function LoaTable() {
     }
   };
 
-  const handleEdit = (loa: Loa) => {
+  const handleEdit = useCallback((loa: Loa) => {
     setCurrentLoa(loa);
     setDialogMode("edit");
-    setIsDialogOpen(true);
-  };
+    setTimeout(() => {
+      setIsDialogOpen(true);
+    }, 0);
+  }, []);
 
-  const handleView = (loa: Loa) => {
+  const handleView = useCallback((loa: Loa) => {
     setCurrentLoa(loa);
     setDialogMode("view");
-    setIsDialogOpen(true);
-  };
+    setTimeout(() => {
+      setIsDialogOpen(true);
+    }, 0);
+  }, []);
 
-  const handleCreate = () => {
+  const handleCreate = useCallback(() => {
     setCurrentLoa(null);
     setDialogMode("create");
-    setIsDialogOpen(true);
-  };
+    setTimeout(() => {
+      setIsDialogOpen(true);
+    }, 0);
+  }, []);
 
-  const handlePrint = () => {
+  const handlePrint = useCallback(() => {
     setPrintMode("all");
     setCurrentPrintLoa(null);
-    setIsPrintDialogOpen(true);
-  };
+    setTimeout(() => {
+      setIsPrintDialogOpen(true);
+    }, 0);
+  }, []);
 
-  const handlePrintSingle = (loa: Loa) => {
+  const handlePrintSingle = useCallback((loa: Loa) => {
     setPrintMode("single");
     setCurrentPrintLoa(loa);
-    setIsPrintDialogOpen(true);
-  };
+    setTimeout(() => {
+      setIsPrintDialogOpen(true);
+    }, 0);
+  }, []);
 
   const columns: ColumnDef<Loa>[] = [
     {
@@ -133,6 +143,14 @@ export function LoaTable() {
     {
       accessorKey: "paper_title",
       header: "Conference Title",
+      cell: ({ row }) => {
+        const title = row.getValue("paper_title") as string;
+        return (
+          <div className="max-w-[250px] truncate whitespace-nowrap overflow-hidden">
+            {title}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "status",
@@ -182,13 +200,18 @@ export function LoaTable() {
                 <FileText className="mr-2 h-4 w-4" />
                 Print PDF
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => handleDelete(loa.id)}
-                className="text-red-600"
-              >
-                Delete
-              </DropdownMenuItem>
+
+              {user?.role !== 1 && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => handleDelete(loa.id)}
+                    className="text-red-600"
+                  >
+                    Delete
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         );
@@ -211,6 +234,8 @@ export function LoaTable() {
     },
   });
 
+  const showAddButton = user?.role !== 1 && user?.role !== 2 && !isLoading;
+
   return (
     <div>
       <div className="flex items-center justify-between py-4">
@@ -231,12 +256,12 @@ export function LoaTable() {
               Print All
             </Button>
           ) : null}
-          {user?.role === 3 ? (
+          {showAddButton && (
             <Button onClick={handleCreate}>
               <Plus className="mr-2 h-4 w-4" />
               Add New LoA
             </Button>
-          ) : null}
+          )}
         </div>
       </div>
       <div className="rounded-md border">

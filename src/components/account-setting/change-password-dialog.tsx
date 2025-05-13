@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 
 import { adminAccounts } from "@/api/adminAccount";
 import api from "@/lib/axios-config";
+import toast from "react-hot-toast";
 
 const formSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters"),
@@ -85,6 +86,7 @@ export function AccountUpdateDialog({
       return res.data;
     },
     onSuccess: () => {
+      toast.success("successfully update password");
       queryClient.invalidateQueries({ queryKey: ["accounts-password"] });
       onOpenChange(false);
     },

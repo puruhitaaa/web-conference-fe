@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useCallback, useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -9,12 +9,12 @@ import {
   ColumnDef,
   SortingState,
   ColumnFiltersState,
-} from "@tanstack/react-table"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import api from "@/lib/axios-config"
-import { bankTransferRoutes } from "@/api"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+} from "@tanstack/react-table";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import api from "@/lib/axios-config";
+import { bankTransferRoutes } from "@/api";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -22,7 +22,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,84 +30,90 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, Plus } from "lucide-react"
-import { BankTransferDialog } from "./bank-transfer-dialog"
-import toast from "react-hot-toast"
-import { useAuthStore } from "@/lib/auth/authStore"
-import { DataTablePagination } from "../data-table-pagination"
+} from "@/components/ui/dropdown-menu";
+import { MoreHorizontal, Plus } from "lucide-react";
+import { BankTransferDialog } from "./bank-transfer-dialog";
+import toast from "react-hot-toast";
+import { useAuthStore } from "@/lib/auth/authStore";
+import { DataTablePagination } from "../data-table-pagination";
 
 export type BankTransfer = {
-  id: string
-  nama_bank: string
-  swift_code: string
-  recipient_name: string
-  beneficiary_bank_account_no: string
-  bank_branch: string
-  bank_address: string
-  city: string
-  country: string
-  created_by: number
-}
+  id: string;
+  nama_bank: string;
+  swift_code: string;
+  recipient_name: string;
+  beneficiary_bank_account_no: string;
+  bank_branch: string;
+  bank_address: string;
+  city: string;
+  country: string;
+  created_by: number;
+};
 
 export function BankTransferTable() {
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentBankTransfer, setCurrentBankTransfer] =
-    useState<BankTransfer | null>(null)
+    useState<BankTransfer | null>(null);
   const [dialogMode, setDialogMode] = useState<"create" | "edit" | "view">(
     "create"
-  )
+  );
 
-  const queryClient = useQueryClient()
-  const user = useAuthStore((state) => state.user)
-  const isSuperAdmin = user?.role === 1
+  const queryClient = useQueryClient();
+  const user = useAuthStore((state) => state.user);
+  const isSuperAdmin = user?.role === 1;
 
   const { data: bankTransfers = [], isLoading } = useQuery<BankTransfer[]>({
     queryKey: ["bank-transfers"],
     queryFn: async () => {
-      const response = await api.get(bankTransferRoutes.list)
-      return response.data
+      const response = await api.get(bankTransferRoutes.list);
+      return response.data;
     },
-  })
+  });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(bankTransferRoutes.delete(id))
+      await api.delete(bankTransferRoutes.delete(id));
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["bank-transfers"] })
-      toast.success("Bank transfer deleted successfully")
+      queryClient.invalidateQueries({ queryKey: ["bank-transfers"] });
+      toast.success("Bank transfer deleted successfully");
     },
     onError: () => {
-      toast.error("Failed to delete bank transfer")
+      toast.error("Failed to delete bank transfer");
     },
-  })
+  });
 
   const handleDelete = (id: string) => {
     if (confirm("Are you sure you want to delete this bank transfer?")) {
-      deleteMutation.mutate(id)
+      deleteMutation.mutate(id);
     }
-  }
+  };
 
-  const handleEdit = (bankTransfer: BankTransfer) => {
-    setCurrentBankTransfer(bankTransfer)
-    setDialogMode("edit")
-    setIsDialogOpen(true)
-  }
+  const handleEdit = useCallback((bankTransfer: BankTransfer) => {
+    setCurrentBankTransfer(bankTransfer);
+    setDialogMode("edit");
+    setTimeout(() => {
+      setIsDialogOpen(true);
+    }, 0);
+  }, []);
 
-  const handleView = (bankTransfer: BankTransfer) => {
-    setCurrentBankTransfer(bankTransfer)
-    setDialogMode("view")
-    setIsDialogOpen(true)
-  }
+  const handleView = useCallback((bankTransfer: BankTransfer) => {
+    setCurrentBankTransfer(bankTransfer);
+    setDialogMode("view");
+    setTimeout(() => {
+      setIsDialogOpen(true);
+    }, 0);
+  }, []);
 
-  const handleCreate = () => {
-    setCurrentBankTransfer(null)
-    setDialogMode("create")
-    setIsDialogOpen(true)
-  }
+  const handleCreate = useCallback(() => {
+    setCurrentBankTransfer(null);
+    setDialogMode("create");
+    setTimeout(() => {
+      setIsDialogOpen(true);
+    }, 0);
+  }, []);
 
   const columns: ColumnDef<BankTransfer>[] = [
     {
@@ -142,17 +148,17 @@ export function BankTransferTable() {
       id: "actions",
       header: "Actions",
       cell: ({ row }) => {
-        const bankTransfer = row.original
+        const bankTransfer = row.original;
 
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant='ghost' className='h-8 w-8 p-0'>
-                <span className='sr-only'>Open menu</span>
-                <MoreHorizontal className='h-4 w-4' />
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align='end'>
+            <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem onClick={() => handleView(bankTransfer)}>
                 View
@@ -165,7 +171,7 @@ export function BankTransferTable() {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={() => handleDelete(bankTransfer.id)}
-                    className='text-red-600'
+                    className="text-red-600"
                   >
                     Delete
                   </DropdownMenuItem>
@@ -173,10 +179,10 @@ export function BankTransferTable() {
               )}
             </DropdownMenuContent>
           </DropdownMenu>
-        )
+        );
       },
     },
-  ]
+  ];
 
   const table = useReactTable({
     data: bankTransfers,
@@ -191,29 +197,31 @@ export function BankTransferTable() {
       sorting,
       columnFilters,
     },
-  })
+  });
+
+  const showAddButton = isSuperAdmin && !isLoading;
 
   return (
-    <div className='space-y-4'>
-      <div className='flex items-center justify-between'>
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
         <Input
-          placeholder='Filter by bank name...'
+          placeholder="Filter by bank name..."
           value={
             (table.getColumn("nama_bank")?.getFilterValue() as string) ?? ""
           }
           onChange={(e) =>
             table.getColumn("nama_bank")?.setFilterValue(e.target.value)
           }
-          className='max-w-sm'
+          className="max-w-sm"
         />
-        {isSuperAdmin && (
+        {showAddButton && (
           <Button onClick={handleCreate}>
-            <Plus className='mr-2 h-4 w-4' /> Add Bank Transfer
+            <Plus className="mr-2 h-4 w-4" /> Add Bank Transfer
           </Button>
         )}
       </div>
 
-      <div className='rounded-md border'>
+      <div className="rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -236,7 +244,7 @@ export function BankTransferTable() {
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className='h-24 text-center'
+                  className="h-24 text-center"
                 >
                   Loading...
                 </TableCell>
@@ -261,7 +269,7 @@ export function BankTransferTable() {
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className='h-24 text-center'
+                  className="h-24 text-center"
                 >
                   No bank transfers found.
                 </TableCell>
@@ -280,5 +288,5 @@ export function BankTransferTable() {
         bankTransfer={currentBankTransfer}
       />
     </div>
-  )
+  );
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -67,6 +67,7 @@ export function AccountManagementTable() {
       const response = await api.get(adminRoutes.listAllAdmins);
       return response.data.admin;
     },
+    staleTime: 30000,
   });
 
   const deleteMutation = useMutation({
@@ -88,23 +89,29 @@ export function AccountManagementTable() {
     }
   };
 
-  const handleEdit = (accountUser: AccountUsers) => {
+  const handleEdit = useCallback((accountUser: AccountUsers) => {
     setCurrentAccountUser(accountUser);
     setDialogMode("edit");
-    setIsDialogOpen(true);
-  };
+    setTimeout(() => {
+      setIsDialogOpen(true);
+    }, 0);
+  }, []);
 
-  const handleView = (accountUser: AccountUsers) => {
+  const handleView = useCallback((accountUser: AccountUsers) => {
     setCurrentAccountUser(accountUser);
     setDialogMode("view");
-    setIsDialogOpen(true);
-  };
+    setTimeout(() => {
+      setIsDialogOpen(true);
+    }, 0);
+  }, []);
 
-  const handleCreate = () => {
+  const handleCreate = useCallback(() => {
     setCurrentAccountUser(null);
     setDialogMode("create");
-    setIsDialogOpen(true);
-  };
+    setTimeout(() => {
+      setIsDialogOpen(true);
+    }, 0);
+  }, []);
 
   const columns: ColumnDef<AccountUsers>[] = [
     {
@@ -179,6 +186,8 @@ export function AccountManagementTable() {
     },
   });
 
+  const showAddButton = isSuperAdmin && !isLoading;
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -192,8 +201,8 @@ export function AccountManagementTable() {
           }
           className="max-w-sm"
         />
-        {isSuperAdmin && (
-          <Button onClick={handleCreate}>
+        {showAddButton && (
+          <Button onClick={handleCreate} disabled={isLoading || isDialogOpen}>
             <Plus className="mr-2 h-4 w-4" /> Add Account
           </Button>
         )}

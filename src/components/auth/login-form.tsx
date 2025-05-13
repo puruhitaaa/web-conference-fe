@@ -49,8 +49,10 @@ export function LoginForm({
   const navigate = useNavigate({ from: "/login" });
 
   const loginMutation = useMutation({
-    mutationFn: (values: z.infer<typeof formSchema>) =>
-      api.post(authRoutes.login, values),
+    mutationFn: (values: z.infer<typeof formSchema>) => {
+      setIsLoading(true);
+      return api.post(authRoutes.login, values);
+    },
     onSuccess: (res) => {
       if (res.status === 200) {
         const loginSuccess = loginAction(
@@ -72,8 +74,9 @@ export function LoginForm({
       }
     },
     onError: (error) => {
+      setIsLoading(false);
       console.error("Login error:", error);
-      toast.error("Login failed");
+      toast.error("username or password is invalid");
     },
   });
 
@@ -82,6 +85,7 @@ export function LoginForm({
   }
 
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <div
@@ -144,8 +148,8 @@ export function LoginForm({
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
-                Login
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? "processing data.." : "Login"}
               </Button>
             </form>
           </Form>
