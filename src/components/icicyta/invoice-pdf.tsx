@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
 
   // Styles for SingleInvoicePdfDocument (new design based on icodsa)
   purpleHeader: {
-    backgroundColor: "#59c3d0",
+    backgroundColor: "#9461AF",
     paddingHorizontal: 30,
     paddingVertical: 15,
     marginBottom: 20,
