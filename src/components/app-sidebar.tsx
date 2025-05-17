@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from "react"
 import {
   Banknote,
   Circle,
@@ -7,26 +7,26 @@ import {
   Plus,
   Settings,
   Signature,
-} from "lucide-react";
+} from "lucide-react"
 
-import { NavMain } from "@/components/nav-main";
-import { NavUser } from "@/components/nav-user";
+import { NavMain } from "@/components/nav-main"
+import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarRail,
   useSidebar,
-} from "@/components/ui/sidebar";
-import { useAuthStore } from "@/lib/auth/authStore";
-import { Logo } from "@/components/ui/logo";
+} from "@/components/ui/sidebar"
+import { useAuthStore } from "@/lib/auth/authStore"
+import { Logo } from "@/components/ui/logo"
 
 // Define menu items
 const DASHBOARD_ITEM = {
   title: "Dashboard",
   url: "/",
   icon: Home,
-};
+}
 
 const ICODSA_ITEM = {
   title: "ICODSA",
@@ -46,7 +46,7 @@ const ICODSA_ITEM = {
       url: "/icodsa/receipt",
     },
   ],
-};
+}
 
 const ICICYTA_ITEM = {
   title: "ICICYTA",
@@ -66,79 +66,79 @@ const ICICYTA_ITEM = {
       url: "/icicyta/receipt",
     },
   ],
-};
+}
 
 const BANK_TRANSFER_ITEM = {
   title: "Bank Transfer",
   url: "/bank-transfer",
   icon: Banknote,
-};
+}
 
 const VIRTUAL_ACCOUNT_ITEM = {
   title: "Virtual Accounts",
   url: "/virtual-accounts",
   icon: CreditCard,
-};
+}
 
 const ACCOUNT_MANAGEMENT = {
   title: "Manage Account",
   url: "/manage-account",
   icon: Plus,
-};
+}
 
 const SIGNATURE = {
   title: "Signature",
   url: "/signature",
   icon: Signature,
-};
+}
 
 const ACCOUNT_SETTING = {
   title: "Setting",
   url: "/setting-account",
   icon: Settings,
-};
+}
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const user = useAuthStore((state) => state.user);
-  const { open } = useSidebar();
+  const user = useAuthStore((state) => state.user)
+  const { open } = useSidebar()
 
-  if (!user) return null;
+  if (!user) return null
 
   // Determine visible menu items based on the user's role
   // Role 1: Super Admin - can see all
   // Role 2: ICODSA Admin - can only see ICODSA
   // Role 3: ICICYTA Admin - can only see ICICYTA
   const getNavItems = () => {
-    const items = [DASHBOARD_ITEM];
+    const items = [DASHBOARD_ITEM]
 
     // Super Admin can access everything
-    if (user.role === 1) {
+    if (user.role === "1") {
       items.push(
         BANK_TRANSFER_ITEM,
         VIRTUAL_ACCOUNT_ITEM,
         ACCOUNT_MANAGEMENT,
         SIGNATURE,
         ACCOUNT_SETTING
-      );
+      )
     }
     // ICODSA Admin can only access ICODSA
-    else if (user.role === 2) {
-      items.push(ICODSA_ITEM, BANK_TRANSFER_ITEM, ACCOUNT_SETTING);
+    else if (user.role === "2") {
+      items.push(ICODSA_ITEM, BANK_TRANSFER_ITEM, ACCOUNT_SETTING)
     }
     // ICICYTA Admin can only access ICICYTA
-    else if (user.role === 3) {
-      items.push(ICICYTA_ITEM, BANK_TRANSFER_ITEM, ACCOUNT_SETTING);
+    else if (user.role === "3") {
+      items.push(ICICYTA_ITEM, BANK_TRANSFER_ITEM, ACCOUNT_SETTING)
     }
 
-    return items;
-  };
+    return items
+  }
 
   return (
-    <Sidebar variant="inset" collapsible="icon" {...props}>
+    <Sidebar variant='inset' collapsible='icon' {...props}>
       <SidebarContent>
         {open ? (
-          <div className="px-4 py-4">
-            <Logo className="mx-auto" />
+          <div className='px-4 py-4'>
+            <Logo className='mx-auto' />
           </div>
         ) : null}
         <NavMain items={getNavItems()} />
@@ -148,5 +148,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  );
+  )
 }
