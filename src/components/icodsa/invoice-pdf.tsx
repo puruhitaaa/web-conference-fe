@@ -6,6 +6,7 @@ import {
   View,
   StyleSheet,
   PDFViewer,
+  Image,
 } from "@react-pdf/renderer"
 import { Invoice } from "./invoice-table"
 
@@ -74,15 +75,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
   },
   purpleHeader: {
-    backgroundColor: "#4A007F",
+    backgroundColor: "#59c3d0",
     paddingHorizontal: 30,
     paddingVertical: 15,
     marginBottom: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   icodsaTitle: {
     fontSize: 28,
     fontWeight: "bold",
     color: "#ffffff",
+  },
+  logoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  logoImage: {
+    height: 30,
+    marginLeft: 8,
+  },
+  largeLogoImage: {
+    height: 75,
+    marginLeft: 8,
   },
   conferencePaymentInvoiceTitle: {
     textAlign: "center",
@@ -338,7 +354,7 @@ export const InvoicePdfDocument: React.FC<InvoicePdfProps> = ({ invoices }) => (
   <Document>
     <Page size='A4' style={styles.page}>
       <View style={styles.multiInvoiceHeader}>
-        <Text style={styles.multiInvoiceTitle}>ICODSA Invoices</Text>
+        <Text style={styles.multiInvoiceTitle}>ICoDSA Invoices</Text>
         <Text style={styles.multiInvoiceSubtitle}>
           Generated on {new Date().toLocaleDateString()}
         </Text>
@@ -452,8 +468,22 @@ export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
         {/* Purple Header */}
         <View style={styles.purpleHeader}>
           <Text style={styles.icodsaTitle}>
-            ICODSA {getInvoiceYear(invoice.date_of_issue)}
+            ICoDSA {getInvoiceYear(invoice.date_of_issue)}
           </Text>
+          <View style={styles.logoContainer}>
+            <Image
+              style={styles.largeLogoImage}
+              src='/assets/images/common/university-logos/tel-u.png'
+            />
+            <Image
+              style={styles.largeLogoImage}
+              src='/assets/images/common/university-logos/unbi-university.png'
+            />
+            <Image
+              style={styles.logoImage}
+              src='/assets/images/common/university-logos/utm-university.png'
+            />
+          </View>
         </View>
 
         {/* Main Invoice Title */}
@@ -634,7 +664,7 @@ export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
             <View style={styles.paymentDetailRow}>
               <Text style={styles.paymentDetailLabel}>Description</Text>
               <Text style={styles.paymentDetailValue}>
-                : ICODSA {getInvoiceYear(invoice.date_of_issue)}
+                : ICoDSA {getInvoiceYear(invoice.date_of_issue)}
               </Text>
             </View>
             <View style={styles.paymentDetailRow}>

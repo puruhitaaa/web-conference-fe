@@ -36,13 +36,15 @@ export function InvoicePrintDialog({
 }: PrintDialogProps) {
   const handleDownload = async () => {
     if (singleMode && !Array.isArray(data)) {
+      const singleInvoice = data as Invoice
       await downloadPDF(
-        <SingleInvoicePdfDocument invoice={data} />,
-        `invoice-${data.invoiceNumber}.pdf`
+        <SingleInvoicePdfDocument invoice={singleInvoice} />,
+        `invoice-${singleInvoice.invoice_no || "unknown"}.pdf`
       )
     } else {
+      const invoicesArray = Array.isArray(data) ? data : [data as Invoice]
       await downloadPDF(
-        <InvoicePdfDocument invoices={Array.isArray(data) ? data : [data]} />,
+        <InvoicePdfDocument invoices={invoicesArray} />,
         "icodsa-invoices.pdf"
       )
     }
