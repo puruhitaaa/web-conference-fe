@@ -205,6 +205,7 @@ export function BankTransferTable() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <Input
+          disabled={isLoading}
           placeholder="Filter by bank name..."
           value={
             (table.getColumn("nama_bank")?.getFilterValue() as string) ?? ""

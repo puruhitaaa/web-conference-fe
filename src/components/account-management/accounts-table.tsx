@@ -192,6 +192,7 @@ export function AccountManagementTable() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <Input
+          disabled={isLoading}
           placeholder="filter by username.."
           value={
             (table.getColumn("username")?.getFilterValue() as string) ?? ""

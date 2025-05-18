@@ -1,4 +1,4 @@
-import React from "react"
+import React from "react";
 import {
   Document,
   Page,
@@ -7,8 +7,8 @@ import {
   StyleSheet,
   PDFViewer,
   Image,
-} from "@react-pdf/renderer"
-import { Invoice } from "./invoice-table"
+} from "@react-pdf/renderer";
+import { Invoice } from "./invoice-table";
 
 // Create styles
 const styles = StyleSheet.create({
@@ -342,17 +342,17 @@ const styles = StyleSheet.create({
     width: 200,
     textAlign: "center",
   },
-})
+});
 
 // Multiple Invoices PDF Props
 interface InvoicePdfProps {
-  invoices: Invoice[]
+  invoices: Invoice[];
 }
 
 // Create Document Component for multiple invoices
 export const InvoicePdfDocument: React.FC<InvoicePdfProps> = ({ invoices }) => (
   <Document>
-    <Page size='A4' style={styles.page}>
+    <Page size="A4" style={styles.page}>
       <View style={styles.multiInvoiceHeader}>
         <Text style={styles.multiInvoiceTitle}>ICoDSA Invoices</Text>
         <Text style={styles.multiInvoiceSubtitle}>
@@ -425,11 +425,11 @@ export const InvoicePdfDocument: React.FC<InvoicePdfProps> = ({ invoices }) => (
       </Text>
     </Page>
   </Document>
-)
+);
 
 // Single Invoice PDF Props
 interface SingleInvoicePdfProps {
-  invoice: Invoice
+  invoice: Invoice;
 }
 
 // Create Single Invoice Document Component
@@ -438,33 +438,33 @@ export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
 }) => {
   const getInvoiceYear = (date: Date | string | null | undefined): string => {
     if (date) {
-      return new Date(date).getFullYear().toString()
+      return new Date(date).getFullYear().toString();
     }
-    return new Date().getFullYear().toString() // Fallback to current year
-  }
+    return new Date().getFullYear().toString(); // Fallback to current year
+  };
 
   const formatDate = (date: Date | null | undefined) => {
-    if (!date) return "N/A"
+    if (!date) return "N/A";
     return `Bandung, ${new Date(date).toLocaleDateString("en-US", {
       month: "long",
       day: "numeric",
       year: "numeric",
-    })}`
-  }
+    })}`;
+  };
 
   const formatCurrency = (amount: number | null | undefined) => {
-    if (amount === null || amount === undefined) return "N/A"
+    if (amount === null || amount === undefined) return "N/A";
     const numberFormatter = new Intl.NumberFormat("id-ID", {
       style: "decimal",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
-    })
-    return `IDR ${numberFormatter.format(amount)}`
-  }
+    });
+    return `IDR ${numberFormatter.format(amount)}`;
+  };
 
   return (
     <Document>
-      <Page size='A4' style={styles.page}>
+      <Page size="A4" style={styles.page}>
         {/* Purple Header */}
         <View style={styles.purpleHeader}>
           <Text style={styles.icodsaTitle}>
@@ -473,15 +473,15 @@ export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
           <View style={styles.logoContainer}>
             <Image
               style={styles.largeLogoImage}
-              src='/assets/images/common/university-logos/tel-u.png'
+              src="/assets/images/common/university-logos/tel-u.png"
             />
             <Image
               style={styles.largeLogoImage}
-              src='/assets/images/common/university-logos/unbi-university.png'
+              src="/assets/images/common/university-logos/unbi-university.png"
             />
             <Image
               style={styles.logoImage}
-              src='/assets/images/common/university-logos/utm-university.png'
+              src="/assets/images/common/university-logos/utm-university.png"
             />
           </View>
         </View>
@@ -783,20 +783,20 @@ export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
         </Text> */}
       </Page>
     </Document>
-  )
-}
+  );
+};
 
 // PDF Viewer Components
 export const InvoicePdfViewer: React.FC<InvoicePdfProps> = ({ invoices }) => (
-  <PDFViewer width='100%' height='600px' className='mt-4'>
+  <PDFViewer width="100%" height="600px" className="mt-4">
     <InvoicePdfDocument invoices={invoices} />
   </PDFViewer>
-)
+);
 
 export const SingleInvoicePdfViewer: React.FC<SingleInvoicePdfProps> = ({
   invoice,
 }) => (
-  <PDFViewer width='100%' height='600px' className='mt-4'>
+  <PDFViewer width="100%" height="600px" className="mt-4">
     <SingleInvoicePdfDocument invoice={invoice} />
   </PDFViewer>
-)
+);

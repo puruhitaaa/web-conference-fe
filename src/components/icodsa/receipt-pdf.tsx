@@ -1,4 +1,4 @@
-import React from "react"
+import React from "react";
 import {
   Document,
   Page,
@@ -7,27 +7,27 @@ import {
   StyleSheet,
   PDFViewer,
   Image,
-} from "@react-pdf/renderer"
-import { Receipt } from "./receipt-table"
-import { amountToWordsIDR, formatCurrencyIDR } from "../../utils/currency"
+} from "@react-pdf/renderer";
+import { Receipt } from "./receipt-table";
+import { amountToWordsIDR, formatCurrencyIDR } from "../../utils/currency";
 
 // Helper function to get year from date
 const getReceiptYear = (date: Date | string | null | undefined): string => {
   if (date) {
-    return new Date(date).getFullYear().toString()
+    return new Date(date).getFullYear().toString();
   }
-  return new Date().getFullYear().toString() // Fallback to current year
-}
+  return new Date().getFullYear().toString(); // Fallback to current year
+};
 
 // Helper function to format date as "Month Day, Year" (e.g., Nov 01, 2024)
 const formatDisplayDate = (date: Date | string | null | undefined): string => {
-  if (!date) return "N/A"
+  if (!date) return "N/A";
   return new Date(date).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
-  })
-}
+  });
+};
 
 // Create styles (similar to icicyta/receipt-pdf for consistency)
 const styles = StyleSheet.create({
@@ -208,17 +208,17 @@ const styles = StyleSheet.create({
   //   fontSize: 9,
   //   color: "#ffffff",
   // },
-})
+});
 
 // Multiple Receipts PDF Props
 interface ReceiptPdfProps {
-  receipts: Receipt[]
+  receipts: Receipt[];
 }
 
 // Document Component for multiple receipts
 export const ReceiptPdfDocument: React.FC<ReceiptPdfProps> = ({ receipts }) => (
   <Document>
-    <Page size='A4' style={styles.page}>
+    <Page size="A4" style={styles.page}>
       <View style={{ paddingHorizontal: 30, paddingTop: 30 }}>
         {" "}
         {/* Add overall padding for multi-receipt content */}
@@ -292,38 +292,38 @@ export const ReceiptPdfDocument: React.FC<ReceiptPdfProps> = ({ receipts }) => (
       </Text>
     </Page>
   </Document>
-)
+);
 
 // Single Receipt PDF Props
 interface SingleReceiptPdfProps {
-  receipt: Receipt
+  receipt: Receipt;
 }
 
 // Single Receipt Document Component
 export const SingleReceiptPdfDocument: React.FC<SingleReceiptPdfProps> = ({
   receipt,
 }) => {
-  const receiptYear = getReceiptYear(receipt.payment_date)
-  const currentDateFormatted = formatDisplayDate(new Date()) // For "Date of Issue" for signature
+  const receiptYear = getReceiptYear(receipt.payment_date);
+  const currentDateFormatted = formatDisplayDate(new Date()); // For "Date of Issue" for signature
 
   return (
     <Document>
-      <Page size='A4' style={styles.page}>
+      <Page size="A4" style={styles.page}>
         {/* Purple Header with Logos */}
         <View style={styles.purpleHeader}>
           <Text style={styles.conferenceNameText}>ICoDSA {receiptYear}</Text>
           <View style={styles.logoContainer}>
             <Image
               style={styles.largeLogoImage}
-              src='/assets/images/common/university-logos/tel-u.png'
+              src="/assets/images/common/university-logos/tel-u.png"
             />
             <Image
               style={styles.largeLogoImage}
-              src='/assets/images/common/university-logos/unbi-university.png'
+              src="/assets/images/common/university-logos/unbi-university.png"
             />
             <Image
               style={styles.logoImage}
-              src='/assets/images/common/university-logos/utm-university.png'
+              src="/assets/images/common/university-logos/utm-university.png"
             />
           </View>
         </View>
@@ -419,20 +419,20 @@ export const SingleReceiptPdfDocument: React.FC<SingleReceiptPdfProps> = ({
         </Text> */}
       </Page>
     </Document>
-  )
-}
+  );
+};
 
 // PDF Viewer Components
 export const ReceiptPdfViewer: React.FC<ReceiptPdfProps> = ({ receipts }) => (
-  <PDFViewer width='100%' height='600px' className='mt-4'>
+  <PDFViewer width="100%" height="600px" className="mt-4">
     <ReceiptPdfDocument receipts={receipts} />
   </PDFViewer>
-)
+);
 
 export const SingleReceiptPdfViewer: React.FC<SingleReceiptPdfProps> = ({
   receipt,
 }) => (
-  <PDFViewer width='100%' height='600px' className='mt-4'>
+  <PDFViewer width="100%" height="600px" className="mt-4">
     <SingleReceiptPdfDocument receipt={receipt} />
   </PDFViewer>
-)
+);

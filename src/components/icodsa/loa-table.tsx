@@ -35,7 +35,6 @@ import { MoreHorizontal, Plus, Printer, FileText } from "lucide-react";
 import { LoaDialog } from "./loa-dialog";
 import { PrintDialog } from "./print-dialog";
 import toast from "react-hot-toast";
-import { useAuthStore } from "@/lib/auth/authStore";
 
 export type Loa = {
   id: string;
@@ -44,7 +43,7 @@ export type Loa = {
   author_names: string;
   status: "Accepted" | "Rejected";
   tempat_tanggal: string;
-  signature_id: number;
+  signature_id: string;
   created_at: Date;
 };
 
@@ -59,7 +58,7 @@ export function LoaTable() {
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
   const [currentPrintLoa, setCurrentPrintLoa] = useState<Loa | null>(null);
   const [printMode, setPrintMode] = useState<"single" | "all">("all");
-  const user = useAuthStore((state) => state.user);
+
   const queryClient = useQueryClient();
 
   // Fetch LOAs
@@ -215,6 +214,7 @@ export function LoaTable() {
     <div>
       <div className="flex items-center justify-between py-4">
         <Input
+          disabled={isLoading}
           placeholder="Filter by paper ID..."
           value={
             (table.getColumn("paper_id")?.getFilterValue() as string) ?? ""
@@ -231,12 +231,10 @@ export function LoaTable() {
               Print All
             </Button>
           ) : null}
-          {user?.role === 2 ? (
-            <Button onClick={handleCreate}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add New LoA
-            </Button>
-          ) : null}
+          <Button onClick={handleCreate} disabled={isLoading}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add New LoA
+          </Button>
         </div>
       </div>
       <div className="rounded-md border">

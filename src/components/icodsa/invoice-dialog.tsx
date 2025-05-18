@@ -58,7 +58,7 @@ const formSchema = z.object({
   virtual_account_id: z.string().nullable(),
   bank_transfer_id: z.string().nullable(),
   created_by: z.coerce.string().nullable(),
-  status: z.enum(["Pending", "Paid", "Unpaid"]),
+  status: z.enum(["Pending", "Paid"]),
   created_at: z.date().nullable(),
   updated_at: z.date().nullable(),
 });
@@ -477,7 +477,6 @@ export function InvoiceDialog({
                       <SelectContent>
                         <SelectItem value="Pending">Pending</SelectItem>
                         <SelectItem value="Paid">Paid</SelectItem>
-                        <SelectItem value="Unpaid">Unpaid</SelectItem>
                       </SelectContent>
                     </Select>
                     <p className="text-xs text-muted-foreground mt-1">

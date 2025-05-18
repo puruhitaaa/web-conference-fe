@@ -44,7 +44,7 @@ export type Loa = {
   author_names: string | string[];
   status: "Accepted" | "Rejected";
   tempat_tanggal: string;
-  signature_id: number;
+  signature_id: string;
   created_at: Date;
 };
 
@@ -234,12 +234,11 @@ export function LoaTable() {
     },
   });
 
-  const showAddButton = user?.role !== 1 && user?.role !== 2 && !isLoading;
-
   return (
     <div>
       <div className="flex items-center justify-between py-4">
         <Input
+          disabled={isLoading}
           placeholder="Filter by paper ID..."
           value={
             (table.getColumn("paper_id")?.getFilterValue() as string) ?? ""
@@ -256,12 +255,11 @@ export function LoaTable() {
               Print All
             </Button>
           ) : null}
-          {showAddButton && (
-            <Button onClick={handleCreate}>
-              <Plus className="mr-2 h-4 w-4" />
-              Add New LoA
-            </Button>
-          )}
+
+          <Button onClick={handleCreate} disabled={isLoading}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add New LoA
+          </Button>
         </div>
       </div>
       <div className="rounded-md border">

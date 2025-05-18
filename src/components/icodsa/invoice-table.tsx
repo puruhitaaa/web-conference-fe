@@ -51,7 +51,7 @@ export type Invoice = {
   virtual_account_id: string | null;
   bank_transfer_id: string | null;
   created_by: string;
-  status: "Pending" | "Paid" | "Unpaid";
+  status: "Pending" | "Paid";
   created_at: Date | null;
   updated_at: Date | null;
 };
@@ -254,12 +254,13 @@ export function InvoiceTable() {
     <div>
       <div className="flex items-center justify-between py-4">
         <Input
-          placeholder="Filter by author name..."
+          disabled={isLoading}
+          placeholder="Filter by institution..."
           value={
-            (table.getColumn("author_type")?.getFilterValue() as string) ?? ""
+            (table.getColumn("institution")?.getFilterValue() as string) ?? ""
           }
           onChange={(event) =>
-            table.getColumn("author_type")?.setFilterValue(event.target.value)
+            table.getColumn("institution")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

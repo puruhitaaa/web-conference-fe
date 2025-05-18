@@ -40,12 +40,15 @@ export type Receipt = {
   id: string;
   invoice_no: string;
   received_from: string;
-  amount: number;
+  amount: number | string;
   in_payment_of: string;
-  payment_date: Date;
+  payment_date: Date | string;
   paper_id: string;
   paper_title: string;
   signature_id: string;
+  created_by: string;
+  created_at: string | Date;
+  updated_at: string | Date;
 };
 
 export function ReceiptTable() {
@@ -231,12 +234,13 @@ export function ReceiptTable() {
     <div>
       <div className="flex items-center justify-between py-4">
         <Input
-          placeholder="Filter by author name..."
+          disabled={isLoading}
+          placeholder="Filter by received from..."
           value={
-            (table.getColumn("authorName")?.getFilterValue() as string) ?? ""
+            (table.getColumn("received_from")?.getFilterValue() as string) ?? ""
           }
           onChange={(event) =>
-            table.getColumn("authorName")?.setFilterValue(event.target.value)
+            table.getColumn("received_from")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

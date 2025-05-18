@@ -109,7 +109,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // Role 2: ICODSA Admin - can only see ICODSA
   // Role 3: ICICYTA Admin - can only see ICICYTA
   const getNavItems = () => {
-    const items = [DASHBOARD_ITEM];
+    const items = [];
 
     // Super Admin can access everything
     if (user.role === 1) {
@@ -123,11 +123,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }
     // ICODSA Admin can only access ICODSA
     else if (user.role === 2) {
-      items.push(ICODSA_ITEM, BANK_TRANSFER_ITEM, ACCOUNT_SETTING);
+      items.push(
+        DASHBOARD_ITEM,
+        ICODSA_ITEM,
+        BANK_TRANSFER_ITEM,
+        ACCOUNT_SETTING
+      );
     }
     // ICICYTA Admin can only access ICICYTA
     else if (user.role === 3) {
-      items.push(ICICYTA_ITEM, BANK_TRANSFER_ITEM, ACCOUNT_SETTING);
+      items.push(
+        DASHBOARD_ITEM,
+        ICICYTA_ITEM,
+        BANK_TRANSFER_ITEM,
+        ACCOUNT_SETTING
+      );
     }
 
     return items;

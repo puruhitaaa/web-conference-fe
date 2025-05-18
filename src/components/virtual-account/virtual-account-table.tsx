@@ -194,6 +194,7 @@ export function VirtualAccountTable() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <Input
+          disabled={isLoading}
           placeholder="Filter by bank name..."
           value={
             (table.getColumn("bank_name")?.getFilterValue() as string) ?? ""

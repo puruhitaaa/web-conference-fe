@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios-config";
-import { loaRoutes } from "@/api";
+import { loaRoutes, signatureRoutes } from "@/api";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/select";
 import toast from "react-hot-toast";
 import { Loa } from "./loa-table";
+import { Signature } from "../signature/signature-table";
 
 const formSchema = z.object({
   paper_id: z.string().min(1, "Paper ID is required"),
@@ -42,7 +43,7 @@ const formSchema = z.object({
     .transform((val) => val.split(",").map((v) => v.trim())),
   status: z.enum(["Accepted", "Rejected"]),
   tempat_tanggal: z.string().min(1, "Place and date is required"),
-  signature_id: z.string().min(1).transform(Number),
+  signature_id: z.string().min(1, "Signature is required"),
   created_by: z.number().optional(), // Added to match backend schema
 });
 
@@ -65,40 +66,34 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
       paper_id: "",
       paper_title: "",
       author_names: ["Dr. Abdi", "Prof. Samu", "Dr. Alex"],
-      status: "Accepted", // Make sure this is uppercase
+      status: "Accepted",
       tempat_tanggal: "",
-      signature_id: 0,
+      signature_id: "",
     },
   });
 
   useEffect(() => {
     if (open && loa) {
-      // Ensure status is properly capitalized when loading from existing loa
       const status =
         typeof loa.status === "string"
           ? loa.status.toLowerCase() === "accepted"
             ? "Accepted"
             : loa.status.toLowerCase() === "rejected"
               ? "Rejected"
-              : "Accepted" // Default to Accepted if unknown
+              : "Accepted"
           : "Accepted";
 
-      // Handle author_names which is JSON in the backend - could be string or array
       let authorNames;
       if (typeof loa.author_names === "string") {
         try {
-          // Try to parse if it's JSON string
           const parsed = JSON.parse(loa.author_names);
           authorNames = Array.isArray(parsed) ? parsed : [parsed];
         } catch {
-          // If parsing fails, split by comma
           authorNames = loa.author_names.split(",").map((name) => name.trim());
         }
       } else if (Array.isArray(loa.author_names)) {
-        // Already an array
         authorNames = loa.author_names;
       } else {
-        // Fallback
         authorNames = [];
       }
 
@@ -117,10 +112,18 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
         author_names: [],
         tempat_tanggal: "",
         status: "Accepted",
-        signature_id: undefined,
+        signature_id: "",
       });
     }
   }, [open, loa, form]);
+
+  const { data: signature = [] } = useQuery<Signature[]>({
+    queryKey: ["icicyta-signature"],
+    queryFn: async () => {
+      const response = await api.get(signatureRoutes.list);
+      return response.data;
+    },
+  });
 
   const createMutation = useMutation({
     mutationFn: async (values: LoaFormValues) => {
@@ -230,7 +233,7 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
                     <FormLabel>Author Name</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="John Doe"
+                        placeholder="John Doe, Alex Doe, Yin Doe"
                         {...field}
                         disabled={isViewMode}
                       />
@@ -310,14 +313,28 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Signature</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Dr. John Smith"
-                        {...field}
-                        disabled={isViewMode}
-                      />
-                    </FormControl>
-                    <FormMessage className="text-red-500" />
+                    <Select
+                      disabled={isViewMode}
+                      onValueChange={(value) => field.onChange(value)}
+                      defaultValue={field.value?.toString()}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Signatory" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {signature.map((signer) => (
+                          <SelectItem
+                            key={signer.id}
+                            value={signer.id.toString()}
+                          >
+                            {signer.nama_penandatangan}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
                   </FormItem>
                 )}
               />

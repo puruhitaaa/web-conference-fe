@@ -33,19 +33,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, FileText } from "lucide-react";
 import toast from "react-hot-toast";
-import { ReceiptPrintDialog } from "../icicyta/receipt-print-dialog";
-// import { useAuthStore } from "@/lib/auth/authStore";
+import { ReceiptPrintDialog } from "./receipt-print-dialog";
 
 export type Receipt = {
   id: string;
   invoice_no: string;
   received_from: string;
-  amount: number;
+  amount: string | number;
   in_payment_of: string;
-  payment_date: Date;
+  payment_date: string | Date;
   paper_id: string;
   paper_title: string;
   signature_id: string;
+  created_by: string;
+  created_at: string | Date;
+  updated_at: string | Date;
 };
 
 export function ReceiptTable() {
@@ -132,7 +134,7 @@ export function ReceiptTable() {
     },
     {
       accessorKey: "paper_title",
-      header: "Conferece Title",
+      header: "Conference Title",
       cell: ({ row }) => {
         const title = row.getValue("paper_title") as string;
         return (
@@ -146,7 +148,11 @@ export function ReceiptTable() {
       accessorKey: "amount",
       header: "Amount",
       cell: ({ row }) => {
-        const amount = parseFloat(row.getValue("amount"));
+        const amountValue = row.getValue("amount");
+        const amount =
+          typeof amountValue === "string"
+            ? parseFloat(amountValue)
+            : (amountValue as number);
         const formatted = new Intl.NumberFormat("id-ID", {
           style: "currency",
           currency: "IDR",
@@ -171,6 +177,10 @@ export function ReceiptTable() {
     {
       accessorKey: "payment_date",
       header: "Payment Date",
+      cell: ({ row }) => {
+        const dateValue = row.getValue("payment_date") as string | Date;
+        return new Date(dateValue).toLocaleDateString("en-CA");
+      },
     },
     {
       id: "actions",
@@ -231,12 +241,13 @@ export function ReceiptTable() {
     <div>
       <div className="flex items-center justify-between py-4">
         <Input
-          placeholder="Filter by author name..."
+          disabled={isLoading}
+          placeholder="Filter by received from..."
           value={
-            (table.getColumn("authorName")?.getFilterValue() as string) ?? ""
+            (table.getColumn("received_from")?.getFilterValue() as string) ?? ""
           }
           onChange={(event) =>
-            table.getColumn("authorName")?.setFilterValue(event.target.value)
+            table.getColumn("received_from")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -317,22 +328,26 @@ export function ReceiptTable() {
         </Button>
       </div>
 
-      <ReceiptPrintDialog
-        open={isPrintDialogOpen}
-        onOpenChange={setIsPrintDialogOpen}
-        data={
-          printMode === "single" && currentPrintReceipt
-            ? currentPrintReceipt
-            : receipts
-        }
-        title={printMode === "single" ? "Print Receipt" : "Print All Receipts"}
-        description={
-          printMode === "single"
-            ? "Preview and print this receipt"
-            : "Preview and print all receipts"
-        }
-        singleMode={printMode === "single"}
-      />
+      {isPrintDialogOpen && currentPrintReceipt && (
+        <ReceiptPrintDialog
+          open={isPrintDialogOpen}
+          onOpenChange={setIsPrintDialogOpen}
+          data={
+            printMode === "single" && currentPrintReceipt
+              ? currentPrintReceipt
+              : receipts
+          }
+          title={
+            printMode === "single" ? "Print Receipt" : "Print All Receipts"
+          }
+          description={
+            printMode === "single"
+              ? "Preview and print this receipt"
+              : "Preview and print all receipts"
+          }
+          singleMode={printMode === "single"}
+        />
+      )}
     </div>
   );
 }
