@@ -43,9 +43,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     paddingVertical: 15,
     marginBottom: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
   },
   conferenceNameText: {
     fontSize: 28,
@@ -309,20 +306,6 @@ export const SingleReceiptPdfDocument: React.FC<SingleReceiptPdfProps> = ({
         {/* Purple Header with Logos */}
         <View style={styles.purpleHeader}>
           <Text style={styles.conferenceNameText}>ICyTA {receiptYear}</Text>
-          <View style={styles.logoContainer}>
-            <Image
-              style={styles.largeLogoImage}
-              src='/assets/images/common/university-logos/tel-u.png'
-            />
-            <Image
-              style={styles.largeLogoImage}
-              src='/assets/images/common/university-logos/unbi-university.png'
-            />
-            <Image
-              style={styles.logoImage}
-              src='/assets/images/common/university-logos/utm-university.png'
-            />
-          </View>
         </View>
         <View style={styles.contentArea}>
           {" "}
