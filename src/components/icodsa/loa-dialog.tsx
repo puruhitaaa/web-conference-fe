@@ -152,44 +152,12 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
 
   const updateMutation = useMutation({
     mutationFn: async (values: LoaFormValues & { id: string }) => {
-      const userId = localStorage.getItem("userId") || "1";
-
-      const processedValues = {
-        ...values,
-        author_names: Array.isArray(values.author_names)
-          ? values.author_names
-          : values.author_names,
-        created_by: parseInt(userId),
-      };
-
-      const response = await api.put(
-        loaRoutes.updateICODSA(values.id), // Changed to ICODSA
-        processedValues
-      );
+      const response = await api.put(loaRoutes.updateICODSA(values.id), values);
       return response.data;
     },
-    onSuccess: (data) => {
-      // Force a complete refetch of the data instead of just invalidating
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["icodsa-loas"] });
-
-      // Optionally, update the cache with the returned data to avoid flickering
-      // This assumes your API returns the updated record
-      try {
-        const previousData = queryClient.getQueryData<Array<Loa>>([
-          "icodsa-loas",
-        ]);
-        if (previousData) {
-          const updatedData = previousData.map((item) =>
-            item.id === data.id ? data : item
-          );
-          queryClient.setQueryData(["icodsa-loas"], updatedData);
-        }
-      } catch (error) {
-        console.error("Error updating cache:", error);
-        // If updating the cache fails, we still have the invalidation as fallback
-      }
-
-      toast.success("LoA updated successfully");
+      toast.success("loa updated successfully");
       onOpenChange(false);
     },
     onError: () => {

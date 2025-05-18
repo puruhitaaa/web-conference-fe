@@ -55,10 +55,14 @@ export function LoginForm({
     },
     onSuccess: (res) => {
       if (res.status === 200) {
+        const parsedRole = {
+          ...res.data.user,
+          role: Number(res.data.user.role),
+        };
         const loginSuccess = loginAction(
           res.data.token,
           res.data.token_type,
-          res.data.user
+          parsedRole
         );
 
         if (loginSuccess) {
