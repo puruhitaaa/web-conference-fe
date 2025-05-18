@@ -1,4 +1,5 @@
 import "../index.css";
+import "../index.css";
 
 import { useState } from "react";
 
@@ -26,16 +27,22 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         },
       })
     );
+    );
     return (
       <>
         <QueryClientProvider client={queryClient}>
           <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+          <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
             <Outlet />
+            <Toaster position="bottom-right" reverseOrder={true} />
             <Toaster position="bottom-right" reverseOrder={true} />
           </ThemeProvider>
         </QueryClientProvider>
         {/* <TanStackRouterDevtools /> */}
+        {/* <TanStackRouterDevtools /> */}
       </>
     );
+    );
   },
+});
 });
