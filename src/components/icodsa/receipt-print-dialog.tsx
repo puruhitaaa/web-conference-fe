@@ -12,8 +12,8 @@ import {
   SingleReceiptPdfViewer,
   ReceiptPdfDocument,
   SingleReceiptPdfDocument,
-} from "./receipt-pdf"
-import { Receipt } from "./receipt-table"
+} from "./receipt-pdf" // Imports from local ICODSA folder
+import { Receipt } from "./receipt-table" // Imports from local ICODSA folder
 import { Download } from "lucide-react"
 import { downloadPDF } from "@/lib/pdf-utils"
 
@@ -39,13 +39,13 @@ export function ReceiptPrintDialog({
       const singleReceipt = data as Receipt
       await downloadPDF(
         <SingleReceiptPdfDocument receipt={singleReceipt} />,
-        `receipt-${singleReceipt.invoice_no || "unknown"}.pdf`
+        `receipt-${singleReceipt.invoice_no || "unknown"}.pdf` // ICODSA specific filename
       )
     } else {
       const receiptsArray = Array.isArray(data) ? data : [data as Receipt]
       await downloadPDF(
         <ReceiptPdfDocument receipts={receiptsArray} />,
-        "icicyta-receipts.pdf"
+        "icodsa-receipts.pdf" // ICODSA specific filename
       )
     }
   }
@@ -59,9 +59,11 @@ export function ReceiptPrintDialog({
         </DialogHeader>
         <div className='py-4'>
           {singleMode && !Array.isArray(data) ? (
-            <SingleReceiptPdfViewer receipt={data} />
+            <SingleReceiptPdfViewer receipt={data as Receipt} />
           ) : (
-            <ReceiptPdfViewer receipts={Array.isArray(data) ? data : [data]} />
+            <ReceiptPdfViewer
+              receipts={Array.isArray(data) ? data : [data as Receipt]}
+            />
           )}
         </div>
         <DialogFooter className='flex gap-2'>

@@ -1,59 +1,191 @@
-import React from "react";
-import { Document, Page, Text, View, StyleSheet, PDFViewer } from "@react-pdf/renderer";
-import { Receipt } from "./receipt-table";
+import React from "react"
+import {
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  PDFViewer,
+  Image,
+} from "@react-pdf/renderer"
+import { Receipt } from "./receipt-table"
+import { amountToWordsIDR, formatCurrencyIDR } from "../../utils/currency"
 
-// Create styles
+// Helper function to get year from date
+const getReceiptYear = (date: Date | string | null | undefined): string => {
+  if (date) {
+    return new Date(date).getFullYear().toString()
+  }
+  return new Date().getFullYear().toString() // Fallback to current year
+}
+
+// Helper function to format date as "Month Day, Year" (e.g., Nov 01, 2024)
+const formatDisplayDate = (date: Date | string | null | undefined): string => {
+  if (!date) return "N/A"
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  })
+}
+
+// Create styles (similar to icicyta/receipt-pdf for consistency)
 const styles = StyleSheet.create({
   page: {
     flexDirection: "column",
     backgroundColor: "#ffffff",
-    padding: 30,
+    padding: 0, // Page padding to 0 for full-width elements
+    fontSize: 10,
+    fontFamily: "Helvetica",
   },
-  header: {
+  purpleHeader: {
+    backgroundColor: "#59c3d0", // ICODSA color (previously #4A007F, then #59c3d0)
+    paddingHorizontal: 30,
+    paddingVertical: 15,
+    marginBottom: 20, // Consistent with icicyta invoice
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  conferenceNameText: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#ffffff",
+  },
+  logoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  logoImage: {
+    // For utm-university.png (smallest)
+    height: 30,
+    marginLeft: 8,
+  },
+  largeLogoImage: {
+    // For tel-u.png and unbi-university.png
+    height: 75, // As per previous adjustments
+    marginLeft: 8,
+  },
+  // Styles for the main content area of the receipt (titles, details)
+  contentArea: {
+    // Wrapper for content that needs padding
+    paddingHorizontal: 30,
+  },
+  mainTitleSection: {
+    textAlign: "center",
+    marginBottom: 25,
+    // paddingHorizontal: 30, // Moved to contentArea
+  },
+  mainTitleText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    textTransform: "uppercase",
+  },
+  topInfoContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 20,
+    fontSize: 9,
+    // paddingHorizontal: 30, // Moved to contentArea
+  },
+  topLeftInfo: { width: "60%" },
+  topRightInfo: { width: "35%", textAlign: "left" },
+  infoRow: { flexDirection: "row", marginBottom: 3 },
+  infoLabel: { width: "70px", fontWeight: "bold" },
+  infoValue: { flex: 1 },
+  infoLabelRight: { width: "80px" },
+
+  receiptDetailsContainer: {
+    // paddingHorizontal: 30, // Moved to contentArea
+    marginTop: 20,
+    fontSize: 11,
+  },
+  detailItem: {
+    flexDirection: "row",
+    marginBottom: 12,
+    alignItems: "flex-start",
+  },
+  detailLabel: { width: "120px", fontWeight: "bold" },
+  detailValue: {
+    flex: 1,
+    borderBottomWidth: 1,
+    borderBottomColor: "#333333",
+    paddingBottom: 2,
+  },
+  amountTextValue: {
+    flex: 1,
+    paddingBottom: 2,
+    fontStyle: "italic",
+    backgroundColor: "#E6E6FA",
+    padding: 5,
+  },
+  amountNumericBox: {
+    backgroundColor: "#E6E6FA",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginTop: 10,
+    marginLeft: 120, // Align with values
+    width: "150px",
     textAlign: "center",
   },
-  title: {
-    fontSize: 24,
+  amountNumericText: { fontSize: 12, fontWeight: "bold" },
+
+  signatureSection: {
+    marginTop: 40,
+    marginBottom: 80,
+    width: 200,
+    fontSize: 9,
+    alignItems: "center",
+    marginLeft: "auto",
+  },
+  signatureDate: { marginBottom: 20 },
+  signaturePlaceholderGraphic: {
+    width: 120,
+    height: 40,
+    borderBottomWidth: 1,
+    borderColor: "#000000",
+    marginBottom: 5,
+  },
+  signatureName: { fontWeight: "bold", fontSize: 10 },
+  signatureTitle: { fontSize: 9 },
+  signatureIcodsaLogo: {
+    fontSize: 14,
     fontWeight: "bold",
-    marginBottom: 10,
+    color: "#59c3d0", // Match header color
+    marginBottom: 3,
   },
-  subtitle: {
-    fontSize: 16,
-    marginBottom: 20,
-  },
-  table: {
+  multiReceiptTable: {
     display: "flex",
     width: "auto",
     borderStyle: "solid",
     borderWidth: 1,
     borderColor: "#bfbfbf",
     marginBottom: 20,
+    marginHorizontal: 30, // For padding in multi-view
   },
-  tableRow: {
-    flexDirection: "row",
-  },
-  tableHeaderRow: {
+  multiReceiptHeaderRow: {
     flexDirection: "row",
     backgroundColor: "#f2f2f2",
   },
-  tableCol: {
-    width: "20%",
+  multiReceiptTableCol: {
+    width: "20%", // 5 columns: invoice_no, received_from, paper_id, amount, payment_date
     borderStyle: "solid",
     borderWidth: 1,
     borderColor: "#bfbfbf",
     padding: 5,
+    overflow: "hidden",
   },
-  tableCell: {
-    margin: 5,
-    fontSize: 10,
+  multiReceiptTableCell: {
+    margin: 2,
+    fontSize: 9,
   },
-  tableHeader: {
-    margin: 5,
-    fontSize: 10,
+  multiReceiptTableHeader: {
+    margin: 2,
+    fontSize: 9,
     fontWeight: "bold",
   },
   footer: {
+    // Generic footer for all pages if needed
     position: "absolute",
     bottom: 30,
     left: 30,
@@ -62,252 +194,245 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: "grey",
   },
-  // Single receipt styles
-  singleReceiptContainer: {
-    marginTop: 20,
-    marginBottom: 20,
-  },
-  receiptHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 20,
-  },
-  receiptDetails: {
-    marginBottom: 20,
-  },
-  receiptField: {
-    marginBottom: 10,
-  },
-  receiptLabel: {
-    fontSize: 12,
-    fontWeight: "bold",
-  },
-  receiptValue: {
-    fontSize: 12,
-    marginTop: 3,
-  },
-  statusPaid: {
-    color: "green",
-    fontWeight: "bold",
-  },
-  statusPending: {
-    color: "orange",
-    fontWeight: "bold",
-  },
-  statusCancelled: {
-    color: "red",
-    fontWeight: "bold",
-  },
-  totalRow: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    marginTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: "#000",
-    borderTopStyle: "solid",
-    paddingTop: 5,
-  },
-  totalLabel: {
-    fontSize: 12,
-    fontWeight: "bold",
-    marginRight: 10,
-  },
-  totalValue: {
-    fontSize: 12,
-    fontWeight: "bold",
-  },
-  signature: {
-    marginTop: 50,
-    borderTopWidth: 1,
-    borderTopColor: "#000",
-    borderTopStyle: "solid",
-    paddingTop: 10,
-    width: 200,
-    textAlign: "center",
-  }
-});
+  // purpleFooter: { // Specific footer, replaced by generic or removed for now from single view
+  //   position: "absolute",
+  //   bottom: 0,
+  //   left: 0,
+  //   right: 0,
+  //   backgroundColor: "#59c3d0", // Match header color
+  //   paddingHorizontal: 30,
+  //   paddingVertical: 10,
+  //   textAlign: "center",
+  // },
+  // footerText: {
+  //   fontSize: 9,
+  //   color: "#ffffff",
+  // },
+})
 
 // Multiple Receipts PDF Props
 interface ReceiptPdfProps {
-  receipts: Receipt[];
+  receipts: Receipt[]
 }
 
-// Create Document Component for multiple receipts
+// Document Component for multiple receipts
 export const ReceiptPdfDocument: React.FC<ReceiptPdfProps> = ({ receipts }) => (
   <Document>
-    <Page size="A4" style={styles.page}>
-      <View style={styles.header}>
-        <Text style={styles.title}>ICODSA Receipts</Text>
-        <Text style={styles.subtitle}>Generated on {new Date().toLocaleDateString()}</Text>
+    <Page size='A4' style={styles.page}>
+      <View style={{ paddingHorizontal: 30, paddingTop: 30 }}>
+        {" "}
+        {/* Add overall padding for multi-receipt content */}
+        <Text
+          style={{
+            fontSize: 24,
+            textAlign: "center",
+            marginBottom: 10,
+            fontWeight: "bold",
+          }}
+        >
+          ICoDSA Receipts
+        </Text>
+        <Text style={{ fontSize: 16, textAlign: "center", marginBottom: 20 }}>
+          Generated on {new Date().toLocaleDateString()}
+        </Text>
       </View>
-
-      <View style={styles.table}>
-        <View style={styles.tableHeaderRow}>
-          <View style={styles.tableCol}>
-            <Text style={styles.tableHeader}>Receipt #</Text>
+      <View style={styles.multiReceiptTable}>
+        <View style={styles.multiReceiptHeaderRow}>
+          <View style={styles.multiReceiptTableCol}>
+            <Text style={styles.multiReceiptTableHeader}>Invoice #</Text>
           </View>
-          <View style={styles.tableCol}>
-            <Text style={styles.tableHeader}>Author Name</Text>
+          <View style={styles.multiReceiptTableCol}>
+            <Text style={styles.multiReceiptTableHeader}>Received From</Text>
           </View>
-          <View style={styles.tableCol}>
-            <Text style={styles.tableHeader}>Paper ID</Text>
+          <View style={styles.multiReceiptTableCol}>
+            <Text style={styles.multiReceiptTableHeader}>Paper ID</Text>
           </View>
-          <View style={styles.tableCol}>
-            <Text style={styles.tableHeader}>Amount</Text>
+          <View style={styles.multiReceiptTableCol}>
+            <Text style={styles.multiReceiptTableHeader}>Amount</Text>
           </View>
-          <View style={styles.tableCol}>
-            <Text style={styles.tableHeader}>Status</Text>
+          <View style={styles.multiReceiptTableCol}>
+            <Text style={styles.multiReceiptTableHeader}>Payment Date</Text>
           </View>
         </View>
-
         {receipts.map((receipt, i) => (
-          <View key={i} style={styles.tableRow}>
-            <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{receipt.receiptNumber}</Text>
-            </View>
-            <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{receipt.authorName}</Text>
-            </View>
-            <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{receipt.paperId}</Text>
-            </View>
-            <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>
-                {new Intl.NumberFormat("id-ID", {
-                  style: "currency",
-                  currency: "IDR",
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0,
-                }).format(receipt.amount)}
+          <View key={receipt.id || i} style={styles.multiReceiptHeaderRow}>
+            {" "}
+            {/* Use receipt.id */}
+            <View style={styles.multiReceiptTableCol}>
+              <Text style={styles.multiReceiptTableCell}>
+                {receipt.invoice_no || "N/A"}
               </Text>
             </View>
-            <View style={styles.tableCol}>
-              <Text 
-                style={[
-                  styles.tableCell, 
-                  receipt.status === "paid" ? styles.statusPaid : 
-                  receipt.status === "pending" ? styles.statusPending : styles.statusCancelled
-                ]}
-              >
-                {receipt.status.toUpperCase()}
+            <View style={styles.multiReceiptTableCol}>
+              <Text style={styles.multiReceiptTableCell}>
+                {receipt.received_from || "N/A"}
+              </Text>
+            </View>
+            <View style={styles.multiReceiptTableCol}>
+              <Text style={styles.multiReceiptTableCell}>
+                {receipt.paper_id || "N/A"}
+              </Text>
+            </View>
+            <View style={styles.multiReceiptTableCol}>
+              <Text style={styles.multiReceiptTableCell}>
+                {formatCurrencyIDR(receipt.amount)}
+              </Text>
+            </View>
+            <View style={styles.multiReceiptTableCol}>
+              <Text style={styles.multiReceiptTableCell}>
+                {formatDisplayDate(receipt.payment_date)}
               </Text>
             </View>
           </View>
         ))}
       </View>
-
       <Text style={styles.footer}>
-        This is an automatically generated document. For more information, please contact the conference organizers.
+        This is an automatically generated document. For more information,
+        please contact the conference organizers.
       </Text>
     </Page>
   </Document>
-);
+)
 
 // Single Receipt PDF Props
 interface SingleReceiptPdfProps {
-  receipt: Receipt;
+  receipt: Receipt
 }
 
-// Create Single Receipt Document Component
-export const SingleReceiptPdfDocument: React.FC<SingleReceiptPdfProps> = ({ receipt }) => (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      <View style={styles.header}>
-        <Text style={styles.title}>RECEIPT</Text>
-        <Text style={styles.subtitle}>ICODSA Conference</Text>
-      </View>
+// Single Receipt Document Component
+export const SingleReceiptPdfDocument: React.FC<SingleReceiptPdfProps> = ({
+  receipt,
+}) => {
+  const receiptYear = getReceiptYear(receipt.payment_date)
+  const currentDateFormatted = formatDisplayDate(new Date()) // For "Date of Issue" for signature
 
-      <View style={styles.receiptHeader}>
-        <View>
-          <Text style={styles.receiptLabel}>Receipt Number:</Text>
-          <Text style={styles.receiptValue}>{receipt.receiptNumber}</Text>
+  return (
+    <Document>
+      <Page size='A4' style={styles.page}>
+        {/* Purple Header with Logos */}
+        <View style={styles.purpleHeader}>
+          <Text style={styles.conferenceNameText}>ICoDSA {receiptYear}</Text>
+          <View style={styles.logoContainer}>
+            <Image
+              style={styles.largeLogoImage}
+              src='/assets/images/common/university-logos/tel-u.png'
+            />
+            <Image
+              style={styles.largeLogoImage}
+              src='/assets/images/common/university-logos/unbi-university.png'
+            />
+            <Image
+              style={styles.logoImage}
+              src='/assets/images/common/university-logos/utm-university.png'
+            />
+          </View>
         </View>
-        <View>
-          <Text style={styles.receiptLabel}>Date:</Text>
-          <Text style={styles.receiptValue}>{receipt.placeAndDate}</Text>
-        </View>
-      </View>
-
-      <View style={styles.receiptDetails}>
-        <View style={styles.receiptField}>
-          <Text style={styles.receiptLabel}>To:</Text>
-          <Text style={styles.receiptValue}>{receipt.authorName}</Text>
-          <Text style={styles.receiptValue}>{receipt.institution}</Text>
-          <Text style={styles.receiptValue}>{receipt.email}</Text>
-        </View>
-        
-        <View style={styles.receiptField}>
-          <Text style={styles.receiptLabel}>Paper ID:</Text>
-          <Text style={styles.receiptValue}>{receipt.paperId}</Text>
-        </View>
-        
-        <View style={styles.receiptField}>
-          <Text style={styles.receiptLabel}>Paper Title:</Text>
-          <Text style={styles.receiptValue}>{receipt.paperTitle}</Text>
-        </View>
-        
-        <View style={styles.receiptField}>
-          <Text style={styles.receiptLabel}>Description:</Text>
-          <Text style={styles.receiptValue}>{receipt.description}</Text>
-        </View>
-        
-        <View style={styles.receiptField}>
-          <Text style={styles.receiptLabel}>Payment Method:</Text>
-          <Text style={styles.receiptValue}>{receipt.paymentMethod}</Text>
-        </View>
-        
-        <View style={styles.receiptField}>
-          <Text style={styles.receiptLabel}>Payment Date:</Text>
-          <Text style={styles.receiptValue}>{receipt.paymentDate}</Text>
-        </View>
-        
-        <View style={styles.receiptField}>
-          <Text style={styles.receiptLabel}>Status:</Text>
-          <Text style={[
-            styles.receiptValue, 
-            receipt.status === "paid" ? styles.statusPaid : 
-            receipt.status === "pending" ? styles.statusPending : styles.statusCancelled
-          ]}>
-            {receipt.status.toUpperCase()}
-          </Text>
-        </View>
-      </View>
-
-      <View style={styles.totalRow}>
-        <Text style={styles.totalLabel}>Total Amount:</Text>
-        <Text style={styles.totalValue}>
-          {new Intl.NumberFormat("id-ID", {
-            style: "currency",
-            currency: "IDR",
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-          }).format(receipt.amount)}
-        </Text>
-      </View>
-
-      {receipt.notes && (
-        <View style={styles.receiptField}>
-          <Text style={styles.receiptLabel}>Notes:</Text>
-          <Text style={styles.receiptValue}>{receipt.notes}</Text>
-        </View>
-      )}
-
-      <Text style={styles.footer}>
-        This is an officially generated Receipt for ICODSA Conference.
-      </Text>
-    </Page>
-  </Document>
-);
+        <View style={styles.contentArea}>
+          {" "}
+          {/* Main content wrapper for padding */}
+          {/* Main Title */}
+          <View style={styles.mainTitleSection}>
+            <Text style={styles.mainTitleText}>CONFERENCE PAYMENT RECEIPT</Text>
+          </View>
+          {/* Top Info: Paper ID/Title and Date/Invoice No. */}
+          <View style={styles.topInfoContainer}>
+            <View style={styles.topLeftInfo}>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Paper ID</Text>
+                <Text style={styles.infoValue}>
+                  : {receipt.paper_id || "N/A"}
+                </Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Title</Text>
+                <Text style={styles.infoValue}>
+                  : {receipt.paper_title || "N/A"}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.topRightInfo}>
+              {/* Date of Issue for the receipt itself can be receipt.created_at or current date */}
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabelRight}>Date of Issue</Text>
+                <Text style={styles.infoValue}>
+                  : {formatDisplayDate(receipt.created_at || new Date())}
+                </Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabelRight}>Invoice No.</Text>
+                <Text style={styles.infoValue}>
+                  : {receipt.invoice_no || "N/A"}
+                </Text>
+              </View>
+            </View>
+          </View>
+          {/* Receipt Details */}
+          <View style={styles.receiptDetailsContainer}>
+            <View style={styles.detailItem}>
+              <Text style={styles.detailLabel}>Received from</Text>
+              <Text style={styles.detailValue}>
+                {receipt.received_from || "N/A"}
+              </Text>
+            </View>
+            <View style={styles.detailItem}>
+              <Text style={styles.detailLabel}>Amount</Text>
+              <Text style={styles.amountTextValue}>
+                {amountToWordsIDR(receipt.amount)}
+              </Text>
+            </View>
+            <View style={styles.amountNumericBox}>
+              <Text style={styles.amountNumericText}>
+                {formatCurrencyIDR(receipt.amount)}
+              </Text>
+            </View>
+            <View style={{ ...styles.detailItem, marginTop: 20 }}>
+              <Text style={styles.detailLabel}>In Payment of</Text>
+              <Text style={styles.detailValue}>
+                {receipt.in_payment_of || "N/A"}
+              </Text>
+            </View>
+            <View style={styles.detailItem}>
+              <Text style={styles.detailLabel}>Payment Date</Text>
+              <Text style={styles.detailValue}>
+                {formatDisplayDate(receipt.payment_date)}
+              </Text>
+            </View>
+          </View>
+          {/* Signature Section */}
+          <View style={styles.signatureSection}>
+            <Text style={styles.signatureDate}>
+              Bandung, {currentDateFormatted}
+            </Text>
+            <View style={styles.signaturePlaceholderGraphic} />
+            <Text style={styles.signatureIcodsaLogo}>ICoDSA</Text>
+            <Text style={styles.signatureName}>Dr. Putu Harry Gunawan</Text>
+            <Text style={styles.signatureTitle}>
+              General Chair ICoDSA {receiptYear}
+            </Text>
+          </View>
+        </View>{" "}
+        {/* End of contentArea */}
+        {/* Footer - using the generic one from styles */}
+        {/* <Text style={styles.footer}>
+          The 4th International Conference on Intelligent Cybernetics Technology
+          and Applications {receiptYear}
+        </Text> */}
+      </Page>
+    </Document>
+  )
+}
 
 // PDF Viewer Components
 export const ReceiptPdfViewer: React.FC<ReceiptPdfProps> = ({ receipts }) => (
-  <PDFViewer width="100%" height="600px" className="mt-4">
+  <PDFViewer width='100%' height='600px' className='mt-4'>
     <ReceiptPdfDocument receipts={receipts} />
   </PDFViewer>
-);
+)
 
-export const SingleReceiptPdfViewer: React.FC<SingleReceiptPdfProps> = ({ receipt }) => (
-  <PDFViewer width="100%" height="600px" className="mt-4">
+export const SingleReceiptPdfViewer: React.FC<SingleReceiptPdfProps> = ({
+  receipt,
+}) => (
+  <PDFViewer width='100%' height='600px' className='mt-4'>
     <SingleReceiptPdfDocument receipt={receipt} />
   </PDFViewer>
-);
+)
