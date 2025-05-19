@@ -160,33 +160,6 @@ export function InvoiceDialog({
     }
   }, [open, invoice, form]);
 
-  // const createMutation = useMutation({
-  //   mutationFn: async (values: InvoiceFormValues) => {
-  //     const response = await api.put(invoiceRoutes.updateICODSA("create"), {
-  //       ...values,
-  //       id: crypto.randomUUID(),
-  //     })
-  //     return response.data.data
-  //   },
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries({ queryKey: ["icodsa-invoices"] })
-  //     if (form.getValues("status") === "Paid") {
-  //       queryClient.invalidateQueries({ queryKey: ["icodsa-receipts"] })
-  //       toast.success("Invoice created successfully and payment generated")
-  //     } else {
-  //       toast.success("Invoice created successfully")
-  //     }
-  //     onOpenChange(false)
-  //   },
-  //   onError: (error: any) => {
-  //     console.error("Error creating invoice:", error)
-  //     toast.error(error?.response?.data?.message || "Failed to create invoice")
-  //   },
-  //   onSettled: () => {
-  //     setIsSubmitting(false)
-  //   },
-  // })
-
   const updateMutation = useMutation({
     mutationFn: async (values: InvoiceFormValues & { id: string }) => {
       // Format the date to MySQL format (YYYY-MM-DD)
@@ -270,7 +243,7 @@ export function InvoiceDialog({
                       <Input
                         placeholder="INV-123456"
                         {...field}
-                        disabled={isViewMode}
+                        disabled={isViewMode || mode === "edit"}
                       />
                     </FormControl>
                     <FormMessage className="text-red-500" />
@@ -411,7 +384,7 @@ export function InvoiceDialog({
                       <Input
                         placeholder="LOA-123"
                         {...field}
-                        disabled={isViewMode}
+                        disabled={isViewMode || mode === "edit"}
                       />
                     </FormControl>
                     <FormMessage className="text-red-500" />
@@ -448,7 +421,7 @@ export function InvoiceDialog({
                       <Input
                         placeholder="Signature reference"
                         {...field}
-                        disabled={isViewMode}
+                        disabled={isViewMode || mode === "edit"}
                       />
                     </FormControl>
                     <FormMessage className="text-red-500" />

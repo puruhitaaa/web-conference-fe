@@ -130,39 +130,6 @@ export function SignatureTable() {
       header: "Signature ID",
     },
     {
-      accessorKey: "picture",
-      header: "Signature",
-      cell: ({ row }) => {
-        const signature = row.original;
-        // Check if we have a valid image URL
-        if (signature.picture) {
-          return (
-            <div className="flex items-center justify-center">
-              <img
-                src={signature.picture}
-                alt={`Signature of ${signature.nama_penandatangan}`}
-                className="max-h-16 max-w-24 object-contain"
-                loading="lazy" // Add lazy loading
-                onError={(e) => {
-                  // If image fails to load, show alt text instead
-                  const imgElement = e.target as HTMLImageElement;
-                  imgElement.style.display = "none";
-                  const parent = imgElement.parentNode as HTMLElement;
-                  if (parent) {
-                    const textNode = document.createElement("span");
-                    textNode.textContent = "Image not available";
-                    textNode.className = "text-sm text-gray-500";
-                    parent.appendChild(textNode);
-                  }
-                }}
-              />
-            </div>
-          );
-        }
-        return <span className="text-gray-500">No image</span>;
-      },
-    },
-    {
       accessorKey: "nama_penandatangan",
       header: "Signatory Name",
     },

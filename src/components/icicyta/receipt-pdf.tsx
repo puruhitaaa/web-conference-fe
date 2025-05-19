@@ -389,7 +389,7 @@ export const SingleReceiptPdfDocument: React.FC<SingleReceiptPdfProps> = ({
             </Text>{" "}
             {/* Placeholder name */}
             <Text style={styles.signatureTitle}>
-              General Chair ICyTA {receiptYear}
+              General Chair ICICyTA {receiptYear}
             </Text>{" "}
             {/* Changed */}
           </View>

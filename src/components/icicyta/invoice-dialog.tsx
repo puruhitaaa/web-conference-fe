@@ -23,6 +23,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import toast from "react-hot-toast";
+import { Invoice } from "./invoice-table"; // Assuming the Invoice type is used here
+import { Separator } from "@radix-ui/react-separator";
 import {
   Select,
   SelectContent,
@@ -30,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useAuthStore } from "@/lib/auth/authStore";
 import {
   Popover,
   PopoverContent,
@@ -39,10 +43,6 @@ import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import toast from "react-hot-toast";
-import { Invoice } from "./invoice-table";
-import { Separator } from "@radix-ui/react-separator";
-import { useAuthStore } from "@/lib/auth/authStore";
 
 const formSchema = z.object({
   invoice_no: z.string().min(1, "Invoice number is required"),
@@ -97,7 +97,7 @@ export function InvoiceDialog({
       signature_id: "",
       virtual_account_id: null,
       bank_transfer_id: null,
-      created_by: null,
+      created_by: "",
       status: "Pending",
       created_at: null,
       updated_at: null,
@@ -152,7 +152,7 @@ export function InvoiceDialog({
         signature_id: "",
         virtual_account_id: null,
         bank_transfer_id: null,
-        created_by: null,
+        created_by: "",
         status: "Pending",
         created_at: new Date(),
         updated_at: null,
@@ -162,6 +162,7 @@ export function InvoiceDialog({
 
   const updateMutation = useMutation({
     mutationFn: async (values: InvoiceFormValues & { id: string }) => {
+      // Format the date to MySQL format (YYYY-MM-DD)
       const formattedValues = {
         ...values,
         created_by: user?.id,
@@ -198,6 +199,11 @@ export function InvoiceDialog({
   function onSubmit(values: InvoiceFormValues) {
     setIsSubmitting(true);
 
+    // if (mode === "edit" && invoice) {
+    //   updateMutation.mutate({ ...values, id: invoice.id })
+    // } else {
+    //   createMutation.mutate(values)
+    // }
     if (mode === "edit" && invoice) {
       updateMutation.mutate({ ...values, id: invoice.id });
     }
@@ -237,7 +243,7 @@ export function InvoiceDialog({
                       <Input
                         placeholder="INV-123456"
                         {...field}
-                        disabled={isViewMode}
+                        disabled={isViewMode || mode === "edit"}
                       />
                     </FormControl>
                     <FormMessage className="text-red-500" />
@@ -378,7 +384,7 @@ export function InvoiceDialog({
                       <Input
                         placeholder="LOA-123"
                         {...field}
-                        disabled={isViewMode}
+                        disabled={isViewMode || mode === "edit"}
                       />
                     </FormControl>
                     <FormMessage className="text-red-500" />
@@ -387,6 +393,73 @@ export function InvoiceDialog({
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="institution"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Institution</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="University/Organization"
+                        {...field}
+                        value={field.value ?? ""}
+                        disabled={isViewMode}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="signature_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Signature ID</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Signature reference"
+                        {...field}
+                        disabled={isViewMode || mode === "edit"}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select
+                      disabled={isViewMode}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      value={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Pending">Pending</SelectItem>
+                        <SelectItem value="Paid">Paid</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {field.value === "Paid" &&
+                        "Payment will be automatically created when status is set to Paid"}
+                    </p>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="date_of_issue"
@@ -423,73 +496,6 @@ export function InvoiceDialog({
                         />
                       </PopoverContent>
                     </Popover>
-                    <FormMessage className="text-red-500" />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="signature_id"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Signature ID</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Signature reference"
-                        {...field}
-                        disabled={isViewMode}
-                      />
-                    </FormControl>
-                    <FormMessage className="text-red-500" />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="institution"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Institution</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="University/Organization"
-                        {...field}
-                        value={field.value ?? ""}
-                        disabled={isViewMode}
-                      />
-                    </FormControl>
-                    <FormMessage className="text-red-500" />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <Select
-                      disabled={isViewMode}
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      value={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="Pending">Pending</SelectItem>
-                        <SelectItem value="Paid">Paid</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {field.value === "Paid" &&
-                        "Payment will be automatically created when status is set to Paid"}
-                    </p>
                     <FormMessage className="text-red-500" />
                   </FormItem>
                 )}

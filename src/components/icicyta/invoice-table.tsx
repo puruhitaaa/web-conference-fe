@@ -35,7 +35,6 @@ import { MoreHorizontal, FileText } from "lucide-react";
 import { InvoiceDialog } from "./invoice-dialog";
 import { InvoicePrintDialog } from "./invoice-print-dialog";
 import toast from "react-hot-toast";
-// import { useAuthStore } from "@/lib/auth/authStore";
 
 export type Invoice = {
   id: string;
@@ -69,8 +68,7 @@ export function InvoiceTable() {
   const [currentPrintInvoice, setCurrentPrintInvoice] =
     useState<Invoice | null>(null);
   const [printMode, setPrintMode] = useState<"single" | "all">("all");
-
-  // const user = useAuthStore((state) => state.user);
+  // const user = useAuthStore((state) => state.user)
   const queryClient = useQueryClient();
 
   const { data: invoices = [], isLoading } = useQuery<Invoice[]>({
@@ -83,7 +81,7 @@ export function InvoiceTable() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await api.delete(invoiceRoutes.updateICICYTA(id));
+      await api.delete(invoiceRoutes.deleteICICYTA(id));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["icicyta-invoices"] });
@@ -113,10 +111,10 @@ export function InvoiceTable() {
   };
 
   // const handleCreate = () => {
-  //   setCurrentInvoice(null);
-  //   setDialogMode("create");
-  //   setIsDialogOpen(true);
-  // };
+  //   setCurrentInvoice(null)
+  //   setDialogMode("create")
+  //   setIsDialogOpen(true)
+  // }
 
   // const handlePrint = () => {
   //   setPrintMode("all");
@@ -167,7 +165,7 @@ export function InvoiceTable() {
       accessorKey: "total",
       header: "Total",
       cell: ({ row }) => {
-        const amount = parseFloat(row.getValue("amount")) || 0;
+        const amount = parseFloat(row.getValue("amount"));
         const formatted = new Intl.NumberFormat("id-ID", {
           style: "currency",
           currency: "IDR",
@@ -273,9 +271,9 @@ export function InvoiceTable() {
               Print All
             </Button>
           ) : null} */}
-          {/* {user?.role === 3 ? (
+          {/* {user?.role === 2 ? (
             <Button onClick={handleCreate}>
-              <Plus className="mr-2 h-4 w-4" /> Add New Invoice
+              <Plus className='mr-2 h-4 w-4' /> Add New Invoice
             </Button>
           ) : null} */}
         </div>

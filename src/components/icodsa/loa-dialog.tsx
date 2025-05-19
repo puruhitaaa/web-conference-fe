@@ -37,13 +37,16 @@ import { Signature } from "../signature/signature-table";
 const formSchema = z.object({
   paper_id: z.string().min(1, "Paper ID is required"),
   paper_title: z.string().min(1, "Conference title is required"),
-  author_names: z
-    .string()
-    .min(1)
-    .transform((val) => val.split(",").map((v) => v.trim())),
+  author_names: z.union([
+    z
+      .string()
+      .min(1)
+      .transform((val) => val.split(",").map((v) => v.trim())),
+    z.array(z.string()),
+  ]),
   status: z.enum(["Accepted", "Rejected"]),
   tempat_tanggal: z.string().min(1, "Place and date is required"),
-  signature_id: z.string().min(1, "Signature is required"),
+  signature_id: z.coerce.string().min(1, "Signature ID is required"),
   created_by: z.number().optional(), // Added to match backend schema
 });
 
@@ -326,7 +329,7 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
                             key={signer.id}
                             value={signer.id.toString()}
                           >
-                            {signer.nama_penandatangan}
+                            {signer.id} - {signer.nama_penandatangan}
                           </SelectItem>
                         ))}
                       </SelectContent>
