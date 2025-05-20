@@ -6,21 +6,12 @@ import {
   View,
   StyleSheet,
   PDFViewer,
+  Image,
 } from "@react-pdf/renderer";
 import { Receipt } from "./receipt-table";
 import { amountToWordsIDR, formatCurrencyIDR } from "../../utils/currency";
 
-// Helper function to format date as "Month Day, Year" (e.g., Nov 01, 2024) - Kept local for specific formatting
-const formatDisplayDate = (date: Date | string | null | undefined): string => {
-  if (!date) return "N/A";
-  return new Date(date).toLocaleDateString("en-US", {
-    month: "long", // ICICYTA used 'long' month, ICODSA 'short'. Keeping 'long' for now.
-    day: "numeric",
-    year: "numeric",
-  });
-};
-
-// Extract year from date - Kept local
+// Helper function to get year from date
 const getReceiptYear = (date: Date | string | null | undefined): string => {
   if (date) {
     return new Date(date).getFullYear().toString();
@@ -28,20 +19,32 @@ const getReceiptYear = (date: Date | string | null | undefined): string => {
   return new Date().getFullYear().toString(); // Fallback to current year
 };
 
-// Create styles (adapted from icodsa/receipt-pdf.tsx)
+// Helper function to format date as "Month Day, Year" (e.g., Nov 01, 2024)
+const formatDisplayDate = (date: Date | string | null | undefined): string => {
+  if (!date) return "N/A";
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+};
+
 const styles = StyleSheet.create({
   page: {
     flexDirection: "column",
     backgroundColor: "#ffffff",
-    padding: 0, // Page padding to 0 for full-width elements
+    padding: 0,
     fontSize: 10,
     fontFamily: "Helvetica",
   },
   purpleHeader: {
-    backgroundColor: "#9461AF", // ICICYTA specific color
+    backgroundColor: "#9461AF",
     paddingHorizontal: 30,
     paddingVertical: 15,
     marginBottom: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   conferenceNameText: {
     fontSize: 28,
@@ -59,15 +62,18 @@ const styles = StyleSheet.create({
   },
   largeLogoImage: {
     // For tel-u.png and unbi-university.png
-    height: 75,
+    height: 75, // As per previous adjustments
     marginLeft: 8,
   },
+  // Styles for the main content area of the receipt (titles, details)
   contentArea: {
+    // Wrapper for content that needs padding
     paddingHorizontal: 30,
   },
   mainTitleSection: {
     textAlign: "center",
     marginBottom: 25,
+    // paddingHorizontal: 30, // Moved to contentArea
   },
   mainTitleText: {
     fontSize: 16,
@@ -79,15 +85,17 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 20,
     fontSize: 9,
+    // paddingHorizontal: 30, // Moved to contentArea
   },
   topLeftInfo: { width: "60%" },
   topRightInfo: { width: "35%", textAlign: "left" },
   infoRow: { flexDirection: "row", marginBottom: 3 },
-  infoLabel: { width: "70px", fontWeight: "bold" }, // Adjusted width
+  infoLabel: { width: "70px", fontWeight: "bold" },
   infoValue: { flex: 1 },
-  infoLabelRight: { width: "80px" }, // Adjusted width
+  infoLabelRight: { width: "80px" },
 
   receiptDetailsContainer: {
+    // paddingHorizontal: 30, // Moved to contentArea
     marginTop: 20,
     fontSize: 11,
   },
@@ -107,11 +115,11 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingBottom: 2,
     fontStyle: "italic",
-    backgroundColor: "#E6E6FA", // Light lavender for consistency with ICODSA's example
+    backgroundColor: "#E6E6FA",
     padding: 5,
   },
   amountNumericBox: {
-    backgroundColor: "#E6E6FA", // Light lavender
+    backgroundColor: "#E6E6FA",
     paddingVertical: 8,
     paddingHorizontal: 12,
     marginTop: 10,
@@ -123,48 +131,27 @@ const styles = StyleSheet.create({
 
   signatureSection: {
     marginTop: 40,
-    marginBottom: 80, // Adjusted margin
-    width: 200, // Fixed width for signature block
+    marginBottom: 80,
+    width: 200,
     fontSize: 9,
-    alignItems: "center", // Center align items in signature block
-    marginLeft: "auto", // Push to the right
-    // Removed text specific alignment, handled by alignItems and direct Text styling
+    alignItems: "center",
+    marginLeft: "auto",
   },
-  signatureDate: { marginBottom: 20 /* textAlign: 'center' */ }, // Centering handled by parent
+  signatureDate: { marginBottom: 20 },
   signaturePlaceholderGraphic: {
-    // Replaces old signature top border
     width: 120,
-    height: 40, // Placeholder for actual graphic/space
+    height: 40,
     borderBottomWidth: 1,
     borderColor: "#000000",
     marginBottom: 5,
   },
-  signatureName: { fontWeight: "bold", fontSize: 10 /* textAlign: 'center' */ },
-  signatureTitle: { fontSize: 9 /* textAlign: 'center' */ },
+  signatureName: { fontWeight: "bold", fontSize: 10 },
+  signatureTitle: { fontSize: 9 },
   signatureIcicytaLogo: {
-    // Specific for ICICYTA
     fontSize: 14,
     fontWeight: "bold",
-    color: "#9461AF", // ICICYTA header color
+    color: "#9461AF",
     marginBottom: 3,
-    // textAlign: 'center', // Centering handled by parent
-  },
-
-  // Styles for multi-receipt table (adapted from icodsa)
-  multiReceiptListHeader: {
-    // For the "ICyTA Receipts" and "Generated on" text
-    textAlign: "center",
-    marginBottom: 20,
-    paddingTop: 30, // Added padding top for multi-receipt list
-  },
-  multiReceiptListTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  multiReceiptListSubtitle: {
-    fontSize: 16,
-    marginBottom: 20,
   },
   multiReceiptTable: {
     display: "flex",
@@ -173,41 +160,39 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#bfbfbf",
     marginBottom: 20,
-    marginHorizontal: 30,
+    marginHorizontal: 30, // For padding in multi-view
   },
   multiReceiptHeaderRow: {
     flexDirection: "row",
-    backgroundColor: "#f2f2f2", // Header row background
-  },
-  multiReceiptDataRow: {
-    // For data rows, no specific background by default
-    flexDirection: "row",
+    backgroundColor: "#f2f2f2",
   },
   multiReceiptTableCol: {
-    width: "20%", // 5 columns
+    width: "20%", // 5 columns: invoice_no, received_from, paper_id, amount, payment_date
     borderStyle: "solid",
     borderWidth: 1,
     borderColor: "#bfbfbf",
     padding: 5,
-    overflow: "hidden", // Prevent text overflow issues
+    overflow: "hidden",
   },
   multiReceiptTableCell: {
-    margin: 2, // Adjusted from 5
-    fontSize: 9, // Adjusted from 10
+    margin: 2,
+    fontSize: 9,
   },
   multiReceiptTableHeader: {
-    margin: 2, // Adjusted from 5
-    fontSize: 9, // Adjusted from 10
+    margin: 2,
+    fontSize: 9,
     fontWeight: "bold",
   },
   footer: {
     position: "absolute",
-    bottom: 30,
-    left: 30,
-    right: 30,
+    bottom: 20,
+    left: 0,
+    right: 0,
     textAlign: "center",
-    fontSize: 10,
-    color: "grey",
+    fontSize: 12,
+    color: "#ffffff",
+    backgroundColor: "#9461AF",
+    paddingVertical: 20,
   },
 });
 
@@ -216,17 +201,27 @@ interface ReceiptPdfProps {
   receipts: Receipt[];
 }
 
-// Create Document Component for multiple receipts
+// Document Component for multiple receipts
 export const ReceiptPdfDocument: React.FC<ReceiptPdfProps> = ({ receipts }) => (
   <Document>
     <Page size="A4" style={styles.page}>
-      <View style={styles.multiReceiptListHeader}>
-        <Text style={styles.multiReceiptListTitle}>ICyTA Receipts</Text>
-        <Text style={styles.multiReceiptListSubtitle}>
+      <View style={{ paddingHorizontal: 30, paddingTop: 30 }}>
+        {" "}
+        {/* Add overall padding for multi-receipt content */}
+        <Text
+          style={{
+            fontSize: 24,
+            textAlign: "center",
+            marginBottom: 10,
+            fontWeight: "bold",
+          }}
+        >
+          ICICyTA Receipts
+        </Text>
+        <Text style={{ fontSize: 16, textAlign: "center", marginBottom: 20 }}>
           Generated on {new Date().toLocaleDateString()}
         </Text>
       </View>
-
       <View style={styles.multiReceiptTable}>
         <View style={styles.multiReceiptHeaderRow}>
           <View style={styles.multiReceiptTableCol}>
@@ -245,9 +240,8 @@ export const ReceiptPdfDocument: React.FC<ReceiptPdfProps> = ({ receipts }) => (
             <Text style={styles.multiReceiptTableHeader}>Payment Date</Text>
           </View>
         </View>
-
         {receipts.map((receipt, i) => (
-          <View key={receipt.id || i} style={styles.multiReceiptDataRow}>
+          <View key={receipt.id || i} style={styles.multiReceiptHeaderRow}>
             {" "}
             {/* Use receipt.id */}
             <View style={styles.multiReceiptTableCol}>
@@ -278,7 +272,6 @@ export const ReceiptPdfDocument: React.FC<ReceiptPdfProps> = ({ receipts }) => (
           </View>
         ))}
       </View>
-
       <Text style={styles.footer}>
         This is an automatically generated document. For more information,
         please contact the conference organizers.
@@ -292,19 +285,50 @@ interface SingleReceiptPdfProps {
   receipt: Receipt;
 }
 
-// Create Single Receipt Document Component
+// Single Receipt Document Component
 export const SingleReceiptPdfDocument: React.FC<SingleReceiptPdfProps> = ({
   receipt,
 }) => {
   const receiptYear = getReceiptYear(receipt.payment_date);
   const currentDateFormatted = formatDisplayDate(new Date()); // For "Date of Issue" for signature
 
+  const getOrdinal = (n: number) => {
+    if (n % 100 >= 11 && n % 100 <= 13) return n + "th";
+    switch (n % 10) {
+      case 1:
+        return n + "st";
+      case 2:
+        return n + "nd";
+      case 3:
+        return n + "rd";
+      default:
+        return n + "th";
+    }
+  };
+  const startYear = 2018;
+  const currentYear = new Date().getFullYear();
+  const editionNumber = currentYear - startYear + 1;
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         {/* Purple Header with Logos */}
         <View style={styles.purpleHeader}>
-          <Text style={styles.conferenceNameText}>ICyTA {receiptYear}</Text>
+          <Text style={styles.conferenceNameText}>ICICyTA {receiptYear}</Text>
+          <View style={styles.logoContainer}>
+            <Image
+              style={styles.largeLogoImage}
+              src="/assets/images/common/university-logos/tel-u.png"
+            />
+            <Image
+              style={styles.largeLogoImage}
+              src="/assets/images/common/university-logos/unbi-university.png"
+            />
+            <Image
+              style={styles.logoImage}
+              src="/assets/images/common/university-logos/utm-university.png"
+            />
+          </View>
         </View>
         <View style={styles.contentArea}>
           {" "}
@@ -330,6 +354,7 @@ export const SingleReceiptPdfDocument: React.FC<SingleReceiptPdfProps> = ({
               </View>
             </View>
             <View style={styles.topRightInfo}>
+              {/* Date of Issue for the receipt itself can be receipt.created_at or current date */}
               <View style={styles.infoRow}>
                 <Text style={styles.infoLabelRight}>Date of Issue</Text>
                 <Text style={styles.infoValue}>
@@ -378,27 +403,21 @@ export const SingleReceiptPdfDocument: React.FC<SingleReceiptPdfProps> = ({
           </View>
           {/* Signature Section */}
           <View style={styles.signatureSection}>
-            <Text style={styles.signatureDate}>
-              Bandung, {currentDateFormatted}
-            </Text>
+            <Text style={styles.signatureDate}>{currentDateFormatted}</Text>
             <View style={styles.signaturePlaceholderGraphic} />
-            <Text style={styles.signatureIcicytaLogo}>ICyTA</Text>{" "}
-            {/* Changed from ICoDSA */}
-            <Text style={styles.signatureName}>
-              Dr. Putu Harry Gunawan
-            </Text>{" "}
-            {/* Placeholder name */}
+            <Text style={styles.signatureIcicytaLogo}>ICICyTA</Text>
+            <Text style={styles.signatureName}>Dr. Putu Harry Gunawan</Text>
             <Text style={styles.signatureTitle}>
               General Chair ICICyTA {receiptYear}
-            </Text>{" "}
-            {/* Changed */}
+            </Text>
           </View>
         </View>{" "}
         {/* End of contentArea */}
-        {/* Footer can be added here if a specific one is needed, or use generic */}
-        {/* <Text style={styles.footer}>
-          The International Conference on Intelligent Cybernetics Technology and Applications {receiptYear}
-        </Text> */}
+        {/* Footer - using the generic one from styles */}
+        <Text style={styles.footer}>
+          The {getOrdinal(editionNumber)} International Conference on
+          Intelligent Cybernetics Technology and Applications {currentYear}
+        </Text>
       </Page>
     </Document>
   );

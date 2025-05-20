@@ -187,12 +187,14 @@ const styles = StyleSheet.create({
   footer: {
     // Generic footer for all pages if needed
     position: "absolute",
-    bottom: 30,
-    left: 30,
-    right: 30,
+    bottom: 0,
+    left: 0,
+    right: 0,
     textAlign: "center",
-    fontSize: 10,
-    color: "grey",
+    fontSize: 12,
+    color: "#ffffff",
+    backgroundColor: "#59c3d0",
+    paddingVertical: 20,
   },
   // purpleFooter: { // Specific footer, replaced by generic or removed for now from single view
   //   position: "absolute",
@@ -306,6 +308,23 @@ export const SingleReceiptPdfDocument: React.FC<SingleReceiptPdfProps> = ({
   const receiptYear = getReceiptYear(receipt.payment_date);
   const currentDateFormatted = formatDisplayDate(new Date()); // For "Date of Issue" for signature
 
+  const getOrdinal = (n: number) => {
+    if (n % 100 >= 11 && n % 100 <= 13) return n + "th";
+    switch (n % 10) {
+      case 1:
+        return n + "st";
+      case 2:
+        return n + "nd";
+      case 3:
+        return n + "rd";
+      default:
+        return n + "th";
+    }
+  };
+  const startYear = 2018;
+  const currentYear = new Date().getFullYear();
+  const editionNumber = currentYear - startYear + 1;
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -400,9 +419,7 @@ export const SingleReceiptPdfDocument: React.FC<SingleReceiptPdfProps> = ({
           </View>
           {/* Signature Section */}
           <View style={styles.signatureSection}>
-            <Text style={styles.signatureDate}>
-              Bandung, {currentDateFormatted}
-            </Text>
+            <Text style={styles.signatureDate}>{currentDateFormatted}</Text>
             <View style={styles.signaturePlaceholderGraphic} />
             <Text style={styles.signatureIcodsaLogo}>ICoDSA</Text>
             <Text style={styles.signatureName}>Dr. Putu Harry Gunawan</Text>
@@ -413,10 +430,10 @@ export const SingleReceiptPdfDocument: React.FC<SingleReceiptPdfProps> = ({
         </View>{" "}
         {/* End of contentArea */}
         {/* Footer - using the generic one from styles */}
-        {/* <Text style={styles.footer}>
-          The 4th International Conference on Intelligent Cybernetics Technology
-          and Applications {receiptYear}
-        </Text> */}
+        <Text style={styles.footer}>
+          The {getOrdinal(editionNumber)} International Conference on
+          Intelligent Cybernetics Technology and Applications {currentYear}
+        </Text>
       </Page>
     </Document>
   );

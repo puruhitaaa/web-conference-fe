@@ -6,33 +6,47 @@ import {
   View,
   StyleSheet,
   PDFViewer,
+  Image,
 } from "@react-pdf/renderer";
 import { Loa } from "./loa-table";
 
 // Create styles
 const styles = StyleSheet.create({
   page: {
-    padding: 20,
+    padding: 0,
     flexDirection: "column",
     backgroundColor: "#ffffff",
   },
-  header: {
-    color: "#ffffff",
-    padding: 20,
-    textAlign: "center",
+  Header: {
     backgroundColor: "#9461AF",
+    paddingHorizontal: 30,
+    paddingVertical: 15,
+    marginBottom: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
-  title: {
-    textAlign: "left",
-    fontSize: 24,
+  Title: {
+    fontSize: 28,
     fontWeight: "bold",
-    marginTop: 20,
-    marginBottom: 10,
+    color: "#ffffff",
   },
   subtitle: {
     fontSize: 10,
     textAlign: "left",
-    fontWeight: "bold",
+    // fontWeight: "ital",
+  },
+  logoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  largeLogoImage: {
+    height: 75,
+    marginLeft: 8,
+  },
+  logoImage: {
+    height: 30,
+    marginLeft: 8,
   },
   table: {
     display: "flex",
@@ -65,14 +79,17 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "bold",
   },
-  footer: {
+  loaFooter: {
     position: "absolute",
-    bottom: 30,
-    left: 30,
-    right: 30,
+    bottom: 0,
+    right: 0,
+    left: 0,
     textAlign: "center",
-    fontSize: 10,
-    color: "grey",
+    fontSize: 9,
+    fontWeight: "bold",
+    color: "#FFFFFF",
+    backgroundColor: "#9461AF",
+    paddingVertical: 12,
   },
   statusAccepted: {
     color: "green",
@@ -86,11 +103,6 @@ const styles = StyleSheet.create({
   singleLoaContainer: {
     margin: 20,
     paddingTop: 20,
-  },
-  loaHeader: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 15,
   },
   loaField: {
     marginBottom: 10,
@@ -124,12 +136,11 @@ interface LoaPdfProps {
 export const LoaPdfDocument: React.FC<LoaPdfProps> = ({ loas }) => (
   <Document>
     <Page size="A4" style={styles.page}>
-      <View style={styles.header}>
-        <Text style={styles.title}>ICICYTA {new Date().getFullYear()}</Text>
+      <View style={styles.Header}>
+        <Text style={styles.Title}>ICoDSA {new Date().getFullYear()}</Text>
         <Text style={styles.subtitle}>
-          The 4TH International Conference on Intelligent Cybernetics Technology
-          & Applications {new Date().getFullYear()} (ICICyTA{" "}
-          {new Date().getFullYear()})
+          The 7th International Conference on Data Science and Its Applications
+          {new Date().getFullYear()} (ICoDSA {new Date().getFullYear()})
         </Text>
       </View>
 
@@ -176,7 +187,7 @@ export const LoaPdfDocument: React.FC<LoaPdfProps> = ({ loas }) => (
         ))}
       </View>
 
-      <Text style={styles.footer}>
+      <Text style={styles.loaFooter}>
         This is an automatically generated document. For more information,
         please contact the conference organizers.
       </Text>
@@ -196,89 +207,129 @@ interface SingleLoaPdfProps {
 }
 
 // Create Single LoA Document Component
-export const SingleLoaPdfDocument: React.FC<SingleLoaPdfProps> = ({ loa }) => (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      <View style={styles.header}>
-        <Text style={styles.title}>ICICYTA {new Date().getFullYear()}</Text>
-        <Text style={styles.subtitle}>
-          The 4TH International Conference on Intelligent Cybernetics Technology
-          & Applications {new Date().getFullYear()} (ICICyTA{" "}
-          {new Date().getFullYear()})
-        </Text>
-      </View>
+export const SingleLoaPdfDocument: React.FC<SingleLoaPdfProps> = ({ loa }) => {
+  const getLoaYear = (date: Date | string | null | undefined): string => {
+    if (date) {
+      return new Date(date).getFullYear().toString();
+    }
+    return new Date().getFullYear().toString(); // Fallback to current year
+  };
+  const getOrdinal = (n: number) => {
+    if (n % 100 >= 11 && n % 100 <= 13) return n + "th";
+    switch (n % 10) {
+      case 1:
+        return n + "st";
+      case 2:
+        return n + "nd";
+      case 3:
+        return n + "rd";
+      default:
+        return n + "th";
+    }
+  };
+  const startYear = 2021;
+  const currentYear = new Date().getFullYear();
+  const editionNumber = currentYear - startYear + 1;
 
-      <div className="flex justify-center m-10">
-        <View style={styles.singleLoaContainer}>
-          <View style={styles.loaField}>
-            <Text style={styles.loaLabel}>LETTER OF ACCEPTANCE</Text>
-            <Text style={styles.subtitle}>
-              The 4th International Conference on Intelligent Cybernetics
-              Technology & Application {new Date().getFullYear()} (ICODSA)
-            </Text>
-          </View>
-
-          <View style={styles.loaField}>
-            <Text style={styles.loaValue}>Dear {loa.author_names}</Text>
-          </View>
-
-          <View style={styles.loaField}>
-            <Text style={styles.loaLabel}>
-              Organizing & Program Committee is pleased to announce that your
-              paper:
-            </Text>
-            <Text style={styles.loaValue}>
-              {loa.paper_id}: {loa.paper_title}
-            </Text>
-          </View>
-
-          <View style={styles.loaField}>
-            <Text style={styles.loaLabel}>Was</Text>
-            <Text
-              style={[
-                styles.loaValue,
-                loa.status === "Accepted"
-                  ? styles.statusAccepted
-                  : styles.statusRejected,
-              ]}
-            >
-              {loa.status.toUpperCase()}
-            </Text>
-          </View>
-
-          <View style={styles.loaField}>
-            <Text style={styles.loaLabel}>
-              For The 4th International Conference on Intelligent Cybernetics
-              Technology & Applications {new Date().getFullYear()} (ICICyTA).
-              For finishing your registration please follow the instruction,
-              which has been already send by e-mail to all authors of accepted
-              papers.
-            </Text>
-            <Text style={styles.loaLabel}>
-              The 4th International Conference on Intelligent Cybernetics
-              Technology & Applications {new Date().getFullYear()} (ICICyTA{" "}
-              {new Date().getFullYear()}) with theme "From Data to Decisions:
-              Cybernetics and Intelligent Systems in Healthcare, IoT, and
-              Business" will be held on December 17-19, 2024 at Bali Indonesia.
-            </Text>
-          </View>
-
-          <Text style={styles.loaValue}>{loa.tempat_tanggal}</Text>
-
-          <View style={styles.signature}>
-            <Text style={styles.loaValue}>{loa.signature_id}</Text>
-            <Text style={styles.loaLabel}>Signature</Text>
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        <View style={styles.Header}>
+          <Text style={styles.Title}>ICICyTA {getLoaYear(loa.created_at)}</Text>
+          <View style={styles.logoContainer}>
+            <Image
+              style={styles.largeLogoImage}
+              src="/assets/images/common/university-logos/tel-u.png"
+            />
+            <Image
+              style={styles.largeLogoImage}
+              src="/assets/images/common/university-logos/unbi-university.png"
+            />
+            <Image
+              style={styles.logoImage}
+              src="/assets/images/common/university-logos/utm-university.png"
+            />
           </View>
         </View>
-      </div>
 
-      <Text style={styles.footer}>
-        This is an officially generated Letter of Acceptance for ICODSA
-        Conference.
-      </Text>
-    </Page>
-  </Document>
-);
+        <div className="flex justify-center m-10">
+          <View style={styles.singleLoaContainer}>
+            <View style={styles.loaField}>
+              <Text style={styles.loaLabel}>LETTER OF ACCEPTANCE</Text>
+              <Text style={styles.subtitle}>
+                The {getOrdinal(editionNumber)} International Conference on
+                Intelligent Cybernetics Technology & Application {currentYear}{" "}
+                (ICIyTA)
+              </Text>
+            </View>
+
+            <View style={styles.loaField}>
+              <Text style={styles.loaValue}>
+                Dear{" "}
+                {Array.isArray(loa.author_names)
+                  ? loa.author_names.join(", ")
+                  : loa.author_names}
+              </Text>
+            </View>
+
+            <View style={styles.loaField}>
+              <Text style={styles.loaLabel}>
+                Organizing & Program Committee is pleased to announce that your
+                paper:
+              </Text>
+              <Text style={styles.loaValue}>
+                {loa.paper_id}: {loa.paper_title}
+              </Text>
+            </View>
+
+            <View style={styles.loaField}>
+              <Text style={styles.loaLabel}>Was</Text>
+              <Text
+                style={[
+                  styles.loaValue,
+                  loa.status === "Accepted"
+                    ? styles.statusAccepted
+                    : styles.statusRejected,
+                ]}
+              >
+                {loa.status.toUpperCase()}
+              </Text>
+            </View>
+
+            <View style={styles.loaField}>
+              <Text style={styles.loaLabel}>
+                For The {getOrdinal(editionNumber)} International Conference on
+                Data Science and Its Applications {currentYear} (ICICyTA{" "}
+                {currentYear}). For finishing your registration please follow
+                the instruction, which has been already send by e-mail to all
+                authors of accepted papers.
+              </Text>
+              <Text style={styles.loaLabel}>
+                The {getOrdinal(editionNumber)} International Conference on Data
+                Science and Its Applications {currentYear} (ICICyTA{" "}
+                {currentYear}) with theme "Data for Good: Leveraging Data
+                Science for Social Impact" will be held on July 10-11, 2024 at
+                Aston Kuta Hotel & Residence, Bali, Indonesia.
+              </Text>
+            </View>
+
+            <Text style={styles.loaValue}>{loa.tempat_tanggal}</Text>
+
+            <View style={styles.signature}>
+              <Text style={styles.loaValue}>{loa.signature_id}</Text>
+              <Text style={styles.loaLabel}>Signature</Text>
+            </View>
+          </View>
+        </div>
+
+        <Text style={styles.loaFooter}>
+          The {getOrdinal(editionNumber)} International Conference on Data
+          Science and Its Applications {currentYear}
+        </Text>
+      </Page>
+    </Document>
+  );
+};
 
 // Single PDF Viewer Component
 export const SingleLoaPdfViewer: React.FC<SingleLoaPdfProps> = ({ loa }) => (

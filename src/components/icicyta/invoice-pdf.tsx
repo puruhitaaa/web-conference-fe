@@ -10,12 +10,6 @@ import {
 import { Invoice } from "./invoice-table";
 
 // Helper function to get year from date
-const getInvoiceYear = (date: Date | string | null | undefined): string => {
-  if (date) {
-    return new Date(date).getFullYear().toString();
-  }
-  return new Date().getFullYear().toString(); // Fallback to current year
-};
 
 // Helper function to format date as "Bandung, Month Day, Year"
 const formatDateForInvoice = (
@@ -300,17 +294,42 @@ const styles = StyleSheet.create({
     fontSize: 9,
     flexShrink: 1,
   },
-  // singleInvoicePageFooter: {
-  //   position: "absolute",
-  //   bottom: 20,
-  //   left: 30,
-  //   right: 30,
-  //   textAlign: "center",
-  //   fontSize: 9,
-  //   color: "#FFFFFF",
-  //   backgroundColor: "#6A0DAD",
-  //   paddingVertical: 10,
-  // },
+  singleInvoicePageFooter: {
+    position: "absolute",
+    bottom: 15,
+    right: 0,
+    left: 0,
+    textAlign: "center",
+    fontSize: 9,
+    fontWeight: "bold",
+    color: "#FFFFFF",
+    backgroundColor: "#9461AF",
+    paddingVertical: 12,
+  },
+  signatureSection: {
+    marginTop: 5,
+    marginBottom: 20,
+    width: 200,
+    fontSize: 9,
+    alignItems: "center",
+    marginLeft: "auto",
+  },
+  signatureDate: { marginBottom: 20 },
+  signaturePlaceholderGraphic: {
+    width: 120,
+    height: 40,
+    borderBottomWidth: 1,
+    borderColor: "#000000",
+    marginBottom: 5,
+  },
+  signatureName: { fontWeight: "bold", fontSize: 10 },
+  signatureTitle: { fontSize: 9 },
+  signatureIcodsaLogo: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#9461AF", // Match header color
+    marginBottom: 3,
+  },
 });
 
 // Multiple Invoices PDF Props
@@ -398,7 +417,49 @@ interface SingleInvoicePdfProps {
 export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
   invoice,
 }) => {
+  const getInvoiceYear = (date: Date | string | null | undefined): string => {
+    if (date) {
+      return new Date(date).getFullYear().toString();
+    }
+    return new Date().getFullYear().toString(); // Fallback to current year
+  };
+
+  const getReceiptYear = (date: Date | string | null | undefined): string => {
+    if (date) {
+      return new Date(date).getFullYear().toString();
+    }
+    return new Date().getFullYear().toString(); // Fallback to current year
+  };
+
+  const formatDate = (date: Date | null | undefined) => {
+    if (!date) return "N/A";
+    return `Bandung, ${new Date(date).toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    })}`;
+  };
+
+  const getOrdinal = (n: number) => {
+    if (n % 100 >= 11 && n % 100 <= 13) return n + "th";
+    switch (n % 10) {
+      case 1:
+        return n + "st";
+      case 2:
+        return n + "nd";
+      case 3:
+        return n + "rd";
+      default:
+        return n + "th";
+    }
+  };
+
+  const startYear = 2018;
+  const currentYear = new Date().getFullYear();
+  const editionNumber = currentYear - startYear + 1;
+  const currentDateFormatted = formatDate(new Date());
   const invoiceYear = getInvoiceYear(invoice.date_of_issue);
+  const receiptYear = getReceiptYear(invoice.updated_at);
 
   return (
     <Document>
@@ -562,55 +623,163 @@ export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
         <View style={styles.notesSection}>
           <Text style={styles.notesTitle}>Notes:</Text>
           <Text style={styles.notesText}>
-            Payment should be made after acceptance by Bank Transfer as below:
+            Payment should be made after acceptance by Bank Transfer to "Bank
+            Negara Indonesia (BNI)" as below:
           </Text>
 
-          <Text style={styles.notesText}>
-            1) Virtual Account (Example Bank)
-          </Text>
+          <Text style={styles.notesText}>1) Virtual Account</Text>
           <View style={{ marginLeft: 10 }}>
             <View style={styles.paymentDetailRow}>
               <Text style={styles.paymentDetailLabel}>
                 Virtual Account Number
               </Text>
               <Text style={styles.paymentDetailValue}>
-                : {invoice.virtual_account_id || "VA_PLACEHOLDER_ICICYTA"}
+                : {invoice.virtual_account_id || "8321066202400048 (Fallback)"}
               </Text>
             </View>
-            {/* Static details below, update if dynamic equivalents exist for ICICYTA */}
             <View style={styles.paymentDetailRow}>
               <Text style={styles.paymentDetailLabel}>Account Holder Name</Text>
-              <Text style={styles.paymentDetailValue}>: ICyTA Conference</Text>
+              <Text style={styles.paymentDetailValue}>: Telkom University</Text>
             </View>
             <View style={styles.paymentDetailRow}>
               <Text style={styles.paymentDetailLabel}>Description</Text>
               <Text style={styles.paymentDetailValue}>
-                : Payment for ICyTA {invoiceYear}
+                : ICICyTA {getInvoiceYear(invoice.date_of_issue)}
+              </Text>
+            </View>
+            <View style={styles.paymentDetailRow}>
+              <Text style={styles.paymentDetailLabel}>Bank Name</Text>
+              <Text style={styles.paymentDetailValue}>
+                : Bank Negara Indonesia (BNI)
+              </Text>
+            </View>
+            <View style={styles.paymentDetailRow}>
+              <Text style={styles.paymentDetailLabel}>Bank Branch</Text>
+              <Text style={styles.paymentDetailValue}>
+                : Perintis Kemerdekaan
               </Text>
             </View>
           </View>
 
           <Text style={{ ...styles.notesText, marginTop: 10 }}>
-            2) Bank Transfer (Example Bank)
+            2) Bank Transfer
           </Text>
           <View style={{ marginLeft: 10 }}>
             <View style={styles.paymentDetailRow}>
-              <Text style={styles.paymentDetailLabel}>Bank Account No.</Text>
+              <Text style={styles.paymentDetailLabel}>Bank Name</Text>
+              <Text style={styles.paymentDetailValue}>: Bank Mandiri</Text>
+            </View>
+            <View style={styles.paymentDetailRow}>
+              <Text style={styles.paymentDetailLabel}>Swift Code</Text>
+              <Text style={styles.paymentDetailValue}>: BMRIIDJA</Text>
+            </View>
+            <View style={styles.paymentDetailRow}>
+              <Text style={styles.paymentDetailLabel}>
+                Beneficiary name/Recipient Name
+              </Text>
               <Text style={styles.paymentDetailValue}>
-                : {invoice.bank_transfer_id || "BANK_ACC_PLACEHOLDER_ICICYTA"}
+                : Universitas Telkom
               </Text>
             </View>
-            {/* Add other relevant static bank details for ICICYTA if available */}
+            <View style={styles.paymentDetailRow}>
+              <Text style={styles.paymentDetailLabel}>
+                Beneficiary Bank Account No.
+              </Text>
+              <Text style={styles.paymentDetailValue}>
+                : {invoice.bank_transfer_id || "1310095019917 (Fallback)"}
+              </Text>
+            </View>
+            <View style={styles.paymentDetailRow}>
+              <Text style={styles.paymentDetailLabel}>Bank Branch</Text>
+              <Text style={styles.paymentDetailValue}>
+                : Bank Mandiri KCP Bandung Martadinata
+              </Text>
+            </View>
+            <View style={styles.paymentDetailRow}>
+              <Text style={styles.paymentDetailLabel}>Bank Address</Text>
+              <Text style={styles.paymentDetailValue}>
+                : Jl. R.E. Martadinata No.103, Kota Bandung, Jawa Barat
+                Indonesia, 40115
+              </Text>
+            </View>
+            <View style={styles.paymentDetailRow}>
+              <Text style={styles.paymentDetailLabel}>City</Text>
+              <Text style={styles.paymentDetailValue}>: Bandung</Text>
+            </View>
+            <View style={styles.paymentDetailRow}>
+              <Text style={styles.paymentDetailLabel}>Country</Text>
+              <Text style={styles.paymentDetailValue}>: Indonesia</Text>
+            </View>
           </View>
 
-          {/* Removed PayPal and extensive additional info for brevity, can be added if ICICYTA has similar */}
+          <Text style={{ ...styles.notesText, marginTop: 10 }}>3) Paypal</Text>
+          <View style={{ marginLeft: 10 }}>
+            <View style={styles.paymentDetailRow}>
+              <Text style={styles.paymentDetailLabel}>Email</Text>
+              <Text style={styles.paymentDetailValue}>
+                : harry.gunawan.putu@gmail.com
+              </Text>
+            </View>
+          </View>
+
+          <Text style={{ ...styles.notesTitle, marginTop: 15 }}>
+            Additional Important Information:
+          </Text>
+          <View style={styles.notesList}>
+            <View style={styles.notesListItem}>
+              <Text style={styles.notesListBullet}>• </Text>
+              <Text style={styles.notesListText}>
+                Please transfer the full registration fee plus 5% PayPal
+                Currency conversion fees to our account. .
+              </Text>
+            </View>
+            <View style={styles.notesListItem}>
+              <Text style={styles.notesListBullet}>• </Text>
+              <Text style={styles.notesListText}>
+                Please note that the fee must be transferred under the
+                registrant's name and should be stated clearly on the payment
+                slip
+              </Text>
+            </View>
+            <View style={styles.notesListItem}>
+              <Text style={styles.notesListBullet}>• </Text>
+              <Text style={styles.notesListText}>
+                Please include the paper ID information on the payment slip.
+              </Text>
+            </View>
+            <View style={styles.notesListItem}>
+              <Text style={styles.notesListBullet}>• </Text>
+              <Text style={styles.notesListText}>
+                Make sure the amount transferred is the correct amount.
+              </Text>
+            </View>
+            <View style={styles.notesListItem}>
+              <Text style={styles.notesListBullet}>• </Text>
+              <Text style={styles.notesListText}>
+                Transfer fees (if any) are borne by the participants
+              </Text>
+            </View>
+          </View>
+
+          {/* Signature Section */}
+          <View style={styles.signatureSection}>
+            <Text style={styles.signatureDate}>
+              Bandung, {currentDateFormatted}
+            </Text>
+            <View style={styles.signaturePlaceholderGraphic} />
+            <Text style={styles.signatureIcodsaLogo}>ICICyTA</Text>
+            <Text style={styles.signatureName}>Dr. Putu Harry Gunawan</Text>
+            <Text style={styles.signatureTitle}>
+              General Chair ICoDSA {receiptYear}
+            </Text>
+          </View>
         </View>
 
         {/* Footer */}
-        {/* <Text style={styles.singleInvoicePageFooter}>
-          The International Conference on Intelligent Cybernetics Technology and
-          Applications (ICICYTA) {invoiceYear}
-        </Text> */}
+        <Text style={styles.singleInvoicePageFooter}>
+          The {getOrdinal(editionNumber)} International Conference on Data
+          Science and Its Applications {currentYear}
+        </Text>
       </Page>
     </Document>
   );

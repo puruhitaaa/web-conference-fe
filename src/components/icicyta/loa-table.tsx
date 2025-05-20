@@ -139,6 +139,15 @@ export function LoaTable() {
     {
       accessorKey: "author_names",
       header: "Author Name",
+      cell: ({ row }) => {
+        const authors = row.getValue("author_names") as string | string[];
+        const formatted = Array.isArray(authors) ? authors.join(", ") : authors;
+        return (
+          <div className="max-w-[250px] truncate whitespace-nowrap overflow-hidden">
+            {formatted}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "paper_title",

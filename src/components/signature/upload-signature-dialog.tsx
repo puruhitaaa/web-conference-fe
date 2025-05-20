@@ -262,7 +262,7 @@ export function SignatureUploadDialog({
                   <FormLabel>Signatory's Position</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Rector/Dean"
+                      placeholder="Signatory Position (ex: Rector)"
                       {...field}
                       disabled={isViewMode}
                     />

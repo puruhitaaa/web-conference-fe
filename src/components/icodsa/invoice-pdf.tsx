@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     color: "grey",
     paddingHorizontal: 30,
   },
-  purpleHeader: {
+  Header: {
     backgroundColor: "#59c3d0",
     paddingHorizontal: 30,
     paddingVertical: 15,
@@ -276,17 +276,14 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
 
-  // singleInvoicePageFooter: {
-  //   position: "absolute",
-  //   bottom: 20,
-  //   left: 30,
-  //   right: 30,
-  //   textAlign: "center",
-  //   fontSize: 9,
-  //   color: "#FFFFFF",
-  //   backgroundColor: "#4A007F",
-  //   paddingVertical: 10,
-  // },
+  singleInvoicePageFooter: {
+    textAlign: "center",
+    fontSize: 9,
+    fontWeight: "bold",
+    color: "#FFFFFF",
+    backgroundColor: "#59c3d0",
+    paddingVertical: 12,
+  },
 
   singleInvoiceContainer: {
     marginTop: 20,
@@ -333,14 +330,29 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "bold",
   },
-  signature: {
-    marginTop: 50,
-    borderTopWidth: 1,
-    borderTopColor: "#000",
-    borderTopStyle: "solid",
-    paddingTop: 10,
+  signatureSection: {
+    marginTop: 5,
+    marginBottom: 20,
     width: 200,
-    textAlign: "center",
+    fontSize: 9,
+    alignItems: "center",
+    marginLeft: "auto",
+  },
+  signatureDate: { marginBottom: 20 },
+  signaturePlaceholderGraphic: {
+    width: 120,
+    height: 40,
+    borderBottomWidth: 1,
+    borderColor: "#000000",
+    marginBottom: 5,
+  },
+  signatureName: { fontWeight: "bold", fontSize: 10 },
+  signatureTitle: { fontSize: 9 },
+  signatureIcodsaLogo: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#59c3d0", // Match header color
+    marginBottom: 3,
   },
 });
 
@@ -452,6 +464,27 @@ export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
     })}`;
   };
 
+  const getReceiptYear = (date: Date | string | null | undefined): string => {
+    if (date) {
+      return new Date(date).getFullYear().toString();
+    }
+    return new Date().getFullYear().toString(); // Fallback to current year
+  };
+
+  const getOrdinal = (n: number) => {
+    if (n % 100 >= 11 && n % 100 <= 13) return n + "th";
+    switch (n % 10) {
+      case 1:
+        return n + "st";
+      case 2:
+        return n + "nd";
+      case 3:
+        return n + "rd";
+      default:
+        return n + "th";
+    }
+  };
+
   const formatCurrency = (amount: number | null | undefined) => {
     if (amount === null || amount === undefined) return "N/A";
     const numberFormatter = new Intl.NumberFormat("id-ID", {
@@ -462,11 +495,18 @@ export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
     return `IDR ${numberFormatter.format(amount)}`;
   };
 
+  const receiptYear = getReceiptYear(invoice.updated_at);
+  const currentDateFormatted = formatDate(new Date());
+
+  const startYear = 2018;
+  const currentYear = new Date().getFullYear();
+  const editionNumber = currentYear - startYear + 1;
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         {/* Purple Header */}
-        <View style={styles.purpleHeader}>
+        <View style={styles.Header}>
           <Text style={styles.icodsaTitle}>
             ICoDSA {getInvoiceYear(invoice.date_of_issue)}
           </Text>
@@ -749,38 +789,36 @@ export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
             <View style={styles.notesListItem}>
               <Text style={styles.notesListBullet}>• </Text>
               <Text style={styles.notesListText}>
-                Please transfer the full registration fee plus 5% PayPal
-                Currency conversion fees to our account.
-              </Text>
-            </View>
-            <View style={styles.notesListItem}>
-              <Text style={styles.notesListBullet}>• </Text>
-              <Text style={styles.notesListText}>
-                Please note that the fee must be transferred under the
-                registrant's name and should be stated clearly on the payment
-                slip.
-              </Text>
-            </View>
-            <View style={styles.notesListItem}>
-              <Text style={styles.notesListBullet}>• </Text>
-              <Text style={styles.notesListText}>
-                Please include the paper ID information on the payment slip.
-              </Text>
-            </View>
-            <View style={styles.notesListItem}>
-              <Text style={styles.notesListBullet}>• </Text>
-              <Text style={styles.notesListText}>
                 Make sure the amount transferred is the correct amount.
               </Text>
             </View>
+            <View style={styles.notesListItem}>
+              <Text style={styles.notesListBullet}>• </Text>
+              <Text style={styles.notesListText}>
+                Transfer fees (if any) are borne by the participants
+              </Text>
+            </View>
+          </View>
+
+          {/* Signature Section */}
+          <View style={styles.signatureSection}>
+            <Text style={styles.signatureDate}>
+              Bandung, {currentDateFormatted}
+            </Text>
+            <View style={styles.signaturePlaceholderGraphic} />
+            <Text style={styles.signatureIcodsaLogo}>ICoDSA</Text>
+            <Text style={styles.signatureName}>Dr. Putu Harry Gunawan</Text>
+            <Text style={styles.signatureTitle}>
+              General Chair ICoDSA {receiptYear}
+            </Text>
           </View>
         </View>
 
         {/* Footer */}
-        {/* <Text style={styles.singleInvoicePageFooter}>
-          The 3rd International Conference on Intelligent Cybernetics Technology
-          and Applications {new Date().getFullYear()}
-        </Text> */}
+        <Text style={styles.singleInvoicePageFooter}>
+          The {getOrdinal(editionNumber)} International Conference on
+          Intelligent Cybernetics Technology & Applications {currentYear}
+        </Text>
       </Page>
     </Document>
   );

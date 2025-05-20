@@ -128,10 +128,27 @@ export function LoaTable() {
     {
       accessorKey: "author_names",
       header: "Author Name",
+      cell: ({ row }) => {
+        const authors = row.getValue("author_names") as string | string[];
+        const formatted = Array.isArray(authors) ? authors.join(", ") : authors;
+        return (
+          <div className="max-w-[250px] truncate whitespace-nowrap overflow-hidden">
+            {formatted}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "paper_title",
       header: "Conference Title",
+      cell: ({ row }) => {
+        const title = row.getValue("paper_title") as string;
+        return (
+          <div className="max-w-[250px] truncate whitespace-nowrap overflow-hidden">
+            {title}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "status",
