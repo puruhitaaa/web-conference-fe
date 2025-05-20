@@ -117,14 +117,29 @@ const styles = StyleSheet.create({
     marginTop: 3,
     fontWeight: "bold",
   },
-  signature: {
-    marginTop: 50,
-    borderTopWidth: 1,
-    borderTopColor: "#000",
-    borderTopStyle: "solid",
-    paddingTop: 10,
+  signatureSection: {
+    marginTop: 40,
+    marginBottom: 80,
     width: 200,
-    textAlign: "center",
+    fontSize: 9,
+    alignItems: "center",
+    marginLeft: "auto",
+  },
+  signatureDate: { marginBottom: 20 },
+  signaturePlaceholderGraphic: {
+    width: 120,
+    height: 40,
+    borderBottomWidth: 1,
+    borderColor: "#000000",
+    marginBottom: 5,
+  },
+  signatureName: { fontWeight: "bold", fontSize: 10 },
+  signatureTitle: { fontSize: 9 },
+  signatureIcicytaLogo: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#9461AF",
+    marginBottom: 3,
   },
 });
 
@@ -137,10 +152,10 @@ export const LoaPdfDocument: React.FC<LoaPdfProps> = ({ loas }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.Header}>
-        <Text style={styles.Title}>ICoDSA {new Date().getFullYear()}</Text>
+        <Text style={styles.Title}>ICICyTA {new Date().getFullYear()}</Text>
         <Text style={styles.subtitle}>
           The 7th International Conference on Data Science and Its Applications
-          {new Date().getFullYear()} (ICoDSA {new Date().getFullYear()})
+          {new Date().getFullYear()} (ICICyTA {new Date().getFullYear()})
         </Text>
       </View>
 
@@ -315,9 +330,14 @@ export const SingleLoaPdfDocument: React.FC<SingleLoaPdfProps> = ({ loa }) => {
 
             <Text style={styles.loaValue}>{loa.tempat_tanggal}</Text>
 
-            <View style={styles.signature}>
-              <Text style={styles.loaValue}>{loa.signature_id}</Text>
-              <Text style={styles.loaLabel}>Signature</Text>
+            <View style={styles.signatureSection}>
+              <Text style={styles.signatureDate}>{loa.tempat_tanggal}</Text>
+              <View style={styles.signaturePlaceholderGraphic} />
+              <Text style={styles.signatureIcicytaLogo}>ICIyTA</Text>
+              <Text style={styles.signatureName}>Dr. Putu Harry Gunawan</Text>
+              <Text style={styles.signatureTitle}>
+                General Chair ICICyTA {currentYear}
+              </Text>
             </View>
           </View>
         </div>

@@ -117,14 +117,29 @@ const styles = StyleSheet.create({
     marginTop: 3,
     fontWeight: "bold",
   },
-  signature: {
-    marginTop: 50,
-    borderTopWidth: 1,
-    borderTopColor: "#000",
-    borderTopStyle: "solid",
-    paddingTop: 10,
+  signatureSection: {
+    marginTop: 40,
+    marginBottom: 80,
     width: 200,
-    textAlign: "center",
+    fontSize: 9,
+    alignItems: "center",
+    marginLeft: "auto",
+  },
+  signatureDate: { marginBottom: 20 },
+  signaturePlaceholderGraphic: {
+    width: 120,
+    height: 40,
+    borderBottomWidth: 1,
+    borderColor: "#000000",
+    marginBottom: 5,
+  },
+  signatureName: { fontWeight: "bold", fontSize: 10 },
+  signatureTitle: { fontSize: 9 },
+  signatureIcodsaLogo: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#59c3d0",
+    marginBottom: 3,
   },
 });
 
@@ -229,6 +244,7 @@ export const SingleLoaPdfDocument: React.FC<SingleLoaPdfProps> = ({ loa }) => {
         return n + "th";
     }
   };
+
   const startYear = 2018;
   const currentYear = new Date().getFullYear();
   const editionNumber = currentYear - startYear + 1;
@@ -317,11 +333,14 @@ export const SingleLoaPdfDocument: React.FC<SingleLoaPdfProps> = ({ loa }) => {
               </Text>
             </View>
 
-            <Text style={styles.loaValue}>{loa.tempat_tanggal}</Text>
-
-            <View style={styles.signature}>
-              <Text style={styles.loaValue}>{loa.signature_id}</Text>
-              <Text style={styles.loaLabel}>Signature</Text>
+            <View style={styles.signatureSection}>
+              <Text style={styles.signatureDate}>{loa.tempat_tanggal}</Text>
+              <View style={styles.signaturePlaceholderGraphic} />
+              <Text style={styles.signatureIcodsaLogo}>ICoDSA</Text>
+              <Text style={styles.signatureName}>Dr. Putu Harry Gunawan</Text>
+              <Text style={styles.signatureTitle}>
+                General Chair ICoDSA {currentYear}
+              </Text>
             </View>
           </View>
         </div>
