@@ -328,6 +328,10 @@ export const SingleReceiptPdfDocument: React.FC<SingleReceiptPdfProps> = ({
               style={styles.logoImage}
               src="/assets/images/common/university-logos/utm-university.png"
             />
+            <Image
+              style={styles.logoImage}
+              src="/assets/images/common/university-logos/ieee-logo.png"
+            />
           </View>
         </View>
         <View style={styles.contentArea}>

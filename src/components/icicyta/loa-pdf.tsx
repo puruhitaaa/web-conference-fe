@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
   },
   loaFooter: {
     position: "absolute",
-    bottom: 0,
+    bottom: 20,
     right: 0,
     left: 0,
     textAlign: "center",
@@ -148,67 +148,80 @@ interface LoaPdfProps {
 }
 
 // Create Document Component
-export const LoaPdfDocument: React.FC<LoaPdfProps> = ({ loas }) => (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      <View style={styles.Header}>
-        <Text style={styles.Title}>ICICyTA {new Date().getFullYear()}</Text>
-        <Text style={styles.subtitle}>
-          The 7th International Conference on Data Science and Its Applications
-          {new Date().getFullYear()} (ICICyTA {new Date().getFullYear()})
-        </Text>
-      </View>
+export const LoaPdfDocument: React.FC<LoaPdfProps> = ({ loas }) => {
+  const currentYear = new Date().getFullYear();
 
-      <View style={styles.table}>
-        <View style={styles.tableHeaderRow}>
-          <View style={styles.tableCol}>
-            <Text style={styles.tableHeader}>Paper ID</Text>
-          </View>
-          <View style={styles.tableCol}>
-            <Text style={styles.tableHeader}>Author Name</Text>
-          </View>
-          <View style={styles.tableCol}>
-            <Text style={styles.tableHeader}>Conference Title</Text>
-          </View>
-          <View style={styles.tableCol}>
-            <Text style={styles.tableHeader}>Status</Text>
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        <View style={styles.Header}>
+          <Text style={styles.Title}>ICICyTA {currentYear}</Text>
+          <View style={styles.logoContainer}>
+            <Image
+              style={styles.largeLogoImage}
+              src="/assets/images/common/university-logos/tel-u.png"
+            />
+            <Image
+              style={styles.largeLogoImage}
+              src="/assets/images/common/university-logos/unbi-university.png"
+            />
+            <Image
+              style={styles.logoImage}
+              src="/assets/images/common/university-logos/utm-university.png"
+            />
+            <Image
+              style={styles.logoImage}
+              src="/assets/images/common/university-logos/ieee-logo.png"
+            />
           </View>
         </View>
 
-        {loas.map((loa, i) => (
-          <View key={i} style={styles.tableRow}>
+        <View style={styles.table}>
+          <View style={styles.tableHeaderRow}>
             <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{loa.paper_id}</Text>
+              <Text style={styles.tableHeader}>Paper ID</Text>
             </View>
             <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{loa.author_names}</Text>
+              <Text style={styles.tableHeader}>Author Name</Text>
             </View>
             <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{loa.paper_title}</Text>
+              <Text style={styles.tableHeader}>Conference Title</Text>
             </View>
             <View style={styles.tableCol}>
-              <Text
-                style={[
-                  styles.tableCell,
-                  loa.status === "Accepted"
-                    ? styles.statusAccepted
-                    : styles.statusRejected,
-                ]}
-              >
-                {loa.status}
-              </Text>
+              <Text style={styles.tableHeader}>Status</Text>
             </View>
           </View>
-        ))}
-      </View>
 
-      <Text style={styles.loaFooter}>
-        This is an automatically generated document. For more information,
-        please contact the conference organizers.
-      </Text>
-    </Page>
-  </Document>
-);
+          {loas.map((loa, i) => (
+            <View key={i} style={styles.tableRow}>
+              <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>{loa.paper_id}</Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>{loa.author_names}</Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>{loa.paper_title}</Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text
+                  style={[
+                    styles.tableCell,
+                    loa.status === "Accepted"
+                      ? styles.statusAccepted
+                      : styles.statusRejected,
+                  ]}
+                >
+                  {loa.status}
+                </Text>
+              </View>
+            </View>
+          ))}
+        </View>
+      </Page>
+    </Document>
+  );
+};
 
 // PDF Viewer Component
 export const LoaPdfViewer: React.FC<LoaPdfProps> = ({ loas }) => (
@@ -263,6 +276,10 @@ export const SingleLoaPdfDocument: React.FC<SingleLoaPdfProps> = ({ loa }) => {
             <Image
               style={styles.logoImage}
               src="/assets/images/common/university-logos/utm-university.png"
+            />
+            <Image
+              style={styles.logoImage}
+              src="/assets/images/common/university-logos/ieee-logo.png"
             />
           </View>
         </View>

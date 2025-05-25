@@ -19,6 +19,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
   multiInvoiceHeader: {
+    flexDirection: "column",
     marginBottom: 20,
     textAlign: "center",
     paddingHorizontal: 30,
@@ -84,7 +85,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   icodsaTitle: {
-    fontSize: 28,
+    width: 140,
+    color: "#ffffff",
+  },
+  subTitle: {
+    fontSize: 7,
     fontWeight: "bold",
     color: "#ffffff",
   },
@@ -277,6 +282,10 @@ const styles = StyleSheet.create({
   },
 
   singleInvoicePageFooter: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
     textAlign: "center",
     fontSize: 9,
     fontWeight: "bold",
@@ -284,7 +293,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#59c3d0",
     paddingVertical: 12,
   },
-
+  titleHeader: {
+    flexDirection: "column",
+    gap: 10,
+  },
   singleInvoiceContainer: {
     marginTop: 20,
     marginBottom: 20,
@@ -507,9 +519,19 @@ export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
       <Page size="A4" style={styles.page}>
         {/* Purple Header */}
         <View style={styles.Header}>
-          <Text style={styles.icodsaTitle}>
+          <View style={styles.titleHeader}>
+            <Image
+              style={styles.icodsaTitle}
+              src="/assets/images/common/university-logos/logo-icodis.png"
+            />
+            <Text style={styles.subTitle}>
+              The {getOrdinal(editionNumber)} International Conference on
+              Intelligent Cybernetics Technology & Applications {currentYear}
+            </Text>
+          </View>
+          {/* <Text style={styles.icodsaTitle}>
             ICoDSA {getInvoiceYear(invoice.date_of_issue)}
-          </Text>
+          </Text> */}
           <View style={styles.logoContainer}>
             <Image
               style={styles.largeLogoImage}
@@ -683,8 +705,7 @@ export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
         <View style={styles.notesSection}>
           <Text style={styles.notesTitle}>Notes:</Text>
           <Text style={styles.notesText}>
-            Payment should be made after acceptance by Bank Transfer to "Bank
-            Negara Indonesia (BNI)" as below:
+            Payment should be made by transfer to either of these accounts:
           </Text>
 
           <Text style={styles.notesText}>1) Virtual Account</Text>
@@ -772,7 +793,7 @@ export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
             </View>
           </View>
 
-          <Text style={{ ...styles.notesText, marginTop: 10 }}>3) Paypal</Text>
+          {/* <Text style={{ ...styles.notesText, marginTop: 10 }}>3) Paypal</Text>
           <View style={{ marginLeft: 10 }}>
             <View style={styles.paymentDetailRow}>
               <Text style={styles.paymentDetailLabel}>Email</Text>
@@ -780,7 +801,7 @@ export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
                 : harry.gunawan.putu@gmail.com
               </Text>
             </View>
-          </View>
+          </View> */}
 
           <Text style={{ ...styles.notesTitle, marginTop: 15 }}>
             Additional Important Information:

@@ -158,6 +158,14 @@ export function InvoiceTable() {
       header: "Author Type",
     },
     {
+      accessorKey: "bank_transfer_id",
+      header: "Bank Transfer ID",
+    },
+    {
+      accessorKey: "virtual_account_id",
+      header: "Virtual Account ID",
+    },
+    {
       accessorKey: "amount",
       header: "Amount",
     },

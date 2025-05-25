@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/axios-config";
-import { invoiceRoutes } from "@/api";
+import { bankTransferRoutes, invoiceRoutes, virtualAccountRoutes } from "@/api";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -43,6 +43,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { BankTransfer } from "../bank-transfer/bank-transfer-table";
+import { VirtualAccount } from "../virtual-account/virtual-account-table";
 
 const formSchema = z.object({
   invoice_no: z.string().min(1, "Invoice number is required"),
@@ -159,6 +161,22 @@ export function InvoiceDialog({
       });
     }
   }, [open, invoice, form]);
+
+  const { data: bank = [] } = useQuery<BankTransfer[]>({
+    queryKey: ["icodsa-bank-transfer"],
+    queryFn: async () => {
+      const response = await api.get(bankTransferRoutes.list);
+      return response.data;
+    },
+  });
+
+  const { data: virtualacc = [] } = useQuery<VirtualAccount[]>({
+    queryKey: ["icodsa-virtual-account"],
+    queryFn: async () => {
+      const response = await api.get(virtualAccountRoutes.list);
+      return response.data;
+    },
+  });
 
   const updateMutation = useMutation({
     mutationFn: async (values: InvoiceFormValues & { id: string }) => {
@@ -353,6 +371,64 @@ export function InvoiceDialog({
             </div>
             <Separator className="my-4 h-px bg-gray-300" />
             <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="bank_transfer_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Bank Transfer</FormLabel>
+                    <Select
+                      disabled={isViewMode}
+                      onValueChange={(value) => field.onChange(value)}
+                      defaultValue={field.value?.toString()}
+                    >
+                      <FormControl className="w-50">
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Bank Transfer" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {bank.map((bank) => (
+                          <SelectItem key={bank.id} value={bank.id.toString()}>
+                            {bank.id} - {bank.nama_bank}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="virtual_account_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Virtual Account</FormLabel>
+                    <Select
+                      disabled={isViewMode}
+                      onValueChange={(value) => field.onChange(value)}
+                      defaultValue={field.value?.toString()}
+                    >
+                      <FormControl className="w-50">
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Virtual Account" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {virtualacc.map((va) => (
+                          <SelectItem key={va.id} value={va.id.toString()}>
+                            {va.nomor_virtual_akun} - {va.bank_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="amount"

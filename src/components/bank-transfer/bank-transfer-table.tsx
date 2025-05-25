@@ -117,6 +117,10 @@ export function BankTransferTable() {
 
   const columns: ColumnDef<BankTransfer>[] = [
     {
+      accessorKey: "id",
+      header: "ID",
+    },
+    {
       accessorKey: "nama_bank",
       header: "Bank Name",
     },

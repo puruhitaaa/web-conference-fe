@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Document,
   Page,
@@ -26,15 +25,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  icodsaTitle: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#ffffff",
-  },
   subtitle: {
     fontSize: 10,
     textAlign: "left",
     // fontWeight: "ital",
+  },
+  subTitle: {
+    fontSize: 7,
+    fontWeight: "bold",
+    color: "#ffffff",
   },
   logoContainer: {
     flexDirection: "row",
@@ -70,6 +69,10 @@ const styles = StyleSheet.create({
     borderColor: "#bfbfbf",
     padding: 5,
   },
+  icodsaTitle: {
+    width: 140,
+    color: "#ffffff",
+  },
   tableCell: {
     margin: 5,
     fontSize: 10,
@@ -99,7 +102,10 @@ const styles = StyleSheet.create({
     color: "red",
     fontWeight: "bold",
   },
-  // Add styles for single LoA view
+  titleHeader: {
+    flexDirection: "column",
+    gap: 10,
+  },
   singleLoaContainer: {
     margin: 20,
     paddingTop: 20,
@@ -148,69 +154,82 @@ interface LoaPdfProps {
 }
 
 // Create Document Component
-export const LoaPdfDocument: React.FC<LoaPdfProps> = ({ loas }) => (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      <View style={styles.Header}>
-        <Text style={styles.icodsaTitle}>
-          ICoDSA {new Date().getFullYear()}
-        </Text>
-        <Text style={styles.subtitle}>
-          The 7th International Conference on Data Science and Its Applications
-          {new Date().getFullYear()} (ICoDSA {new Date().getFullYear()})
-        </Text>
-      </View>
-
-      <View style={styles.table}>
-        <View style={styles.tableHeaderRow}>
-          <View style={styles.tableCol}>
-            <Text style={styles.tableHeader}>Paper ID</Text>
-          </View>
-          <View style={styles.tableCol}>
-            <Text style={styles.tableHeader}>Author Name</Text>
-          </View>
-          <View style={styles.tableCol}>
-            <Text style={styles.tableHeader}>Conference Title</Text>
-          </View>
-          <View style={styles.tableCol}>
-            <Text style={styles.tableHeader}>Status</Text>
+export const LoaPdfDocument: React.FC<LoaPdfProps> = ({ loas }) => {
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        <View style={styles.Header}>
+          <Image
+            style={styles.icodsaTitle}
+            src="/assets/images/common/university-logos/logo-icodis.png"
+          />
+          <View style={styles.logoContainer}>
+            <Image
+              style={styles.largeLogoImage}
+              src="/assets/images/common/university-logos/tel-u.png"
+            />
+            <Image
+              style={styles.largeLogoImage}
+              src="/assets/images/common/university-logos/unbi-university.png"
+            />
+            <Image
+              style={styles.logoImage}
+              src="/assets/images/common/university-logos/utm-university.png"
+            />
           </View>
         </View>
 
-        {loas.map((loa, i) => (
-          <View key={i} style={styles.tableRow}>
+        <View style={styles.table}>
+          <View style={styles.tableHeaderRow}>
             <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{loa.paper_id}</Text>
+              <Text style={styles.tableHeader}>Paper ID</Text>
             </View>
             <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{loa.author_names}</Text>
+              <Text style={styles.tableHeader}>Author Name</Text>
             </View>
             <View style={styles.tableCol}>
-              <Text style={styles.tableCell}>{loa.paper_title}</Text>
+              <Text style={styles.tableHeader}>Conference Title</Text>
             </View>
             <View style={styles.tableCol}>
-              <Text
-                style={[
-                  styles.tableCell,
-                  loa.status === "Accepted"
-                    ? styles.statusAccepted
-                    : styles.statusRejected,
-                ]}
-              >
-                {loa.status}
-              </Text>
+              <Text style={styles.tableHeader}>Status</Text>
             </View>
           </View>
-        ))}
-      </View>
 
-      <Text style={styles.loaFooter}>
-        This is an automatically generated document. For more information,
-        please contact the conference organizers.
-      </Text>
-    </Page>
-  </Document>
-);
+          {loas.map((loa, i) => (
+            <View key={i} style={styles.tableRow}>
+              <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>{loa.paper_id}</Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>{loa.author_names}</Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text style={styles.tableCell}>{loa.paper_title}</Text>
+              </View>
+              <View style={styles.tableCol}>
+                <Text
+                  style={[
+                    styles.tableCell,
+                    loa.status === "Accepted"
+                      ? styles.statusAccepted
+                      : styles.statusRejected,
+                  ]}
+                >
+                  {loa.status}
+                </Text>
+              </View>
+            </View>
+          ))}
+        </View>
+
+        <Text style={styles.loaFooter}>
+          This is an automatically generated document. For more information,
+          please contact the conference organizers.
+        </Text>
+      </Page>
+    </Document>
+  );
+};
 
 // PDF Viewer Component
 export const LoaPdfViewer: React.FC<LoaPdfProps> = ({ loas }) => (
@@ -225,12 +244,6 @@ interface SingleLoaPdfProps {
 
 // Create Single LoA Document Component
 export const SingleLoaPdfDocument: React.FC<SingleLoaPdfProps> = ({ loa }) => {
-  const getLoaYear = (date: Date | string | null | undefined): string => {
-    if (date) {
-      return new Date(date).getFullYear().toString();
-    }
-    return new Date().getFullYear().toString(); // Fallback to current year
-  };
   const getOrdinal = (n: number) => {
     if (n % 100 >= 11 && n % 100 <= 13) return n + "th";
     switch (n % 10) {
@@ -248,14 +261,25 @@ export const SingleLoaPdfDocument: React.FC<SingleLoaPdfProps> = ({ loa }) => {
   const startYear = 2018;
   const currentYear = new Date().getFullYear();
   const editionNumber = currentYear - startYear + 1;
+  console.log(loa.picture);
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.Header}>
-          <Text style={styles.icodsaTitle}>
-            ICoDSA {getLoaYear(loa.created_at)}
-          </Text>
+          <View style={styles.titleHeader}>
+            <Image
+              style={styles.icodsaTitle}
+              src="/assets/images/common/university-logos/logo-icodis.png"
+            />
+            <Text style={styles.subTitle}>
+              The {getOrdinal(editionNumber)} International Conference on
+              Intelligent Cybernetics Technology & Applications {currentYear}
+            </Text>
+          </View>
+          {/* <Text style={styles.icodsaTitle}>
+                      ICoDSA {getInvoiceYear(invoice.date_of_issue)}
+                    </Text> */}
           <View style={styles.logoContainer}>
             <Image
               style={styles.largeLogoImage}
@@ -327,19 +351,19 @@ export const SingleLoaPdfDocument: React.FC<SingleLoaPdfProps> = ({ loa }) => {
               <Text style={styles.loaLabel}>
                 The {getOrdinal(editionNumber)} International Conference on Data
                 Science and Its Applications {currentYear} (ICoDSA {currentYear}
-                ) with theme "Data for Good: Leveraging Data Science for Social
-                Impact" will be held on July 10-11, 2024 at Aston Kuta Hotel &
-                Residence, Bali, Indonesia.
+                ) with theme {loa.theme_conference} will be held on{" "}
+                {loa.place_date_conference}.
               </Text>
             </View>
 
             <View style={styles.signatureSection}>
               <Text style={styles.signatureDate}>{loa.tempat_tanggal}</Text>
-              <View style={styles.signaturePlaceholderGraphic} />
+              <Image src={loa.picture} />
+
               <Text style={styles.signatureIcodsaLogo}>ICoDSA</Text>
-              <Text style={styles.signatureName}>Dr. Putu Harry Gunawan</Text>
+              <Text style={styles.signatureName}>{loa.nama_penandatangan}</Text>
               <Text style={styles.signatureTitle}>
-                General Chair ICoDSA {currentYear}
+                {loa.jabatan_penandatangan} {currentYear}
               </Text>
             </View>
           </View>

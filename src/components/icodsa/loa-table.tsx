@@ -43,7 +43,12 @@ export type Loa = {
   author_names: string;
   status: "Accepted" | "Rejected";
   tempat_tanggal: string;
+  picture: string;
+  nama_penandatangan: string;
+  jabatan_penandatangan: string;
   signature_id: string;
+  theme_conference: string;
+  place_date_conference: string;
   created_at: Date;
 };
 
@@ -171,6 +176,22 @@ export function LoaTable() {
     {
       accessorKey: "tempat_tanggal",
       header: "Place & Date",
+    },
+    {
+      accessorKey: "place_date_conference",
+      header: "Conference Held On",
+      cell: ({ row }) => {
+        const title = row.getValue("place_date_conference") as string;
+        return (
+          <div className="max-w-[250px] truncate whitespace-nowrap overflow-hidden">
+            {title}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "theme_conference",
+      header: "Theme",
     },
     {
       id: "actions",

@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { ChevronRight, type LucideIcon } from "lucide-react"
+import { ChevronRight, type LucideIcon } from "lucide-react";
 
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+} from "@/components/ui/collapsible";
 import {
   SidebarGroup,
   SidebarMenu,
@@ -15,35 +15,36 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/ui/sidebar"
-import { Link, useLocation } from "@tanstack/react-router"
+} from "@/components/ui/sidebar";
+import { Link, useLocation } from "@tanstack/react-router";
 
 export function NavMain({
   items,
 }: {
   items: {
-    title: string
-    url: string
-    icon?: LucideIcon
-    isActive?: boolean
+    title: string;
+    url: string;
+    icon?: LucideIcon;
+    isActive?: boolean;
+    target?: string;
     items?: {
-      title: string
-      url: string
-    }[]
-  }[]
+      title: string;
+      url: string;
+    }[];
+  }[];
 }) {
-  const location = useLocation()
+  const location = useLocation();
 
   // Function to check if a dropdown should be open based on current path
   const isDropdownActive = (item: (typeof items)[0]) => {
-    if (!item.items) return false
+    if (!item.items) return false;
 
     // Check if current path starts with the parent URL or matches any child URL
     return (
       location.pathname.startsWith(item.url) ||
       item.items.some((subItem) => location.pathname === subItem.url)
-    )
-  }
+    );
+  };
 
   return (
     <SidebarGroup>
@@ -54,7 +55,7 @@ export function NavMain({
               key={item.title}
               asChild
               defaultOpen={isDropdownActive(item)}
-              className='group/collapsible'
+              className="group/collapsible"
             >
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
@@ -64,7 +65,7 @@ export function NavMain({
                   >
                     {item.icon && <item.icon />}
                     <span>{item.title}</span>
-                    <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
+                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
@@ -92,7 +93,7 @@ export function NavMain({
                 tooltip={item.title}
                 asChild
               >
-                <Link to={item.url}>
+                <Link to={item.url} target={item.target}>
                   {item.icon && <item.icon />}
                   {item.title}
                 </Link>
@@ -102,5 +103,5 @@ export function NavMain({
         )}
       </SidebarMenu>
     </SidebarGroup>
-  )
+  );
 }

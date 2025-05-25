@@ -266,7 +266,9 @@ export function Dashboard() {
         </CardContent>
         <CardFooter className="flex justify-center">
           <Button variant="outline" asChild>
-            <Link to={viewMoreLink}>View more</Link>
+            <Link to={viewMoreLink} disabled={isLoading}>
+              View more
+            </Link>
           </Button>
         </CardFooter>
       </Card>
@@ -331,7 +333,9 @@ export function Dashboard() {
         </CardContent>
         <CardFooter className="flex justify-center">
           <Button variant="outline" asChild>
-            <Link to={viewMoreLink}>View more</Link>
+            <Link to={viewMoreLink} disabled={isLoading}>
+              View more
+            </Link>
           </Button>
         </CardFooter>
       </Card>
@@ -384,7 +388,9 @@ export function Dashboard() {
         </CardContent>
         <CardFooter className="flex justify-center">
           <Button variant="outline" asChild>
-            <Link to={viewMoreLink}>View more</Link>
+            <Link to={viewMoreLink} disabled={isLoading}>
+              View more
+            </Link>
           </Button>
         </CardFooter>
       </Card>

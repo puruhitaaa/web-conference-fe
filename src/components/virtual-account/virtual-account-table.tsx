@@ -118,6 +118,10 @@ export function VirtualAccountTable() {
 
   const columns: ColumnDef<VirtualAccount>[] = [
     {
+      accessorKey: "id",
+      header: "ID",
+    },
+    {
       accessorKey: "nomor_virtual_akun",
       header: "Account Number",
     },

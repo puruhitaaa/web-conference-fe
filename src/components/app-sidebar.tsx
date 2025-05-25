@@ -7,6 +7,7 @@ import {
   Plus,
   Settings,
   Signature,
+  Download,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -98,6 +99,13 @@ const ACCOUNT_SETTING = {
   icon: Settings,
 };
 
+const DOWNLOAD_MOBILE = {
+  title: "Download Apps",
+  url: "https://drive.google.com/drive/folders/1qCScnCLpu_umtOSfjBzB79RGNr7Ltp73",
+  icon: Download,
+  target: "_blank",
+};
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useAuthStore((state) => state.user);
   const { open } = useSidebar();
@@ -126,8 +134,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       items.push(
         DASHBOARD_ITEM,
         ICODSA_ITEM,
+        VIRTUAL_ACCOUNT_ITEM,
         BANK_TRANSFER_ITEM,
-        ACCOUNT_SETTING
+        ACCOUNT_SETTING,
+        DOWNLOAD_MOBILE
       );
     }
     // ICICYTA Admin can only access ICICYTA
@@ -135,8 +145,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       items.push(
         DASHBOARD_ITEM,
         ICICYTA_ITEM,
+        VIRTUAL_ACCOUNT_ITEM,
         BANK_TRANSFER_ITEM,
-        ACCOUNT_SETTING
+        ACCOUNT_SETTING,
+        DOWNLOAD_MOBILE
       );
     }
 

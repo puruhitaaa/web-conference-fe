@@ -6,6 +6,7 @@ import {
   View,
   StyleSheet,
   PDFViewer,
+  Image,
 } from "@react-pdf/renderer";
 import { Invoice } from "./invoice-table";
 
@@ -102,20 +103,41 @@ const styles = StyleSheet.create({
   },
 
   // Styles for SingleInvoicePdfDocument (new design based on icodsa)
-  purpleHeader: {
+  Header: {
     backgroundColor: "#9461AF",
     paddingHorizontal: 30,
     paddingVertical: 15,
     marginBottom: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
-  conferenceNameText: {
-    fontSize: 28,
+  titleHeader: {
+    flexDirection: "column",
+    gap: 10,
+  },
+  icodsaTitle: {
+    width: 140,
+    color: "#ffffff",
+  },
+  subTitle: {
+    fontSize: 7,
     fontWeight: "bold",
     color: "#ffffff",
   },
   logoContainer: {
     flexDirection: "row",
     alignItems: "center",
+  },
+  conferenceNameText: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#ffffff",
+  },
+  Title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#ffffff",
   },
   logoImage: {
     height: 30,
@@ -296,7 +318,7 @@ const styles = StyleSheet.create({
   },
   singleInvoicePageFooter: {
     position: "absolute",
-    bottom: 15,
+    bottom: 40,
     right: 0,
     left: 0,
     textAlign: "center",
@@ -307,7 +329,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   signatureSection: {
-    marginTop: 5,
+    marginTop: 2,
     marginBottom: 20,
     width: 200,
     fontSize: 9,
@@ -458,15 +480,41 @@ export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
   const currentYear = new Date().getFullYear();
   const editionNumber = currentYear - startYear + 1;
   const currentDateFormatted = formatDate(new Date());
-  const invoiceYear = getInvoiceYear(invoice.date_of_issue);
   const receiptYear = getReceiptYear(invoice.updated_at);
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         {/* Purple Header */}
-        <View style={styles.purpleHeader}>
-          <Text style={styles.conferenceNameText}>ICICyTA {invoiceYear}</Text>
+        <View style={styles.Header}>
+          <View style={styles.titleHeader}>
+            <Text style={styles.Title}>ICICyTA {currentYear}</Text>
+            <Text style={styles.subTitle}>
+              The {getOrdinal(editionNumber)} International Conference on Data
+              Science and Its Applications {currentYear}
+            </Text>
+          </View>
+          {/* <Text style={styles.icodsaTitle}>
+                    ICoDSA {getInvoiceYear(invoice.date_of_issue)}
+                  </Text> */}
+          <View style={styles.logoContainer}>
+            <Image
+              style={styles.largeLogoImage}
+              src="/assets/images/common/university-logos/tel-u.png"
+            />
+            <Image
+              style={styles.largeLogoImage}
+              src="/assets/images/common/university-logos/unbi-university.png"
+            />
+            <Image
+              style={styles.logoImage}
+              src="/assets/images/common/university-logos/utm-university.png"
+            />
+            <Image
+              style={styles.logoImage}
+              src="/assets/images/common/university-logos/ieee-logo.png"
+            />
+          </View>
         </View>
 
         {/* Main Invoice Title */}
@@ -770,16 +818,16 @@ export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
             <Text style={styles.signatureIcodsaLogo}>ICICyTA</Text>
             <Text style={styles.signatureName}>Dr. Putu Harry Gunawan</Text>
             <Text style={styles.signatureTitle}>
-              General Chair ICoDSA {receiptYear}
+              General Chair ICICyTA {receiptYear}
             </Text>
           </View>
         </View>
 
         {/* Footer */}
-        <Text style={styles.singleInvoicePageFooter}>
+        {/* <Text style={styles.singleInvoicePageFooter}>
           The {getOrdinal(editionNumber)} International Conference on Data
           Science and Its Applications {currentYear}
-        </Text>
+        </Text> */}
       </Page>
     </Document>
   );

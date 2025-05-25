@@ -47,6 +47,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
+  subTitle: {
+    fontSize: 7,
+    fontWeight: "bold",
+    color: "#ffffff",
+  },
+  icodsaTitle: {
+    width: 140,
+    color: "#ffffff",
+  },
+  titleHeader: {
+    flexDirection: "column",
+    gap: 10,
+  },
   conferenceNameText: {
     fontSize: 28,
     fontWeight: "bold",
@@ -330,7 +343,19 @@ export const SingleReceiptPdfDocument: React.FC<SingleReceiptPdfProps> = ({
       <Page size="A4" style={styles.page}>
         {/* Purple Header with Logos */}
         <View style={styles.purpleHeader}>
-          <Text style={styles.conferenceNameText}>ICoDSA {receiptYear}</Text>
+          <View style={styles.titleHeader}>
+            <Image
+              style={styles.icodsaTitle}
+              src="/assets/images/common/university-logos/logo-icodis.png"
+            />
+            <Text style={styles.subTitle}>
+              The {getOrdinal(editionNumber)} International Conference on
+              Intelligent Cybernetics Technology & Applications {currentYear}
+            </Text>
+          </View>
+          {/* <Text style={styles.icodsaTitle}>
+                      ICoDSA {getInvoiceYear(invoice.date_of_issue)}
+                    </Text> */}
           <View style={styles.logoContainer}>
             <Image
               style={styles.largeLogoImage}
