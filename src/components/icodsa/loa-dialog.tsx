@@ -165,10 +165,7 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
 
   const updateMutation = useMutation({
     mutationFn: async (values: LoaFormValues & { id: string }) => {
-      const response = await api.put(
-        loaRoutes.updateICICYTA(values.id),
-        values
-      );
+      const response = await api.put(loaRoutes.updateICODSA(values.id), values);
       return response.data;
     },
     onSuccess: () => {
@@ -243,7 +240,7 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
                     <FormLabel>Author Name</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="John Doe, Alex Doe, Yin Doe"
+                        placeholder="John Doe, Alex Doe, Yin Doe (max. 5 authors)"
                         {...field}
                         disabled={isViewMode}
                       />

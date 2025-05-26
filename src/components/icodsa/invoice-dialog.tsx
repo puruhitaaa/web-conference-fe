@@ -34,15 +34,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAuthStore } from "@/lib/auth/authStore";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 import { BankTransfer } from "../bank-transfer/bank-transfer-table";
 import { VirtualAccount } from "../virtual-account/virtual-account-table";
 
@@ -59,6 +51,8 @@ const formSchema = z.object({
   signature_id: z.coerce.string().min(1, "Signature ID is required"),
   virtual_account_id: z.string().nullable(),
   bank_transfer_id: z.string().nullable(),
+  nomor_virtual_akun: z.string().nullable(),
+  beneficiary_bank_account_no: z.string().nullable(),
   created_by: z.coerce.string().nullable(),
   status: z.enum(["Pending", "Paid"]),
   created_at: z.date().nullable(),
@@ -99,6 +93,8 @@ export function InvoiceDialog({
       signature_id: "",
       virtual_account_id: null,
       bank_transfer_id: null,
+      nomor_virtual_akun: null,
+      beneficiary_bank_account_no: null,
       created_by: "",
       status: "Pending",
       created_at: null,
@@ -133,8 +129,14 @@ export function InvoiceDialog({
           ? new Date(invoice.date_of_issue)
           : null,
         signature_id: invoice.signature_id,
-        virtual_account_id: invoice.virtual_account_id,
-        bank_transfer_id: invoice.bank_transfer_id,
+        virtual_account_id: invoice.virtual_account_id
+          ? String(invoice.virtual_account_id)
+          : null,
+        bank_transfer_id: invoice.bank_transfer_id
+          ? String(invoice.bank_transfer_id)
+          : null,
+        nomor_virtual_akun: invoice.nomor_virtual_akun,
+        beneficiary_bank_account_no: invoice.beneficiary_bank_account_no,
         created_by: invoice.created_by,
         status: invoice.status,
         created_at: invoice.created_at ? new Date(invoice.created_at) : null,
@@ -154,6 +156,8 @@ export function InvoiceDialog({
         signature_id: "",
         virtual_account_id: null,
         bank_transfer_id: null,
+        nomor_virtual_akun: null,
+        beneficiary_bank_account_no: null,
         created_by: "",
         status: "Pending",
         created_at: new Date(),
@@ -390,6 +394,7 @@ export function InvoiceDialog({
                       <SelectContent>
                         {bank.map((bank) => (
                           <SelectItem key={bank.id} value={bank.id.toString()}>
+                            {bank.beneficiary_bank_account_no} -{" "}
                             {bank.nama_bank}
                           </SelectItem>
                         ))}
@@ -416,10 +421,10 @@ export function InvoiceDialog({
                           <SelectValue placeholder="Select Virtual Account" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="">
+                      <SelectContent>
                         {virtualacc.map((va) => (
                           <SelectItem key={va.id} value={va.id.toString()}>
-                            {va.id} - {va.nomor_virtual_akun} - {va.bank_name}
+                            {va.nomor_virtual_akun} - {va.bank_name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -428,6 +433,46 @@ export function InvoiceDialog({
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="beneficiary_bank_account_no"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Bank Account Number</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="123456xxx"
+                        {...field}
+                        value={field.value ?? ""}
+                        onChange={(e) => field.onChange(e.target.value)}
+                        disabled={isViewMode}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="nomor_virtual_akun"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Virtual Account Number</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="123456xxx"
+                        {...field}
+                        value={field.value ?? ""}
+                        onChange={(e) => field.onChange(e.target.value)}
+                        disabled={isViewMode}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="amount"
@@ -441,7 +486,10 @@ export function InvoiceDialog({
                         min="0"
                         {...field}
                         value={field.value ?? ""}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          field.onChange(value === "" ? null : Number(value));
+                        }}
                         disabled={isViewMode}
                       />
                     </FormControl>
@@ -539,38 +587,24 @@ export function InvoiceDialog({
                 control={form.control}
                 name="date_of_issue"
                 render={({ field }) => (
-                  <FormItem className="flex flex-col">
+                  <FormItem>
                     <FormLabel>Date of Issue</FormLabel>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            className={cn(
-                              "w-full pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
-                            )}
-                            disabled={isViewMode}
-                          >
-                            {field.value ? (
-                              format(field.value, "PPP")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value as Date | undefined}
-                          onSelect={field.onChange}
-                          disabled={isViewMode}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
+                    <FormControl>
+                      <Input
+                        className="w-1/2"
+                        type="date"
+                        {...field}
+                        value={
+                          field.value ? format(field.value, "yyyy-MM-dd") : ""
+                        }
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value ? new Date(e.target.value) : null
+                          )
+                        }
+                        disabled={isViewMode}
+                      />
+                    </FormControl>
                     <FormMessage className="text-red-500" />
                   </FormItem>
                 )}

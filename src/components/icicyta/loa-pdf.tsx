@@ -41,11 +41,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   largeLogoImage: {
-    height: 75,
+    height: 60,
     marginLeft: 8,
   },
   logoImage: {
-    height: 30,
+    height: 20,
     marginLeft: 8,
   },
   table: {
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
   },
   loaFooter: {
     position: "absolute",
-    bottom: 20,
+    bottom: 0,
     right: 0,
     left: 0,
     textAlign: "center",
@@ -229,6 +229,7 @@ export const LoaPdfViewer: React.FC<LoaPdfProps> = ({ loas }) => (
     <LoaPdfDocument loas={loas} />
   </PDFViewer>
 );
+
 // Single LoA PDF Props
 interface SingleLoaPdfProps {
   loa: Loa;
@@ -258,7 +259,7 @@ export const SingleLoaPdfDocument: React.FC<SingleLoaPdfProps> = ({ loa }) => {
   const startYear = 2021;
   const currentYear = new Date().getFullYear();
   const editionNumber = currentYear - startYear + 1;
-
+  console.log("Full URL:", `http://localhost:8000/storage/${loa.picture}`);
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -339,21 +340,22 @@ export const SingleLoaPdfDocument: React.FC<SingleLoaPdfProps> = ({ loa }) => {
               <Text style={styles.loaLabel}>
                 The {getOrdinal(editionNumber)} International Conference on Data
                 Science and Its Applications {currentYear} (ICICyTA{" "}
-                {currentYear}) with theme "Data for Good: Leveraging Data
-                Science for Social Impact" will be held on July 10-11, 2024 at
-                Aston Kuta Hotel & Residence, Bali, Indonesia.
+                {currentYear}) with theme {loa.theme_conference}, will be held
+                at {loa.place_date_conference}.
               </Text>
             </View>
 
-            <Text style={styles.loaValue}>{loa.tempat_tanggal}</Text>
-
             <View style={styles.signatureSection}>
               <Text style={styles.signatureDate}>{loa.tempat_tanggal}</Text>
+              <Image
+                src={`http://localhost:8000/storage/${loa.picture}`}
+                style={{ width: 120, height: 60, marginBottom: 10 }}
+              />
               <View style={styles.signaturePlaceholderGraphic} />
-              <Text style={styles.signatureIcicytaLogo}>ICIyTA</Text>
-              <Text style={styles.signatureName}>Dr. Putu Harry Gunawan</Text>
+              <Text style={styles.signatureIcicytaLogo}>ICICyTA</Text>
+              <Text style={styles.signatureName}>{loa.nama_penandatangan}</Text>
               <Text style={styles.signatureTitle}>
-                General Chair ICICyTA {currentYear}
+                {loa.jabatan_penandatangan} {currentYear}
               </Text>
             </View>
           </View>

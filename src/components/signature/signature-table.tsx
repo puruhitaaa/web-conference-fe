@@ -113,16 +113,14 @@ export function SignatureTable() {
     }, 0);
   }, []);
 
-  // Format the date string if it exists
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return "-";
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString();
-    } catch (e) {
-      return dateString;
-    }
-  };
+  function formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat("id-ID", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }).format(date);
+  }
 
   const columns: ColumnDef<Signature>[] = [
     {
@@ -136,6 +134,10 @@ export function SignatureTable() {
     {
       accessorKey: "jabatan_penandatangan",
       header: "Signatory's Position",
+    },
+    {
+      accessorKey: "picture",
+      header: "Signature",
     },
     {
       accessorKey: "tanggal_dibuat",

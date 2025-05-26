@@ -70,13 +70,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logoImage: {
-    // For utm-university.png (smallest)
-    height: 30,
+    height: 20,
     marginLeft: 8,
   },
   largeLogoImage: {
-    // For tel-u.png and unbi-university.png
-    height: 75, // As per previous adjustments
+    height: 60,
     marginLeft: 8,
   },
   // Styles for the main content area of the receipt (titles, details)
@@ -445,11 +443,14 @@ export const SingleReceiptPdfDocument: React.FC<SingleReceiptPdfProps> = ({
           {/* Signature Section */}
           <View style={styles.signatureSection}>
             <Text style={styles.signatureDate}>{currentDateFormatted}</Text>
+            <Image src={`data:image/png;base64,${receipt.picture}`} />
             <View style={styles.signaturePlaceholderGraphic} />
             <Text style={styles.signatureIcodsaLogo}>ICoDSA</Text>
-            <Text style={styles.signatureName}>Dr. Putu Harry Gunawan</Text>
+            <Text style={styles.signatureName}>
+              {receipt.nama_penandatangan}
+            </Text>
             <Text style={styles.signatureTitle}>
-              General Chair ICoDSA {receiptYear}
+              {receipt.jabatan_penandatangan} {receiptYear}
             </Text>
           </View>
         </View>{" "}

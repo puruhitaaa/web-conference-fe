@@ -34,6 +34,7 @@ import {
 import { MoreHorizontal, FileText } from "lucide-react";
 import toast from "react-hot-toast";
 import { ReceiptPrintDialog } from "./receipt-print-dialog";
+import { ReceiptDialog } from "./receipt-dialog";
 
 export type Receipt = {
   id: string;
@@ -45,6 +46,9 @@ export type Receipt = {
   paper_id: string;
   paper_title: string;
   signature_id: string;
+  picture: string;
+  nama_penandatangan: string;
+  jabatan_penandatangan: string;
   created_by: string;
   created_at: string | Date;
   updated_at: string | Date;
@@ -53,15 +57,16 @@ export type Receipt = {
 export function ReceiptTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  // const [, setIsDialogOpen] = useState(false);
-  // const [, setCurrentReceipt] = useState<Receipt | null>(null);
-  // const [, setDialogMode] = useState<"view">("view");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [currentReceipt, setCurrentReceipt] = useState<Receipt | null>(null);
+  const [dialogMode, setDialogMode] = useState<"create" | "edit" | "view">(
+    "create"
+  );
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
   const [currentPrintReceipt, setCurrentPrintReceipt] =
     useState<Receipt | null>(null);
   const [printMode, setPrintMode] = useState<"single" | "all">("all");
 
-  // const user = useAuthStore((state) => state.user);
   const queryClient = useQueryClient();
 
   const { data: receipts = [], isLoading } = useQuery<Receipt[]>({
@@ -91,31 +96,17 @@ export function ReceiptTable() {
     }
   };
 
-  // const handleEdit = (receipt: Receipt) => {
-  //   setCurrentReceipt(receipt);
-  //   setDialogMode("edit");
-  //   setIsDialogOpen(true);
-  // };
+  const handleEdit = (receipt: Receipt) => {
+    setCurrentReceipt(receipt);
+    setDialogMode("edit");
+    setIsDialogOpen(true);
+  };
 
-  // const handleView = (receipt: Receipt) => {
-  //   setCurrentReceipt(receipt);
-  //   setDialogMode("view");
-  //   setIsDialogOpen(true);
-  // };
-
-  // const handleCreate = () => {
-  //   setCurrentReceipt(null);
-  //   setDialogMode("create");
-  //   setIsDialogOpen(true);
-  // };
-
-  // const handlePrint = () => {
-  //   if (!receipts.length) return toast.error("No receipts found");
-
-  //   setPrintMode("all");
-  //   setCurrentPrintReceipt(null);
-  //   setIsPrintDialogOpen(true);
-  // };
+  const handleView = (receipt: Receipt) => {
+    setCurrentReceipt(receipt);
+    setDialogMode("view");
+    setIsDialogOpen(true);
+  };
 
   const handlePrintSingle = (receipt: Receipt) => {
     setPrintMode("single");
@@ -179,7 +170,12 @@ export function ReceiptTable() {
       header: "Payment Date",
       cell: ({ row }) => {
         const dateValue = row.getValue("payment_date") as string | Date;
-        return new Date(dateValue).toLocaleDateString("en-CA");
+        const formattedDate = new Date(dateValue).toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        });
+        return formattedDate;
       },
     },
     {
@@ -198,12 +194,12 @@ export function ReceiptTable() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              {/* <DropdownMenuItem onClick={() => handleView(receipt)}>
+              <DropdownMenuItem onClick={() => handleView(receipt)}>
                 View
-              </DropdownMenuItem> */}
-              {/* <DropdownMenuItem onClick={() => handleEdit(receipt)}>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleEdit(receipt)}>
                 Edit
-              </DropdownMenuItem> */}
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handlePrintSingle(receipt)}>
                 <FileText className="mr-2 h-4 w-4" />
                 Print PDF
@@ -327,6 +323,13 @@ export function ReceiptTable() {
           Next
         </Button>
       </div>
+
+      <ReceiptDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        mode={dialogMode}
+        receipt={currentReceipt}
+      />
 
       {isPrintDialogOpen && currentPrintReceipt && (
         <ReceiptPrintDialog

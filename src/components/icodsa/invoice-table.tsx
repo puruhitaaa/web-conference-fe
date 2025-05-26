@@ -40,16 +40,24 @@ export type Invoice = {
   id: string;
   invoice_no: string;
   loa_id: string;
+  paper_id: string;
+  paper_title: string;
   institution: string | null;
   email: string | null;
   presentation_type: string | null;
   member_type: string | null;
+  author_names: string | null;
   author_type: string | null;
   amount: number | null;
   date_of_issue: Date | null;
   signature_id: string;
   virtual_account_id: string | null;
   bank_transfer_id: string | null;
+  nomor_virtual_akun: string | null;
+  beneficiary_bank_account_no: string | null;
+  picture: string;
+  nama_penandatangan: string;
+  jabatan_penandatangan: string;
   created_by: string;
   status: "Pending" | "Paid";
   created_at: Date | null;
@@ -134,12 +142,12 @@ export function InvoiceTable() {
       header: "Invoice #",
     },
     {
-      accessorKey: "loa_id",
-      header: "LoA ID",
+      accessorKey: "paper_id",
+      header: "Paper ID",
     },
     {
-      accessorKey: "institution",
-      header: "Institution",
+      accessorKey: "paper_title",
+      header: "Paper Title",
     },
     {
       accessorKey: "email",
@@ -158,12 +166,16 @@ export function InvoiceTable() {
       header: "Author Type",
     },
     {
-      accessorKey: "bank_transfer_id",
-      header: "Bank Transfer ID",
+      accessorKey: "author_names",
+      header: "Author Names",
     },
     {
-      accessorKey: "virtual_account_id",
-      header: "Virtual Account ID",
+      accessorKey: "beneficiary_bank_account_no",
+      header: "Bank Account Number",
+    },
+    {
+      accessorKey: "nomor_virtual_akun",
+      header: "Virtual Account Number",
     },
     {
       accessorKey: "amount",
@@ -263,12 +275,12 @@ export function InvoiceTable() {
       <div className="flex items-center justify-between py-4">
         <Input
           disabled={isLoading}
-          placeholder="Filter by institution..."
+          placeholder="Filter by paper title..."
           value={
-            (table.getColumn("institution")?.getFilterValue() as string) ?? ""
+            (table.getColumn("paper_title")?.getFilterValue() as string) ?? ""
           }
           onChange={(event) =>
-            table.getColumn("institution")?.setFilterValue(event.target.value)
+            table.getColumn("paper_title")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

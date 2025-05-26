@@ -140,11 +140,11 @@ const styles = StyleSheet.create({
     color: "#ffffff",
   },
   logoImage: {
-    height: 30,
+    height: 20,
     marginLeft: 8,
   },
   largeLogoImage: {
-    height: 75,
+    height: 60,
     marginLeft: 8,
   },
   mainDocumentTitleSection: {
@@ -529,9 +529,12 @@ export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
           <View style={styles.invoiceToSection}>
             <Text style={styles.sectionTitle}>INVOICE TO</Text>
             <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Author Type</Text>
+              <Text style={styles.detailLabel}>Author Names</Text>
               <Text style={styles.detailValue}>
-                : {invoice.author_type || "N/A"}
+                :{" "}
+                {Array.isArray(invoice.author_names)
+                  ? invoice.author_names.join(", ")
+                  : invoice.author_names || "N/A"}
               </Text>
             </View>
             <View style={styles.detailRow}>
@@ -547,7 +550,13 @@ export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Paper ID (LoA ID)</Text>
               <Text style={styles.detailValue}>
-                : {invoice.loa_id || "N/A"}
+                : {invoice.paper_id || "N/A"}
+              </Text>
+            </View>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Paper Title</Text>
+              <Text style={styles.detailValue}>
+                : {invoice.paper_title || "N/A"}
               </Text>
             </View>
           </View>
@@ -682,7 +691,7 @@ export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
                 Virtual Account Number
               </Text>
               <Text style={styles.paymentDetailValue}>
-                : {invoice.virtual_account_id || "8321066202400048 (Fallback)"}
+                : {invoice.nomor_virtual_akun || "N/A"}
               </Text>
             </View>
             <View style={styles.paymentDetailRow}>
@@ -734,7 +743,7 @@ export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
                 Beneficiary Bank Account No.
               </Text>
               <Text style={styles.paymentDetailValue}>
-                : {invoice.bank_transfer_id || "1310095019917 (Fallback)"}
+                : {invoice.beneficiary_bank_account_no || "N/A"}
               </Text>
             </View>
             <View style={styles.paymentDetailRow}>
@@ -811,14 +820,15 @@ export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
 
           {/* Signature Section */}
           <View style={styles.signatureSection}>
-            <Text style={styles.signatureDate}>
-              Bandung, {currentDateFormatted}
-            </Text>
+            <Text style={styles.signatureDate}>{currentDateFormatted}</Text>
+            <Image src={invoice.picture} />
             <View style={styles.signaturePlaceholderGraphic} />
             <Text style={styles.signatureIcodsaLogo}>ICICyTA</Text>
-            <Text style={styles.signatureName}>Dr. Putu Harry Gunawan</Text>
+            <Text style={styles.signatureName}>
+              {invoice.nama_penandatangan}
+            </Text>
             <Text style={styles.signatureTitle}>
-              General Chair ICICyTA {receiptYear}
+              {invoice.jabatan_penandatangan} {receiptYear}
             </Text>
           </View>
         </View>

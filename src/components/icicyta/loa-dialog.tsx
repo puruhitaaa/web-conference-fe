@@ -47,6 +47,8 @@ const formSchema = z.object({
   status: z.enum(["Accepted", "Rejected"]),
   tempat_tanggal: z.string().min(1, "Place and date is required"),
   signature_id: z.coerce.string().min(1, "Signature ID is required"),
+  theme_conference: z.string().min(1, "theme conference is required"),
+  place_date_conference: z.string().min(1, "Place and date is required"),
   created_by: z.number().optional(),
 });
 
@@ -72,6 +74,8 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
       status: "Accepted",
       tempat_tanggal: "",
       signature_id: "",
+      theme_conference: "",
+      place_date_conference: "",
     },
   });
 
@@ -107,15 +111,19 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
         status: status as "Accepted" | "Rejected",
         tempat_tanggal: loa.tempat_tanggal,
         signature_id: loa.signature_id,
+        theme_conference: loa.theme_conference,
+        place_date_conference: loa.place_date_conference,
       });
     } else if (open && !loa) {
       form.reset({
         paper_id: "",
-        paper_title: "ICICYTA 2023",
+        paper_title: "",
         author_names: [],
         tempat_tanggal: "",
         status: "Accepted",
         signature_id: "",
+        theme_conference: "",
+        place_date_conference: "",
       });
     }
   }, [open, loa, form]);
@@ -148,8 +156,9 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
       toast.success("LoA created successfully");
       onOpenChange(false);
     },
-    onError: () => {
+    onError: (error: any) => {
       toast.error("Failed to create LoA");
+      console.error(error);
     },
     onSettled: () => {
       setIsSubmitting(false);
@@ -274,6 +283,40 @@ export function LoaDialog({ open, onOpenChange, mode, loa }: LoaDialogProps) {
                     <FormControl>
                       <Input
                         placeholder="Jakarta, 1 January 2023"
+                        {...field}
+                        disabled={isViewMode}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="theme_conference"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Conference Theme Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter conference theme name.."
+                        {...field}
+                        disabled={isViewMode}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="place_date_conference"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Place and Date of Conference</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="e.g., Jakarta, 12 Dec 2025"
                         {...field}
                         disabled={isViewMode}
                       />

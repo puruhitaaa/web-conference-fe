@@ -56,13 +56,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logoImage: {
-    // For utm-university.png (smallest)
-    height: 30,
+    height: 20,
     marginLeft: 8,
   },
   largeLogoImage: {
-    // For tel-u.png and unbi-university.png
-    height: 75, // As per previous adjustments
+    height: 60,
     marginLeft: 8,
   },
   // Styles for the main content area of the receipt (titles, details)
@@ -153,6 +151,11 @@ const styles = StyleSheet.create({
     color: "#9461AF",
     marginBottom: 3,
   },
+  image: {
+    width: 50,
+    height: 80,
+    marginBottom: 10,
+  },
   multiReceiptTable: {
     display: "flex",
     width: "auto",
@@ -185,7 +188,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     position: "absolute",
-    bottom: 20,
+    bottom: 0,
     left: 0,
     right: 0,
     textAlign: "center",
@@ -408,11 +411,17 @@ export const SingleReceiptPdfDocument: React.FC<SingleReceiptPdfProps> = ({
           {/* Signature Section */}
           <View style={styles.signatureSection}>
             <Text style={styles.signatureDate}>{currentDateFormatted}</Text>
+            <Image
+              src={`data:image/png;base64,${receipt.picture}`}
+              style={styles.image}
+            />
             <View style={styles.signaturePlaceholderGraphic} />
             <Text style={styles.signatureIcicytaLogo}>ICICyTA</Text>
-            <Text style={styles.signatureName}>Dr. Putu Harry Gunawan</Text>
+            <Text style={styles.signatureName}>
+              {receipt.nama_penandatangan}
+            </Text>
             <Text style={styles.signatureTitle}>
-              General Chair ICICyTA {receiptYear}
+              {receipt.jabatan_penandatangan} {receiptYear}
             </Text>
           </View>
         </View>{" "}

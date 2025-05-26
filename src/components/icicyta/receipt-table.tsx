@@ -32,20 +32,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, FileText } from "lucide-react";
-import { ReceiptPrintDialog } from "./receipt-print-dialog";
 import toast from "react-hot-toast";
-// import { useAuthStore } from "@/lib/auth/authStore";
+import { ReceiptPrintDialog } from "./receipt-print-dialog";
+import { ReceiptDialog } from "./receipt-dialog";
 
 export type Receipt = {
   id: string;
   invoice_no: string;
   received_from: string;
-  amount: number | string;
+  amount: string | number;
   in_payment_of: string;
-  payment_date: Date | string;
+  payment_date: string | Date;
   paper_id: string;
   paper_title: string;
   signature_id: string;
+  picture: string;
+  nama_penandatangan: string;
+  jabatan_penandatangan: string;
   created_by: string;
   created_at: string | Date;
   updated_at: string | Date;
@@ -54,15 +57,16 @@ export type Receipt = {
 export function ReceiptTable() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  // const [, setIsDialogOpen] = useState(false);
-  // const [, setCurrentReceipt] = useState<Receipt | null>(null);
-  // const [, setDialogMode] = useState<"view">("view");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [currentReceipt, setCurrentReceipt] = useState<Receipt | null>(null);
+  const [dialogMode, setDialogMode] = useState<"create" | "edit" | "view">(
+    "create"
+  );
   const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
   const [currentPrintReceipt, setCurrentPrintReceipt] =
     useState<Receipt | null>(null);
   const [printMode, setPrintMode] = useState<"single" | "all">("all");
 
-  // const user = useAuthStore((state) => state.user);
   const queryClient = useQueryClient();
 
   const { data: receipts = [], isLoading } = useQuery<Receipt[]>({
@@ -92,31 +96,17 @@ export function ReceiptTable() {
     }
   };
 
-  // const handleEdit = (receipt: Receipt) => {
-  //   setCurrentReceipt(receipt);
-  //   setDialogMode("edit");
-  //   setIsDialogOpen(true);
-  // };
+  const handleEdit = (receipt: Receipt) => {
+    setCurrentReceipt(receipt);
+    setDialogMode("edit");
+    setIsDialogOpen(true);
+  };
 
-  // const handleView = (receipt: Receipt) => {
-  //   setCurrentReceipt(receipt);
-  //   setDialogMode("view");
-  //   setIsDialogOpen(true);
-  // };
-
-  // const handleCreate = () => {
-  //   setCurrentReceipt(null);
-  //   setDialogMode("create");
-  //   setIsDialogOpen(true);
-  // };
-
-  // const handlePrint = () => {
-  //   if (!receipts.length) return toast.error("No receipts found");
-
-  //   setPrintMode("all");
-  //   setCurrentPrintReceipt(null);
-  //   setIsPrintDialogOpen(true);
-  // };
+  const handleView = (receipt: Receipt) => {
+    setCurrentReceipt(receipt);
+    setDialogMode("view");
+    setIsDialogOpen(true);
+  };
 
   const handlePrintSingle = (receipt: Receipt) => {
     setPrintMode("single");
@@ -135,7 +125,7 @@ export function ReceiptTable() {
     },
     {
       accessorKey: "paper_title",
-      header: "Conferece Title",
+      header: "Conference Title",
       cell: ({ row }) => {
         const title = row.getValue("paper_title") as string;
         return (
@@ -149,7 +139,11 @@ export function ReceiptTable() {
       accessorKey: "amount",
       header: "Amount",
       cell: ({ row }) => {
-        const amount = parseFloat(row.getValue("amount"));
+        const amountValue = row.getValue("amount");
+        const amount =
+          typeof amountValue === "string"
+            ? parseFloat(amountValue)
+            : (amountValue as number);
         const formatted = new Intl.NumberFormat("id-ID", {
           style: "currency",
           currency: "IDR",
@@ -174,6 +168,15 @@ export function ReceiptTable() {
     {
       accessorKey: "payment_date",
       header: "Payment Date",
+      cell: ({ row }) => {
+        const dateValue = row.getValue("payment_date") as string | Date;
+        const formattedDate = new Date(dateValue).toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        });
+        return formattedDate;
+      },
     },
     {
       id: "actions",
@@ -191,12 +194,12 @@ export function ReceiptTable() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              {/* <DropdownMenuItem onClick={() => handleView(receipt)}>
+              <DropdownMenuItem onClick={() => handleView(receipt)}>
                 View
-              </DropdownMenuItem> */}
-              {/* <DropdownMenuItem onClick={() => handleEdit(receipt)}>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleEdit(receipt)}>
                 Edit
-              </DropdownMenuItem> */}
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handlePrintSingle(receipt)}>
                 <FileText className="mr-2 h-4 w-4" />
                 Print PDF
@@ -321,22 +324,33 @@ export function ReceiptTable() {
         </Button>
       </div>
 
-      <ReceiptPrintDialog
-        open={isPrintDialogOpen}
-        onOpenChange={setIsPrintDialogOpen}
-        data={
-          printMode === "single" && currentPrintReceipt
-            ? currentPrintReceipt
-            : receipts
-        }
-        title={printMode === "single" ? "Print Receipt" : "Print All Receipts"}
-        description={
-          printMode === "single"
-            ? "Preview and print this receipt"
-            : "Preview and print all receipts"
-        }
-        singleMode={printMode === "single"}
+      <ReceiptDialog
+        open={isDialogOpen}
+        mode={dialogMode}
+        onOpenChange={setIsDialogOpen}
+        receipt={currentReceipt}
       />
+
+      {isPrintDialogOpen && currentPrintReceipt && (
+        <ReceiptPrintDialog
+          open={isPrintDialogOpen}
+          onOpenChange={setIsPrintDialogOpen}
+          data={
+            printMode === "single" && currentPrintReceipt
+              ? currentPrintReceipt
+              : receipts
+          }
+          title={
+            printMode === "single" ? "Print Receipt" : "Print All Receipts"
+          }
+          description={
+            printMode === "single"
+              ? "Preview and print this receipt"
+              : "Preview and print all receipts"
+          }
+          singleMode={printMode === "single"}
+        />
+      )}
     </div>
   );
 }

@@ -44,7 +44,12 @@ export type Loa = {
   author_names: string | string[];
   status: "Accepted" | "Rejected";
   tempat_tanggal: string;
+  picture: string;
+  nama_penandatangan: string;
+  jabatan_penandatangan: string;
   signature_id: string;
+  theme_conference: string;
+  place_date_conference: string;
   created_at: Date;
 };
 
@@ -184,6 +189,22 @@ export function LoaTable() {
       header: "Place & Date",
     },
     {
+      accessorKey: "place_date_conference",
+      header: "Conference Held On",
+      cell: ({ row }) => {
+        const title = row.getValue("place_date_conference") as string;
+        return (
+          <div className="max-w-[250px] truncate whitespace-nowrap overflow-hidden">
+            {title}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "theme_conference",
+      header: "Theme",
+    },
+    {
       id: "actions",
       header: "Actions",
       cell: ({ row }) => {
@@ -248,12 +269,12 @@ export function LoaTable() {
       <div className="flex items-center justify-between py-4">
         <Input
           disabled={isLoading}
-          placeholder="Filter by paper ID..."
+          placeholder="Filter by paper title..."
           value={
-            (table.getColumn("paper_id")?.getFilterValue() as string) ?? ""
+            (table.getColumn("paper_title")?.getFilterValue() as string) ?? ""
           }
           onChange={(event) =>
-            table.getColumn("paper_id")?.setFilterValue(event.target.value)
+            table.getColumn("paper_title")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

@@ -31,20 +31,21 @@ const styles = StyleSheet.create({
     // fontWeight: "ital",
   },
   subTitle: {
-    fontSize: 7,
+    fontSize: 8,
     fontWeight: "bold",
     color: "#ffffff",
   },
   logoContainer: {
     flexDirection: "row",
     alignItems: "center",
+    fontSize: 10,
   },
   largeLogoImage: {
-    height: 75,
+    height: 60,
     marginLeft: 8,
   },
   logoImage: {
-    height: 30,
+    height: 20,
     marginLeft: 8,
   },
   table: {
@@ -263,6 +264,8 @@ export const SingleLoaPdfDocument: React.FC<SingleLoaPdfProps> = ({ loa }) => {
   const editionNumber = currentYear - startYear + 1;
   console.log(loa.picture);
 
+  const signatureImageSrc = `http://localhost:8000/storage/signatures/p4xkIG6dcWpWmdfibclvlRrbBBKuUby2dDqZbPtR.png`;
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -351,15 +354,15 @@ export const SingleLoaPdfDocument: React.FC<SingleLoaPdfProps> = ({ loa }) => {
               <Text style={styles.loaLabel}>
                 The {getOrdinal(editionNumber)} International Conference on Data
                 Science and Its Applications {currentYear} (ICoDSA {currentYear}
-                ) with theme {loa.theme_conference} will be held on{" "}
+                ) with theme {loa.theme_conference}, will be held at{" "}
                 {loa.place_date_conference}.
               </Text>
             </View>
 
             <View style={styles.signatureSection}>
               <Text style={styles.signatureDate}>{loa.tempat_tanggal}</Text>
-              <Image src={loa.picture} />
-
+              <Image src={signatureImageSrc} />
+              <View style={styles.signaturePlaceholderGraphic} />
               <Text style={styles.signatureIcodsaLogo}>ICoDSA</Text>
               <Text style={styles.signatureName}>{loa.nama_penandatangan}</Text>
               <Text style={styles.signatureTitle}>
