@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   signatureDate: { marginBottom: 20 },
   signaturePlaceholderGraphic: {
     width: 120,
-    height: 40,
+    height: 20,
     borderBottomWidth: 1,
     borderColor: "#000000",
     marginBottom: 5,
@@ -147,6 +147,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#59c3d0",
     marginBottom: 3,
+  },
+  pictureUrl: {
+    width: 90,
   },
 });
 
@@ -262,9 +265,22 @@ export const SingleLoaPdfDocument: React.FC<SingleLoaPdfProps> = ({ loa }) => {
   const startYear = 2018;
   const currentYear = new Date().getFullYear();
   const editionNumber = currentYear - startYear + 1;
-  console.log(loa.picture);
 
-  const signatureImageSrc = `http://localhost:8000/storage/signatures/p4xkIG6dcWpWmdfibclvlRrbBBKuUby2dDqZbPtR.png`;
+  const getSignatureImageUrl = (picturePath: string) => {
+    if (!picturePath) return null;
+
+    if (picturePath.startsWith("http")) {
+      return picturePath;
+    }
+
+    const baseUrl = "https://docssummit-api.humicprototyping.com";
+    return `${baseUrl}/storage/${picturePath}`;
+  };
+
+  const signatureImageUrl = getSignatureImageUrl(loa.picture);
+
+  console.log("Signature Image URL:", signatureImageUrl);
+  console.log("Original loa.picture:", loa.picture);
 
   return (
     <Document>
@@ -361,9 +377,13 @@ export const SingleLoaPdfDocument: React.FC<SingleLoaPdfProps> = ({ loa }) => {
 
             <View style={styles.signatureSection}>
               <Text style={styles.signatureDate}>{loa.tempat_tanggal}</Text>
-              <Image src={signatureImageSrc} />
+              {signatureImageUrl ? (
+                <Image src={signatureImageUrl} style={styles.pictureUrl} />
+              ) : (
+                <View style={styles.signaturePlaceholderGraphic} />
+              )}
               <View style={styles.signaturePlaceholderGraphic} />
-              <Text style={styles.signatureIcodsaLogo}>ICoDSA</Text>
+              {/* <Text style={styles.signatureIcodsaLogo}>ICoDSA</Text> */}
               <Text style={styles.signatureName}>{loa.nama_penandatangan}</Text>
               <Text style={styles.signatureTitle}>
                 {loa.jabatan_penandatangan} {currentYear}

@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   signatureDate: { marginBottom: 20 },
   signaturePlaceholderGraphic: {
     width: 120,
-    height: 40,
+    height: 10,
     borderBottomWidth: 1,
     borderColor: "#000000",
     marginBottom: 5,
@@ -196,6 +196,9 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     backgroundColor: "#9461AF",
     paddingVertical: 20,
+  },
+  pictureUrl: {
+    width: 90,
   },
 });
 
@@ -312,6 +315,19 @@ export const SingleReceiptPdfDocument: React.FC<SingleReceiptPdfProps> = ({
   const currentYear = new Date().getFullYear();
   const editionNumber = currentYear - startYear + 1;
 
+  const getSignatureImageUrl = (picturePath: string) => {
+    if (!picturePath) return null;
+
+    if (picturePath.startsWith("http")) {
+      return picturePath;
+    }
+
+    const baseUrl = "https://docssummit-api.humicprototyping.com";
+    return `${baseUrl}/storage/${picturePath}`;
+  };
+
+  const signatureImageUrl = getSignatureImageUrl(receipt.picture);
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -411,12 +427,13 @@ export const SingleReceiptPdfDocument: React.FC<SingleReceiptPdfProps> = ({
           {/* Signature Section */}
           <View style={styles.signatureSection}>
             <Text style={styles.signatureDate}>{currentDateFormatted}</Text>
-            <Image
-              src={`data:image/png;base64,${receipt.picture}`}
-              style={styles.image}
-            />
+            {signatureImageUrl ? (
+              <Image src={signatureImageUrl} style={styles.pictureUrl} />
+            ) : (
+              <View style={styles.signaturePlaceholderGraphic} />
+            )}
             <View style={styles.signaturePlaceholderGraphic} />
-            <Text style={styles.signatureIcicytaLogo}>ICICyTA</Text>
+            {/* <Text style={styles.signatureIcicytaLogo}>ICICyTA</Text> */}
             <Text style={styles.signatureName}>
               {receipt.nama_penandatangan}
             </Text>

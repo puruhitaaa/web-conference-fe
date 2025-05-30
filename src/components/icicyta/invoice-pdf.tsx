@@ -329,14 +329,14 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   signatureSection: {
-    marginTop: 2,
+    marginTop: 0,
     marginBottom: 20,
     width: 200,
     fontSize: 9,
     alignItems: "center",
     marginLeft: "auto",
   },
-  signatureDate: { marginBottom: 20 },
+  signatureDate: { marginBottom: 10, marginTop: 145 },
   signaturePlaceholderGraphic: {
     width: 120,
     height: 40,
@@ -351,6 +351,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#9461AF", // Match header color
     marginBottom: 3,
+  },
+  pictureUrl: {
+    width: 90,
   },
 });
 
@@ -481,6 +484,19 @@ export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
   const editionNumber = currentYear - startYear + 1;
   const currentDateFormatted = formatDate(new Date());
   const receiptYear = getReceiptYear(invoice.updated_at);
+
+  const getSignatureImageUrl = (picturePath: string) => {
+    if (!picturePath) return null;
+
+    if (picturePath.startsWith("http")) {
+      return picturePath;
+    }
+
+    const baseUrl = "https://docssummit-api.humicprototyping.com";
+    return `${baseUrl}/storage/${picturePath}`;
+  };
+
+  const signatureImageUrl = getSignatureImageUrl(invoice.picture);
 
   return (
     <Document>
@@ -821,9 +837,13 @@ export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
           {/* Signature Section */}
           <View style={styles.signatureSection}>
             <Text style={styles.signatureDate}>{currentDateFormatted}</Text>
-            <Image src={invoice.picture} />
+            {signatureImageUrl ? (
+              <Image src={signatureImageUrl} style={styles.pictureUrl} />
+            ) : (
+              <View style={styles.signaturePlaceholderGraphic} />
+            )}
             <View style={styles.signaturePlaceholderGraphic} />
-            <Text style={styles.signatureIcodsaLogo}>ICICyTA</Text>
+            {/* <Text style={styles.signatureIcodsaLogo}>ICICyTA</Text> */}
             <Text style={styles.signatureName}>
               {invoice.nama_penandatangan}
             </Text>

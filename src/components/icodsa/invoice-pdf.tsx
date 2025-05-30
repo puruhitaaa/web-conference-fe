@@ -353,10 +353,10 @@ const styles = StyleSheet.create({
   signatureDate: { marginBottom: 20 },
   signaturePlaceholderGraphic: {
     width: 120,
-    height: 40,
+    height: 10,
     borderBottomWidth: 1,
     borderColor: "#000000",
-    marginBottom: 5,
+    marginBottom: 3,
   },
   signatureName: { fontWeight: "bold", fontSize: 10 },
   signatureTitle: { fontSize: 9 },
@@ -365,6 +365,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#59c3d0", // Match header color
     marginBottom: 3,
+  },
+  pictureUrl: {
+    width: 90,
   },
 });
 
@@ -514,6 +517,21 @@ export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
   const currentYear = new Date().getFullYear();
   const editionNumber = currentYear - startYear + 1;
 
+  const getSignatureImageUrl = (picturePath: string) => {
+    if (!picturePath) return null;
+
+    if (picturePath.startsWith("http")) {
+      return picturePath;
+    }
+
+    const baseUrl = "https://docssummit-api.humicprototyping.com";
+    return `${baseUrl}/storage/${picturePath}`;
+  };
+
+  const signatureImageUrl = getSignatureImageUrl(invoice.picture);
+
+  console.log("Signature Image URL:", signatureImageUrl);
+  console.log("Original loa.picture:", invoice.picture);
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -833,9 +851,13 @@ export const SingleInvoicePdfDocument: React.FC<SingleInvoicePdfProps> = ({
           {/* Signature Section */}
           <View style={styles.signatureSection}>
             <Text style={styles.signatureDate}>{currentDateFormatted}</Text>
-            <Image src={invoice.picture} />
+            {signatureImageUrl ? (
+              <Image src={signatureImageUrl} style={styles.pictureUrl} />
+            ) : (
+              <View style={styles.signaturePlaceholderGraphic} />
+            )}
             <View style={styles.signaturePlaceholderGraphic} />
-            <Text style={styles.signatureIcodsaLogo}>ICoDSA</Text>
+            {/* <Text style={styles.signatureIcodsaLogo}>ICoDSA</Text> */}
             <Text style={styles.signatureName}>
               {invoice.nama_penandatangan}
             </Text>

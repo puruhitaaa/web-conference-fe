@@ -66,7 +66,7 @@ export function LoginForm({
         );
 
         if (loginSuccess) {
-          toast.success(res.data.message || "Login successful");
+          toast.success("Login successful");
           console.log(parsedRole);
           if (parsedRole.role === 1) {
             navigate({
@@ -76,8 +76,8 @@ export function LoginForm({
             navigate({
               to: "/",
               replace: true,
-              // ignoreBlocker: true,
             });
+            console.log(parsedRole);
           }
         } else {
           toast.error("Failed to authenticate");
